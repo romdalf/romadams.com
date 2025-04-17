@@ -24,7 +24,15 @@ Previously, he served as a Principal Architect at Ondat, a cloud-native storage 
 
 ## Portfolio of contributions, articles and webinars
 
-### Contributor and author
+### Book contributor and author
+|Title|Published on|Date|
+|-----|------------|----|
+|Kubernetes Secrets Handbook |[packt](https://www.packtpub.com/en-us/product/kubernetes-secrets-handbook-9781805127154) | 01/2024
+|Kubernetes – An Enterprise Guide | [packt](https://www.packtpub.com/en-us/product/kubernetes-an-enterprise-guide-9781835081754) | 08/2024
+|The Kubernetes Bible | [packt](https://www.packtpub.com/en-us/product/the-kubernetes-bible-9781835468241) | 11/2024
+
+
+### Articles contributor and author
 |Title|Published on|Date|
 |-----|------------|----|
 |Digital Wallonia, a proposal for a digital plan (in French)|[Belgian Walloon Regional Government](https://content.digitalwallonia.be/post/20180322085717/Plan-du-Num%C3%A9rique_Rapport-du-Conseil-du-Num%C3%A9rique_VF.pdf)|09/2015|
@@ -35,7 +43,7 @@ Previously, he served as a Principal Architect at Ondat, a cloud-native storage 
 |The biggest gap in Kubernetes storage architecture|[TheNewStack.io](https://thenewstack.io/whats-the-biggest-gap-in-kubernetes-storage-architecture/)|07/2021|
 |How to solve kubernetes persistent storage challenges|[TheNewStack.io](https://thenewstack.io/how-to-solve-kubernetes-persistent-storage-challenges/)|06/2021|
 |Deploying cloud native persistent storage in the age of containers|[TheNewStack.io](https://thenewstack.io/deploying-cloud-native-persistent-storage-in-the-age-of-containers/)|05/2021|
-|Can Kubernetes help solve automation challneges?|[opensource.com](https://opensource.com/article/22/10/kubernetes-solve-automation-challenges)|10/2022
+|Can Kubernetes help solve automation challenges?|[opensource.com](https://opensource.com/article/22/10/kubernetes-solve-automation-challenges)|10/2022
 
 
 ### Live Presentations
