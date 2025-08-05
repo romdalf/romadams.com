@@ -128,11 +128,11 @@ nav:
     - namespace:
       - rdht/namespace/index.md
     - app resources:
-      - rhdt/appresources/index.md
+      - rdht/appresources/index.md
     - source2image:
-      - rhdt/s2i/index.md 
+      - rdht/s2i/index.md 
     - helm charts:
-      - rhdt/helm/index.md 
+      - rdht/helm/index.md 
     
     
     
