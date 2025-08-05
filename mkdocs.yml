@@ -124,5 +124,15 @@ nav:
         - ntap/trident/index.md 
       - console plugin for Protect:
         - ntap/protect/index.md
+  - red hat:
+    - namespace:
+      - rdht/namespace/index.md
+    - app resources:
+      - rhdt/appresources/index.md
+    - source2image:
+      - rhdt/s2i/index.md 
+    - helm charts:
+      - rhdt/helm/index.md 
+    
     
     
