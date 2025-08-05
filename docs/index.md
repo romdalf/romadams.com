@@ -2,8 +2,10 @@
 ## Who's Rom 👋 
  <a href="https://www.linkedin.com/in/romdalf/"> <img src="https://img.shields.io/badge/LinkedIn-Connect-blue" /></a> 
 
-Rom Adams (né Romuald Vandepoel) is an open-source strategy and C-Suite advisor with two decades of experience in the IT industry. He is a cloud-native expert dedicated to helping customer and partner organizations modernize and transform their data center strategies through enterprise open-source solutions. 
-Rom, a former AppDev Solutions Specialist at Red Hat, designed and implemented hybrid cloud solutions. With previously held roles at NetApp and Ondat (acquired by Akamai), he became a certified expert in storage and hybrid cloud infrastructure. Rom is a frequent speaker and writer on culture, process, and technology. He is passionate about transformation and innovation with open-source and cloud-native technologies, actively contributing to open-source projects and advising on open-source and sustainability strategies.
+Rom Adams (né Romuald Vandepoel) is an open-source strategy and C-Suite advisor with two decades of experience in the IT industry. He is a cloud-native expert dedicated to helping customer and partner organizations modernize and transform their data center strategies through enterprise open-source solutions.  
+
+Rom, a former AppDev Solutions Specialist at Red Hat, designed and implemented hybrid cloud solutions. With previously held roles at NetApp and Ondat (acquired by Akamai), he became a certified expert in storage and hybrid cloud infrastructure. Rom is a frequent speaker and writer on culture, process, and technology. He is passionate about transformation and innovation with open-source and cloud-native technologies, actively contributing to open-source projects and advising on open-source and sustainability strategies.   
+
 Currently, Rom serves as a Principal Software Engineer in the NetApp Office of the CTO, within the Innovation and Solutions group. In this role, he prototypes new solutions for sovereign AI workloads, leveraging containerization and cloud technologies to drive innovation.
 
 ## Contribution Stats 🔭
