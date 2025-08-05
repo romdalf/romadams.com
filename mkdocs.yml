@@ -121,8 +121,8 @@ nav:
       - ntap/neo/index.md 
     - openshift:
       - console plugin for Trident:
-        - ntap/ocp/console_trident.md 
+        - ntap/trident/index.md 
       - console plugin for Protect:
-        - ntap/ocp/console_protect.md
+        - ntap/protect/index.md
     
     
