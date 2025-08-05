@@ -25,7 +25,7 @@ theme:
     - content.code.copy
     - content.code.select
   icon:
-    logo: fontawesome/solid/code-merge
+    logo: fontawesome/solid/circle-user
     repo: fontawesome/brands/github
   name: material
   palette: 
