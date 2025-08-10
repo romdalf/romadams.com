@@ -2,6 +2,7 @@ site_name: romadams.com
 site_url: https://romadams.com
 
 plugins:
+  - blog
   - git-revision-date-localized:
       enable_creation_date: true
   - git-authors
@@ -109,9 +110,11 @@ markdown_extensions:
 nav:
   - about: 
     - index.md
+  - blog:
+    - blog/index.md
   - blog-test:
-    - blog/index.md 
-    - vectordb: blog/vectordb.md
+    - blog-test/index.md 
+    - vectordb: blog-test/vectordb.md
   - foss:
     - abacc-rag:
       - foss/abacc/index.md 
