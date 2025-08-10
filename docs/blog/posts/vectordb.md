@@ -1,6 +1,6 @@
 ---
 authors:
-  - Rom Adams
+  - romadalf
 categories:
   - database
   - AI
