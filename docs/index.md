@@ -1,3 +1,6 @@
+--- 
+title: Who is Rom Adams?
+---
 
 ## Who's Rom 👋 
  <a href="https://www.linkedin.com/in/romdalf/"> <img src="https://img.shields.io/badge/LinkedIn-Connect-blue" /></a> 

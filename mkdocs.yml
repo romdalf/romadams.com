@@ -109,6 +109,9 @@ markdown_extensions:
 nav:
   - about: 
     - index.md
+  - blog:
+    - index.md 
+    - vectordb: vectordb.md
   - foss:
     - abacc-rag:
       - foss/abacc/index.md 
