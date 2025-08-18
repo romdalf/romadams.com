@@ -111,7 +111,7 @@ Go in ```Administration\Cluster Settings``` and search for ```Console``` then cl
 ![openshift administration settings with filtered search to console](../../images/openshift-administration-settings.png)
 
 Click on the tab ```Console Plugins``` to display the existing list of plugins. The plugin should appear in the list as "Disabled" if the deployment with Helm was successfuly.   
-![openshift-console-plugins-list](.../../images/openshift-console-plugins-list.png)
+![openshift-console-plugins-list](../../images/openshift-console-plugins-list.png)
 
 Click on ```Disabled``` to open the ```Console plugin Enablement``` window and change it to ```Enable``` then ```Save```.   
 ![openshift-console-plugin-enablement](../../images/openshift-console-plugin-enablement.png)
@@ -120,7 +120,7 @@ After a couple of minutes, a notification should invite you to refresh the conso
 ![openshift-console-plugin-refresh](../../images/openshift-console-plugin-refresh.png)
 
 After refreshing the web console, the Description should have been populated and the new ```NetApp Protect Console``` is now appearing in the menu item list ready to be used.   
-![openshift-console-plugin-refreshed](.../../images/openshift-console-plugin-refreshed.png)
+![openshift-console-plugin-refreshed](../../images/openshift-console-plugin-refreshed.png)
 
 #### Uninstall a plugin
 First disable the plugin as following the same steps as for enabling it. 
