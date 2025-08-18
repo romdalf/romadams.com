@@ -2,9 +2,9 @@ site_name: romadams.com
 site_url: https://romadams.com
 
 plugins:
-  - blog:
-      authors: true  
-      authors_file: "{blog}/.authors.yml"
+  # - blog:
+  #     authors: true  
+  #     authors_file: "{blog}/.authors.yml"
   - git-revision-date-localized:
       enable_creation_date: true
   - git-authors
@@ -137,11 +137,11 @@ nav:
           - rdht/s2i/index.md 
         - helm charts:
           - rdht/helm/index.md 
-  - blog:
-    - blog/index.md
-  - blog-test:
-    - blog-test/index.md 
-    - vectordb: blog-test/vectordb.md
+  # - blog:
+  #   - blog/index.md
+  # - blog-test:
+  #   - blog-test/index.md 
+  #   - vectordb: blog-test/vectordb.md
     
     
     
