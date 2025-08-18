@@ -14,19 +14,17 @@ We offer two powerful plugins to meet your storage management needs:
 
 1. netapp-openshift-console-trident
 This is your plugin for core Trident functionalities. It provides an intuitive GUI to:
-
-* Manage volumes and snapshots.
-* Create clones from snapshots. 
-* Import existing NetApp volumes to Red Hat OpenShift, even if not created with Trident
-* Expose volumes to Red Hat OpenShift AI for advanced data engineering workflows
+    * Manage volumes and snapshots.
+    * Create clones from snapshots. 
+    * Import existing NetApp volumes to Red Hat OpenShift, even if not created with Trident
+    * Expose volumes to Red Hat OpenShift AI for advanced data engineering workflows
 
 2. netapp-openshift-console-protect
 This is your plugin for workload protection with Trident Protect. It provides a simplified GUI to:
-
-* Create, schedule, and trigger on-demand application-aware local backups 
-* Create, schedule, and trigger on-demand application-aware remote backups 
-* Manage in-place restore
-* Manage restore as a new workload
+    * Create, schedule, and trigger on-demand application-aware local backups 
+    * Create, schedule, and trigger on-demand application-aware remote backups 
+    * Manage in-place restore
+    * Manage restore as a new workload
 
 ## Getting Started
 Both projects are currently in a pre-release phase and require an Early Access Program agreement. This agreement will grant you the necessary access token to deploy the plugins on your OpenShift cluster.
