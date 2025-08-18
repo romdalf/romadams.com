@@ -117,30 +117,31 @@ nav:
   - blog-test:
     - blog-test/index.md 
     - vectordb: blog-test/vectordb.md
-  - foss:
-    - abacc-rag:
-      - foss/abacc/index.md 
-    - dialup: 
-      - foss/dialup/index.md 
-    - kleidi:
-      - foss/kleidi/index.md
-  - netapp:
-    - neo:
-      - ntap/neo/index.md 
-    - openshift:
-      - console plugin for Trident:
-        - ntap/trident/index.md 
-      - console plugin for Protect:
-        - ntap/protect/index.md
-  - red hat:
-    - namespace:
-      - rdht/namespace/index.md
-    - app resources:
-      - rdht/appresources/index.md
-    - source2image:
-      - rdht/s2i/index.md 
-    - helm charts:
-      - rdht/helm/index.md 
+  - portfolio:
+    - foss:
+      - abacc-rag:
+        - foss/abacc/index.md 
+      - dialup: 
+        - foss/dialup/index.md 
+      - kleidi:
+        - foss/kleidi/index.md
+    - netapp:
+      - neo client:
+        - ntap/neo/index.md 
+      - openshift:
+        - console plugin for Trident:
+          - ntap/trident/index.md 
+        - console plugin for Protect:
+          - ntap/protect/index.md
+    - red hat:
+      - namespace:
+        - rdht/namespace/index.md
+      - app resources:
+        - rdht/appresources/index.md
+      - source2image:
+        - rdht/s2i/index.md 
+      - helm charts:
+        - rdht/helm/index.md 
     
     
     
