@@ -1,1 +1,0 @@
-# NetApp Protect Console for Red Hat OpenShift

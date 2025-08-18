@@ -123,11 +123,8 @@ nav:
       - netapp:
         - neo client:
           - ntap/neo/index.md 
-        - openshift:
-          - console plugin for Trident:
-            - ntap/trident/index.md 
-          - console plugin for Protect:
-            - ntap/protect/index.md
+        - netapp consoles for openshift:
+          - ntap/trident/index.md 
       - red hat:
         - namespace:
           - rdht/namespace/index.md
