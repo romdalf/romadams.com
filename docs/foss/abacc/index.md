@@ -21,11 +21,11 @@ The components are:
 
 For more details, you can go through [the documentation](DOCS/README.md)
 
-# Documentation
+## Documentation
 
-## Concepts
+### Concepts
 
-## Attributes
+### Attributes
 The construct of additional attributes is to enrich the classic POSIX permissions in two ways:
 - the operation-based attributes, like adding an attribute to a file to set an append-only, immutable, secure, and undeletable attribute.
 - the extended attributes that a user would define through the 4 existing classes: user, security, system, and trusted.
@@ -58,7 +58,7 @@ user.status="Final"
 > [!NOTE]
 > Exciting? Not really! While the [operation-based attributes](ops-attr.md) have a direct impact, the extended attributes don't. The impact will be handled at an application level, similar to the ABACC RAG.
 
-## ABACC RAG
+### ABACC RAG
 Organizations have been pouring millions of files into their storage systems over the years in an unstructured manner, resulting in a so-called data lake that resembles a data swamp more closely. As-is, this file real estate is a cost, a security burden, and a lifecycle nightmare with little return on investment.  
 
 With data classification at scale, these cons can become pros, fostering a new wave of creativity and productivity within an organization. Thanks to the AI hype, the use of data pipelines has revamped data management practices to produce “drinkable” data from an organization's data swamp. 
@@ -211,18 +211,18 @@ Successfully processed and stored 5 chunks for 'wiske_document.txt'.
 
 #### frontend
 The frontend is a simple Node.js, React, and Tailwind user interface.
-![image](assets/Screenshot%20From%202025-07-03%2018-49-17.png)
+![image](images/Screenshot%20From%202025-07-03%2018-49-17.png)
 
 The user context influences the retrieval of the documents based on the extended attributes:
 
 1. Suske prompts "when was the conference?", the backend returns zero documents, the LLM has no context, and can't provide an answer:  
 
-![image](assets/Screenshot%20From%202025-07-03%2018-47-29.png)
+![image](images/Screenshot%20From%202025-07-03%2018-47-29.png)
 
 
 1. Wiske prompts for the same question, the backend provides access to the two files, and the LLM uses these two files as context to return an answer:
 
-![image](assets/Screenshot%20From%202025-07-03%2018-41-05.png)
+![image](images/Screenshot%20From%202025-07-03%2018-41-05.png)
 
 
 
