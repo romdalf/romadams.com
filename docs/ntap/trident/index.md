@@ -1,6 +1,7 @@
 # NetApp Console Plugins for Red Hat OpenShift
 
-Welcome to the NetApp OpenShift Console Plugins, a suite of open-source projects designed to significantly improve how you interact NetApp storage within your Red Hat OpenShift environment. These native OpenShift console plugins bring powerful storage and data management capabilities directly to your fingertips, simplifying complex tasks and accelerating your development and deployment workflows.
+Welcome to the NetApp OpenShift Console Plugins, a suite of open-source projects designed to significantly improve how you interact NetApp storage within your Red Hat OpenShift environment.  
+These native OpenShift console plugins bring powerful storage and data management capabilities directly to your fingertips, simplifying complex tasks and accelerating your development and deployment workflows.
 
 ## Why Use the NetApp Console Plugins?
 Managing persistent storage for critical workload can be complex, especially in a containerized environment. Our plugins solve this by providing an intuitive graphical user interface (GUI) inside the OpenShift console, allowing you to:
