@@ -113,28 +113,28 @@ nav:
   - about: 
     - index.md
     - portfolio:
-      - index.md
+      - portfolio/index.md
       - foss:
         - abacc-rag:
-          - foss/abacc/index.md 
+          - portfolio/foss/abacc/index.md 
         - dialup: 
-          - foss/dialup/index.md 
+          - portfolio/foss/dialup/index.md 
         - kleidi:
-          - foss/kleidi/index.md
+          - portfolio/foss/kleidi/index.md
       - netapp:
         - neo client:
-          - ntap/neo/index.md 
+          - portfolio/ntap/neo/index.md 
         - netapp consoles for openshift:
-          - ntap/trident/index.md 
+          - portfolio/ntap/trident/index.md 
       - red hat:
         - namespace:
-          - rdht/namespace/index.md
+          - portfolio/rdht/namespace/index.md
         - app resources:
-          - rdht/appresources/index.md
+          - portfolio/rdht/appresources/index.md
         - source2image:
-          - rdht/s2i/index.md 
+          - portfolio/rdht/s2i/index.md 
         - helm charts:
-          - rdht/helm/index.md 
+          - portfolio/rdht/helm/index.md 
   # - blog:
   #   - blog/index.md
   # - blog-test:
