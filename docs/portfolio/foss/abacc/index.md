@@ -1,4 +1,4 @@
-# ABACC RAG
+# abacc rag
 
 ABACC RAG stands for Attribute-Based Access Controlled Context for Retrieval-Augmented Generation, exploring an organization-level AI sovereignty.
 
