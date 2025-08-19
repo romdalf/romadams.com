@@ -73,7 +73,7 @@ The above example established a series of limitations for the project ```my-weba
 The quota can be monitored via:
 
 GUI:  
-![quota-dashboard](../images/quota-dashboard.png)
+![quota-dashboard](../../../images/quota-dashboard.png)
 
 CLI:
 ```

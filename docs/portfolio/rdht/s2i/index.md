@@ -55,43 +55,43 @@ In a nutshell, the service reads the URL's path and prints it back in logs and b
 
 ***Within the Developer view***    
 Click on the "+Add" button and select the "Import from Git"   
-![helm repo](../images/s2i_01.png)    
+![helm repo](../../../images/s2i_01.png)    
 
 Get the Git repo URL   
-![helm repo](../images/s2i_02.png)    
+![helm repo](../../../images/s2i_02.png)    
 
 Insert the Git repo URL in the corresponding field  
-![helm repo](../images/s2i_03.png)   
+![helm repo](../../../images/s2i_03.png)   
 
 
 OCP will preconfigure everything to build and deploy. However, you can still customize everything like the "Import Strategy" and relevant build image and target image: 
-![helm repo](../images/s2i_04.png)    
+![helm repo](../../../images/s2i_04.png)    
 
 
 Clicking create will generate all the needed objects to build, deploy, and access the application.  
-![helm repo](../images/s2i_05.png)   
+![helm repo](../../../images/s2i_05.png)   
 
 
 Build logs can be reviewed live by clicking on the "Go" symbol, and "View logs" within the "Resouces" tab. When finished, a green label will appear to mark the build "Complete"
-![helm repo](../images/s2i_06.png)   
+![helm repo](../../../images/s2i_06.png)   
 
 
 Returning to the "Topology" tab, click the "Go" symbol, the route for the application is available in the "Resouces" tab. 
-![helm repo](../images/s2i_07.png)   
+![helm repo](../../../images/s2i_07.png)   
 
 
 Modifying the URL by appending "s2i" at the end will print the path both in the browser and the logs.  
-![helm repo](../images/s2i_08.png)   
-![helm repo](../images/s2i_09.png)   
+![helm repo](../../../images/s2i_08.png)   
+![helm repo](../../../images/s2i_09.png)   
 
 
 The "Project" tab provides an overview of all the objects created within the Project,   
-![helm repo](../images/s2i_10.png)   
+![helm repo](../../../images/s2i_10.png)   
 
 
 As an example, the clicking "Service", then exploring the ```hello-path-git``` service object in YAML is a good start to understand how the manifest would look like:   
-![helm repo](../images/s2i_11.png)   
-![helm repo](../images/s2i_12.png)   
+![helm repo](../../../images/s2i_11.png)   
+![helm repo](../../../images/s2i_12.png)   
 
 The below output is a stream down version of the ```Service``` manifest that could be applied to create the relates ```Service``` API object to expose the port 8080:   
 
