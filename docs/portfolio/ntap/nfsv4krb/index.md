@@ -3,12 +3,12 @@
 ## Problem Statement
 With an ONTAP NFSv4 configured with Kerberos, all mounts will require a valid Kerberos ticket, and all entities interacting at the filesystem level will also need a valid Kerberos ticket.   
 This also includes, by design from a security standpoint, an SVM being set up as follows:   
-* The root junction path, ```/```, is configured with ```krb5``` to force Kerberos authentication at the node level.   
-* All exports are configured with ```sys``` to allow a classic non-Kerberos authentication.     
+- The root junction path, ```/```, is configured with ```krb5``` to force Kerberos authentication at the node level.   
+- All exports are configured with ```sys``` to allow a classic non-Kerberos authentication.     
 
 The outcomes of such a configuration are:   
-* The junction mount at the node level with a valid Kerberos authentication will succeed.   
-* Only root and an authenticated user with Kerberos will have access to the mount of the junction path **AND** all volumes from this junction path.   
+- The junction mount at the node level with a valid Kerberos authentication will succeed.   
+- Only root and an authenticated user with Kerberos will have access to the mount of the junction path **AND** all volumes from this junction path.   
 
 We can conclude that setting up the junction path with Kerberos will create a least privileged permission set for the whole tree, even if ```sys```  is defined for underlying volumes. Presenting the data path through NFSv4 with Kerberos authentication enforced a valid ticket for all services and users that would interact with the filesystem, even when a different authentication construct is forced at the export level, the Kerberos authentication takes precedence and enforces a least privileged permission set.
 
@@ -23,14 +23,14 @@ Some legacy applications would call for an interactive shell environment with on
     This document should be considered a Request for Comments reference, rather than a solution brief or technical report.   
 
 ### Architectural components
-* Kubernetes Control Plane: Manages all cluster resources, including Persistent Volumes (PVs) and Persistent Volume Claims (PVCs).
-* Trident CSI with NAS Driver: Interface between Kubernetes storage and the NFS server.
-* Key Distribution Center (KDC): Issues tickets for authentication, could be an Active Directory, FreeIPA, ...
-* ONTAP NFSv4: expose the data path service, the export configuration, and validate authentication.
-* Secrets Store CSI Driver: Optional component to mount secrets from external stores into Pods.
-* Client credentials: Either node machine creds (host/<node>) or per-user delegated creds; do not use the server’s nfs/<server> key on the client.
-* Application Pod: Contains the application container and the storage volume.
-* Kerberos Configuration on nodes (krb5.conf, nfs-utils, idmap): Required for node-side Kerberos.
+- Kubernetes Control Plane: Manages all cluster resources, including Persistent Volumes (PVs) and Persistent Volume Claims (PVCs).
+- Trident CSI with NAS Driver: Interface between Kubernetes storage and the NFS server.
+- Key Distribution Center (KDC): Issues tickets for authentication, could be an Active Directory, FreeIPA, ...
+- ONTAP NFSv4: expose the data path service, the export configuration, and validate authentication.
+- Secrets Store CSI Driver: Optional component to mount secrets from external stores into Pods.
+- Client credentials: Either node machine creds (host/<node>) or per-user delegated creds; do not use the server’s nfs/<server> key on the client.
+- Application Pod: Contains the application container and the storage volume.
+- Kerberos Configuration on nodes (krb5.conf, nfs-utils, idmap): Required for node-side Kerberos.
 
 # Potential Solution Paths
 
@@ -38,23 +38,23 @@ Some legacy applications would call for an interactive shell environment with on
 Securely mounting NFSv4 volumes using Kerberos in Kubernetes using CSI drivers, and enabling both application runtimes and multi-user SSH workflows with per-user authorization.
 
 Provide an overview of:   
-* Mount NFSv4 volumes with Kerberos (krb5/krb5i/krb5p) using a Trident.   
-* Configure nodes and backends (e.g., NetApp ONTAP via Trident).   
-* Support application runtime    
-* Support multi-user access via SSH with GSSAPI and credential delegation.   
-* Avoid common pitfalls (Pod vs node Kerberos, keytab handling, idmapping).   
+- Mount NFSv4 volumes with Kerberos (krb5/krb5i/krb5p) using a Trident.   
+- Configure nodes and backends (e.g., NetApp ONTAP via Trident).   
+- Support application runtime    
+- Support multi-user access via SSH with GSSAPI and credential delegation.   
+- Avoid common pitfalls (Pod vs node Kerberos, keytab handling, idmapping).   
 
 ### Important constraints and clarifications   
-* NFSv4 Kerberos negotiation happens on the node: the CSI Node plugin mounts the NFS volume in the host namespace, and the node’s kernel NFS client plus rpc.gssd perform GSSAPI. Pods do not run rpc.gssd for these mounts.    
-* Configure Kerberos (krb5.conf, nfs-utils, rpc.gssd/gssproxy, idmap) on the nodes. Injecting krb5.conf into a Pod does not affect node-side Kerberos.   
-* For a non-ONTAP solution, do not distribute the NFS server’s keytab (nfs/<server>@REALM) to clients/Pods. Use either:    
- * Node-scoped machine credentials (e.g., host/<node>@REALM) in /etc/krb5.keytab for system mounts; or    
- * Per-user delegated credentials, making the user’s ccache visible to the node’s rpc.gssd (e.g., KEYRING caches, hostPath ccaches with cruid, or gssproxy).   
-* The Secrets Store CSI Driver pulls from external secret stores (optionally syncing to a Kubernetes Secret). It does not read Kubernetes Secrets directly. This improves the security posture if no Kubernetes KMS plugin is used to encrypt the ETCD data payloads for Secrets and ConfigMaps.   
-* The NFS server validates Kerberos service tickets locally with its keytab; it typically does not call back to the KDC on each request.   
-* If the NFS provisioner mounts the export to create subdirectories, it also needs Kerberos credentials on its node.   
-* For NetApp Trident (provisioner csi.trident.netapp.io), Kerberos is enabled on the ONTAP SVM/backend (Kerberos interface, SVM realm join, export-policy rules). StorageClass parameters do not enable Kerberos; mountOptions with sec=krb5, krb5i, or krb5p only signal the client to request Kerberos.   
-* In AD environments, ensure consistent UID/GID-to-principal mapping across nodes and the NFS server (idmap/nfsidmap with SSSD on nodes; appropriate name services on the server) so the same user maps to the duplicate IDs.   
+- NFSv4 Kerberos negotiation happens on the node: the CSI Node plugin mounts the NFS volume in the host namespace, and the node’s kernel NFS client plus rpc.gssd perform GSSAPI. Pods do not run rpc.gssd for these mounts.    
+- Configure Kerberos (krb5.conf, nfs-utils, rpc.gssd/gssproxy, idmap) on the nodes. Injecting krb5.conf into a Pod does not affect node-side Kerberos.   
+- For a non-ONTAP solution, do not distribute the NFS server’s keytab (nfs/<server>@REALM) to clients/Pods. Use either:    
+ - Node-scoped machine credentials (e.g., host/<node>@REALM) in /etc/krb5.keytab for system mounts; or    
+ - Per-user delegated credentials, making the user’s ccache visible to the node’s rpc.gssd (e.g., KEYRING caches, hostPath ccaches with cruid, or gssproxy).   
+- The Secrets Store CSI Driver pulls from external secret stores (optionally syncing to a Kubernetes Secret). It does not read Kubernetes Secrets directly. This improves the security posture if no Kubernetes KMS plugin is used to encrypt the ETCD data payloads for Secrets and ConfigMaps.   
+- The NFS server validates Kerberos service tickets locally with its keytab; it typically does not call back to the KDC on each request.   
+- If the NFS provisioner mounts the export to create subdirectories, it also needs Kerberos credentials on its node.   
+- For NetApp Trident (provisioner csi.trident.netapp.io), Kerberos is enabled on the ONTAP SVM/backend (Kerberos interface, SVM realm join, export-policy rules). StorageClass parameters do not enable Kerberos; mountOptions with sec=krb5, krb5i, or krb5p only signal the client to request Kerberos.   
+- In AD environments, ensure consistent UID/GID-to-principal mapping across nodes and the NFS server (idmap/nfsidmap with SSSD on nodes; appropriate name services on the server) so the same user maps to the duplicate IDs.   
 
 ### Kubernetes node configuration
 
@@ -112,8 +112,8 @@ Nobody-User = nobody
 Nobody-Group = nogroup
 ```
 
-* Install and configure SSSD so node NSS resolves AD users/groups; ensure nsswitch.conf includes “sss” for passwd/group.   
-* Ensure the SVM/backend resolves the same identities consistently (LDAP/AD).   
+- Install and configure SSSD so node NSS resolves AD users/groups; ensure nsswitch.conf includes “sss” for passwd/group.   
+- Ensure the SVM/backend resolves the same identities consistently (LDAP/AD).   
 
 ### ONTAP SVM configuration checklist (NFSv4 + Kerberos)
 
@@ -192,17 +192,17 @@ vserver export-policy check-access -vserver vs1 -volume projects -client-ip 10.0
 ```
 
 #### Considerations
-!!!! tip   
-    * Time: ```cluster time-service ntp server show```   
-    * Kerberos/AD: ```event log show -severity NOTICE..EMERGENCY -message-name secd.*```   
-    * DNS: ```vserver services name-service dns check -vserver vs1```   
-    * LDAP: ```vserver services name-service ldap check -vserver vs1 -client-config ad-ldap```   
-    * Ensure SVM v4-id-domain matches client idmapd domain; clients mount with nfsvers=4.1 and sec=krb5[p|i].   
+!!! tip   
+    - Time: ```cluster time-service ntp server show```   
+    - Kerberos/AD: ```event log show -severity NOTICE..EMERGENCY -message-name secd.*```   
+    - DNS: ```vserver services name-service dns check -vserver vs1```   
+    - LDAP: ```vserver services name-service ldap check -vserver vs1 -client-config ad-ldap```   
+    - Ensure SVM v4-id-domain matches client idmapd domain; clients mount with nfsvers=4.1 and sec=krb5[p|i].   
 
 !!! note
-    * CIFS is not required for NFS Kerberos.   
-    * Enable Kerberos on each NFS data LIF and use its FQDN for mounts.    
-    * Use “unix” security style for NFS-only; mixed/ntfs introduces ACL translation complexity.   
+    - CIFS is not required for NFS Kerberos.   
+    - Enable Kerberos on each NFS data LIF and use its FQDN for mounts.    
+    - Use “unix” security style for NFS-only; mixed/ntfs introduces ACL translation complexity.   
 
 ### BackendConfig, StorageClass, and PVC
 
@@ -270,11 +270,10 @@ spec:
 
 #### Considerations
 
-!!! note   
-    - Reason for unixPermissions: "0770"   
-      - Principle of least privilege: rwx for owner and group; no access for others. Even after Kerberos auth, “other” users on the realm can’t read/exec the PV root.   
-      - Group-collaboration: lets a team (shared GID) fully use the volume while keeping everyone else out. Fits multi-user SSH where users share a POSIX group.   
-      - Safe defaults with ONTAP “unix” security-style: applies at volume/qtree root at create time; you can further tighten/relax later or add NFSv4 ACLs.   
+!!! note "Reason for unixPermissions 0770"
+    - Principle of least privilege: rwx for owner and group; no access for others. Even after Kerberos auth, “other” users on the realm can’t read/exec the PV root.   
+    - Group-collaboration: lets a team (shared GID) fully use the volume while keeping everyone else out. Fits multi-user SSH where users share a POSIX group.   
+    - Safe defaults with ONTAP “unix” security-style: applies at volume/qtree root at create time; you can further tighten/relax later or add NFSv4 ACLs.   
     - When to adjust   
       - Single-user volume: use "0700".   
       - Read-only for others: "0750".   
@@ -751,18 +750,18 @@ klist
 
 #### Considerations
 !!! note  
-    * RWO vs RWX: Two containers in the same Pod can share a single PVC with ReadWriteOnce (RWO). The volume is mounted once on the node, and both containers see the same mount. A ReadWriteOnce Pod is also fine for the sidecar-in-same-Pod pattern, but it will block any additional Pod from mounting the PVC. With the Trident NAS driver, choose RWX for flexibility and scalability.   
-    * Security: The sidecar brings a host/<fqdn> Kerberos keytab into the app Pod. A separate SSH Pod sharing the PVC avoids placing that credential in the app Pod and reduces blast radius.   
-    * Kerberos: sshd reads its host/<fqdn> key from /etc/krb5.keytab to accept GSS; it does not run kinit.   
-    * Delegation: Users must enable GSSAPIDelegateCredentials. Use KEYRING:persistent:%{uid} and align UIDs so delegated user tickets are visible to node rpc.gssd for per-user NFS.   
-    * NFS mount: The CSI Node plugin mounts on the node; Pod-side tickets do not alter the NFS mount unless the credential cache is visible to the node (KEYRING/file ccache + cruid, or gssproxy).    
-    * Hardening: Apply NetworkPolicies, runAsUser/runAsGroup/fsGroup, drop capabilities, restrict sshd users/groups.    
-    * Operations: Separate Pod lets you patch/rotate sshd and keytabs independently of the app and apply tighter PodSecurity/PSaC policies.    
+    - RWO vs RWX: Two containers in the same Pod can share a single PVC with ReadWriteOnce (RWO). The volume is mounted once on the node, and both containers see the same mount. A ReadWriteOnce Pod is also fine for the sidecar-in-same-Pod pattern, but it will block any additional Pod from mounting the PVC. With the Trident NAS driver, choose RWX for flexibility and scalability.   
+    - Security: The sidecar brings a host/<fqdn> Kerberos keytab into the app Pod. A separate SSH Pod sharing the PVC avoids placing that credential in the app Pod and reduces blast radius.   
+    - Kerberos: sshd reads its host/<fqdn> key from /etc/krb5.keytab to accept GSS; it does not run kinit.   
+    - Delegation: Users must enable GSSAPIDelegateCredentials. Use KEYRING:persistent:%{uid} and align UIDs so delegated user tickets are visible to node rpc.gssd for per-user NFS.   
+    - NFS mount: The CSI Node plugin mounts on the node; Pod-side tickets do not alter the NFS mount unless the credential cache is visible to the node (KEYRING/file ccache + cruid, or gssproxy).    
+    - Hardening: Apply NetworkPolicies, runAsUser/runAsGroup/fsGroup, drop capabilities, restrict sshd users/groups.    
+    - Operations: Separate Pod lets you patch/rotate sshd and keytabs independently of the app and apply tighter PodSecurity/PSaC policies.    
 
 
 ## Top Takeaways
-* Kerberos for NFSv4 is negotiated on the node by rpc.gssd; Pods don’t run Kerberos for these mounts.
-* Do not distribute the NFS server’s keytab to Pods; use node machine creds or delegated user creds.
-* Use KEYRING credential caches (or file ccaches + cruid) so rpc.gssd can use delegated SSH user tickets.
-* StorageClass mountOptions (sec=krb5[p|i]) only signal the client; backend/SVM must be Kerberos-enabled.
-* Align identity resolution (SSSD/idmapd on nodes and LDAP/AD on the SVM) for consistent UID/GID
+- Kerberos for NFSv4 is negotiated on the node by rpc.gssd; Pods don’t run Kerberos for these mounts.
+- Do not distribute the NFS server’s keytab to Pods; use node machine creds or delegated user creds.
+- Use KEYRING credential caches (or file ccaches + cruid) so rpc.gssd can use delegated SSH user tickets.
+- StorageClass mountOptions (sec=krb5[p|i]) only signal the client; backend/SVM must be Kerberos-enabled.
+- Align identity resolution (SSSD/idmapd on nodes and LDAP/AD on the SVM) for consistent UID/GID
