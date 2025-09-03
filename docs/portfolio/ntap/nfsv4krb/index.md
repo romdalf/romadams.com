@@ -385,11 +385,11 @@ spec:
 
 ## Basic implementation for an application runtime with application-level Kerberos
 
-This implementation addresses the following requirements:
-*   **Separation of concerns:** The sidecar handles all the complex Kerberos logic, allowing the application container to remain lightweight and focused on its core function.
-*   **Security:** Only the sidecar needs access to the sensitive keytab file. The main application only ever sees the less-sensitive ticket cache.
-*   **Automated renewal:** The sidecar ensures the Kerberos tickets are automatically renewed, preventing authentication failures for long-running applications without manual intervention.
-*   **Simplified application development:** Developers don't need to embed Kerberos dependencies or logic into their application images. The sidecar pattern is managed at the platform level.
+This implementation addresses the following requirements:   
+* **Separation of concerns:** The sidecar handles all the complex Kerberos logic, allowing the application container to remain lightweight and focused on its core function.   
+* **Security:** Only the sidecar needs access to the sensitive keytab file. The main application only ever sees the less-sensitive ticket cache.   
+* **Automated renewal:** The sidecar ensures the Kerberos tickets are automatically renewed, preventing authentication failures for long-running applications without manual intervention.   
+* **Simplified application development:** Developers don't need to embed Kerberos dependencies or logic into their application images. The sidecar pattern is managed at the platform level.   
 
 On top of the previous diagram for the NFSv4 Kerberos, the following workflow is added to handle the application-level Kerberos authentication:
 
@@ -567,23 +567,23 @@ spec:
 ## Basic implementation for a multi-user environment
 When multiple users need SSH access to a pod and authenticate using GSSAPI (Kerberos), the architecture becomes more complex. Instead of a single sidecar managing a shared service keytab, the setup must handle individual user authentication and delegate credentials. The most secure and robust approach involves a secure SSH server inside the pod, configured for GSSAPI, with GSSAPIDelegateCredentials set to ```yes``` to forward user tickets for NFS access. 
 
-Architectural components
-* Kubernetes Control Plane, CSI Driver, KDC, NFSv4 Server: These function as before.
-* SSH Server Container: A new container in the pod runs an SSH server (e.g., OpenSSH). It must be configured to use GSSAPI.
+Architectural components   
+* Kubernetes Control Plane, CSI Driver, KDC, NFSv4 Server: These function as before.   
+* SSH Server Container: A new container in the pod runs an SSH server (e.g., OpenSSH). It must be configured to use GSSAPI.   
 * Kerberos Sidecar: The sidecar's role is now limited to providing a service keytab for the SSH server to use for its own host principal. It manages and renews this ticket, but individual user tickets are handled differently.
-* Application Container: Runs the main application.
-* Shared Volumes: Multiple shared emptyDir volumes are used: one for the SSH service keytab and krb5.conf, and another for user-specific ticket caches.
-* Kerberos-Enabled Clients: Users' machines must have a Kerberos client (kinit) and an SSH client configured for GSSAPI.
-* Credential Delegation: Crucial for multi-user NFS access. When users connect via SSH with GSSAPI, they delegate their Kerberos tickets, which are then used for NFSv4 authentication.
-* sshd_config: The SSH server configuration file within the container must be set to allow GSSAPI authentication and credential delegation.
+* Application Container: Runs the main application.   
+* Shared Volumes: Multiple shared emptyDir volumes are used: one for the SSH service keytab and krb5.conf, and another for user-specific ticket caches.   
+* Kerberos-Enabled Clients: Users' machines must have a Kerberos client (kinit) and an SSH client configured for GSSAPI.   
+* Credential Delegation: Crucial for multi-user NFS access. When users connect via SSH with GSSAPI, they delegate their Kerberos tickets, which are then used for NFSv4 authentication.   
+* sshd_config: The SSH server configuration file within the container must be set to allow GSSAPI authentication and credential delegation.   
 
-This implementation addresses the following requirements for production-readiness for a multi-user interactive environment:
-*   **Dedicated SSH Server:** A container running an SSH server is required. Exposing it requires a Kubernetes Service.
-*   **Service Authentication:** The Kerberos Sidecar handles authenticating the SSH server itself using a `host/` principal, so the pod can listen and establish a secure connection.
-*   **User Authentication:** Individual users authenticate via SSH using their own credentials, a more secure approach than sharing a service keytab.
-*   **Credential Delegation:** The `GSSAPIDelegateCredentials` SSH option is essential. It allows the SSH server to place a copy of the user's TGT into a ticket cache that can be used by services inside the pod (like NFS).
-*   **Per-Session Ticket Cache:** The SSH server places the delegated user ticket into a cache that is scoped to the user's SSH session, providing proper isolation for multi-user access to NFS.
-*   **Implicit NFS Access:** Once authenticated and inside the pod, the user's commands will automatically use the delegated Kerberos ticket for NFSv4 operations, with permissions tied to their own Kerberos principal.
+This implementation addresses the following requirements for production-readiness for a multi-user interactive environment:   
+*   **Dedicated SSH Server:** A container running an SSH server is required. Exposing it requires a Kubernetes Service.   
+*   **Service Authentication:** The Kerberos Sidecar handles authenticating the SSH server itself using a `host/` principal, so the pod can listen and establish a secure connection.   
+*   **User Authentication:** Individual users authenticate via SSH using their own credentials, a more secure approach than sharing a service keytab.   
+*   **Credential Delegation:** The `GSSAPIDelegateCredentials` SSH option is essential. It allows the SSH server to place a copy of the user's TGT into a ticket cache that can be used by services inside the pod (like NFS).   
+*   **Per-Session Ticket Cache:** The SSH server places the delegated user ticket into a cache that is scoped to the user's SSH session, providing proper isolation for multi-user access to NFS.   
+*   **Implicit NFS Access:** Once authenticated and inside the pod, the user's commands will automatically use the delegated Kerberos ticket for NFSv4 operations, with permissions tied to their own Kerberos principal.   
 
 ```mermaid
 sequenceDiagram
