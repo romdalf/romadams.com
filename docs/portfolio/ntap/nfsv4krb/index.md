@@ -1,8 +1,9 @@
 # NetApp NFSv4 with Kerberos for containerized legacy and cloud-native applications 
 
 ## Problem Statement
-With an ONTAP NFSv4 configured with Kerberos, all mounts will require a valid Kerberos ticket, and all entities interacting at the filesystem level will also need a valid Kerberos ticket.   
-This also includes, by design from a security standpoint, an SVM being set up as follows:   
+With an ONTAP NFSv4 configured with Kerberos, all mounts will require a valid Kerberos ticket, and all entities, service and user, interacting at the filesystem level will also need a valid Kerberos ticket.  
+
+This also applies, by design from a security standpoint, to export policies that somehow attempt to bypass the krb5 auth being set up at the junction path as follows:   
 - The root junction path, ```/```, is configured with ```krb5``` to force Kerberos authentication at the node level.   
 - All exports are configured with ```sys``` to allow a classic non-Kerberos authentication.     
 
