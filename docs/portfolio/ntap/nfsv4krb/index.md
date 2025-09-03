@@ -6,11 +6,15 @@
 ## Background
 In a Kubernetes environment, integrating Kerberos with NFSv4 on ONTAP using Trident, the NetApp Container Storage Interface (CSI) driver, combines storage orchestration with secure, strong authentication and encryption. This approach requires coordinating the Kubernetes nodes, the CSI driver, and the Kerberos authentication system to provision and mount volumes for pods dynamically. 
 
-A cloud-native application Pod running without an interactive shell environment for users (no direct connection to a shell at the container level) will only require a valid Kerberos ticket to access the file system without encountering any 'permission denied' operations. This is a decoupled architecture where services and users are authorized or authenticated at the application layer:   
-- authorization of services and users using a framework like Oauth2 granting third-parties with limited access to their data without revealing credentials.  
-- authentication of services and users using a framework like OpenID Connect (OIDC) built on top of OAuth2 validating identity for authentiction with user information to process capabilities like Single Sign-On.
+### Cloud-native application
+A cloud-native application Pod running without an interactive shell environment for users (no direct connection to a shell at the container level) will only require a valid Kerberos ticket to access the file system without encountering any 'permission denied' operations. This is a decoupled architecture where services and users are authorized or authenticated at the application layer while the filesystem is handled by the CSI at the node level:
+- A Kerberos ticket is negotiated at the node level by the CSI, verified by the NFS service, then the NFS export is mounted to the Pod.      
+- Authorization of services and users using a framework like Oauth2 granting third-parties with limited access to their data without revealing credentials.    
+- Authentication of services and users using a framework like OpenID Connect (OIDC) built on top of OAuth2 validating identity for authentiction with user information to process capabilities like Single Sign-On.  
 
-Some legacy applications would call for an interactive shell environment with one or multiple users to run the application or even access the Pod to interact with the application. When integrating with Kerberos, all users who will interact with the filesystem in any fashion will require a valid Kerberos ticket to avoid any permission denied operations. This represents a challenge during application deployment, and the code may need refactoring.
+### Containerized vintage application
+Containerized vintage applications might require an interactive shell environment for one or multiple users to access the application Pod and interact with the application and filesystem. When integrating with Kerberos, all users interacting with the filesystem will require a valid Kerberos ticket to avoid any 'permission denied' operations. This model doesn't present a decoupled architecture and highly depend on dynamic provisioning and rotation of Kerberos tickets.
+This represents a challenge during application deployment, and the code may need refactoring.
 
  
 
