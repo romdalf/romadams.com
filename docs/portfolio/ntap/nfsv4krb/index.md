@@ -7,18 +7,33 @@
 In a Kubernetes environment, integrating Kerberos with NFSv4 on ONTAP using Trident, the NetApp Container Storage Interface (CSI) driver, combines storage orchestration with secure, strong authentication and encryption. This approach requires coordinating the Kubernetes nodes, the CSI driver, and the Kerberos authentication system to provision and mount volumes for pods dynamically. 
 
 ### Cloud-native application
-A cloud-native application Pod running without an interactive shell environment for users (no direct connection to a shell at the container level) will only require a valid Kerberos ticket to access the file system without encountering any 'permission denied' operations. This is a decoupled architecture where services and users are authorized or authenticated at the application layer while the filesystem is handled by the CSI at the node level:
+A cloud-native application Pod running without an interactive shell environment for users (no direct connection to a shell at the container level) will only require a valid Kerberos ticket to access the file system without encountering any 'permission denied' operations. This is a decoupled architecture where services and users are authorized or authenticated at the application layer while the filesystem is handled by the CSI at the node level:   
 - A Kerberos ticket is negotiated at the node level by the CSI, verified by the NFS service, then the NFS export is mounted to the Pod.      
 - Authorization of services and users using a framework like Oauth2 granting third-parties with limited access to their data without revealing credentials.    
 - Authentication of services and users using a framework like OpenID Connect (OIDC) built on top of OAuth2 validating identity for authentiction with user information to process capabilities like Single Sign-On.  
 
 ### Containerized vintage application
 Containerized vintage applications might require an interactive shell environment for one or multiple users to access the application Pod and interact with the application and filesystem. When integrating with Kerberos, all users interacting with the filesystem will require a valid Kerberos ticket to avoid any 'permission denied' operations. This model doesn't present a decoupled architecture and highly depend on dynamic provisioning and rotation of Kerberos tickets.
-This represents a challenge during application deployment, and the code may need refactoring.
+This represents a challenge during application deployment due to the ephemeral state and immutable nature of containers which might require to refactor both the Deployment strategy and the application code to support the Kubernetes design constraints.
 
- 
+# Potential Solution Paths
 
-## Problem Statement
+#### Main objectives  
+1. Establish a potential secure path to mount volumes using NFSv4 with Kerberos in Kubernetes using Trident.   
+2. Enable both application runtimes and multi-user SSH workflows with per-user authorization.   
+
+### Architectural components   
+- Kubernetes Control Plane: Manages all cluster resources, including Persistent Volumes (PVs) and Persistent Volume Claims (PVCs).
+- Trident CSI with NAS Driver: Interface between Kubernetes storage and the NFS server.
+- Key Distribution Center (KDC): Issues tickets for authentication, could be an Active Directory, FreeIPA, ...
+- ONTAP NFSv4: expose the data path service, the export configuration, and validate authentication.
+- Secrets Store CSI Driver: Optional component to mount secrets from external stores into Pods.
+- Client credentials: Either node machine creds (host/<node>) or per-user delegated creds; do not use the server’s nfs/<server> key on the client.
+- Application Pod: Contains the application container and the storage volume.
+- Kerberos Configuration on nodes (krb5.conf, nfs-utils, idmap): Required for node-side Kerberos.   
+--- 
+
+## Kerberos at the junction path with sys at volume level
 With an ONTAP NFSv4 configured with Kerberos, all mounts will require a valid Kerberos ticket, and all entities, service and user, interacting at the filesystem level will also need a valid Kerberos ticket.  
 
 This also applies, by design from a security standpoint, to export policies that somehow attempt to bypass the krb5 auth being set up at the junction path as follows:   
@@ -31,27 +46,6 @@ The outcomes of such a configuration are:
 
 We can conclude that setting up the junction path with Kerberos will create a least privileged permission set for the whole tree, even if ```sys```  is defined for underlying volumes. Presenting the data path through NFSv4 with Kerberos authentication enforced a valid ticket for all services and users that would interact with the filesystem, even when a different authentication construct is forced at the export level, the Kerberos authentication takes precedence and enforces a least privileged permission set.
 
-### Architectural components   
-- Kubernetes Control Plane: Manages all cluster resources, including Persistent Volumes (PVs) and Persistent Volume Claims (PVCs).
-- Trident CSI with NAS Driver: Interface between Kubernetes storage and the NFS server.
-- Key Distribution Center (KDC): Issues tickets for authentication, could be an Active Directory, FreeIPA, ...
-- ONTAP NFSv4: expose the data path service, the export configuration, and validate authentication.
-- Secrets Store CSI Driver: Optional component to mount secrets from external stores into Pods.
-- Client credentials: Either node machine creds (host/<node>) or per-user delegated creds; do not use the server’s nfs/<server> key on the client.
-- Application Pod: Contains the application container and the storage volume.
-- Kerberos Configuration on nodes (krb5.conf, nfs-utils, idmap): Required for node-side Kerberos.
-
-# Potential Solution Paths
-
-### Objectives
-Securely mounting NFSv4 volumes using Kerberos in Kubernetes using CSI drivers, and enabling both application runtimes and multi-user SSH workflows with per-user authorization.
-
-Provide an overview of:   
-- Mount NFSv4 volumes with Kerberos (krb5/krb5i/krb5p) using a Trident.   
-- Configure nodes and backends (e.g., NetApp ONTAP via Trident).   
-- Support application runtime    
-- Support multi-user access via SSH with GSSAPI and credential delegation.   
-- Avoid common pitfalls (Pod vs node Kerberos, keytab handling, idmapping).   
 
 ### Important constraints and clarifications   
 - NFSv4 Kerberos negotiation happens on the node: the CSI Node plugin mounts the NFS volume in the host namespace, and the node’s kernel NFS client plus rpc.gssd perform GSSAPI. Pods do not run rpc.gssd for these mounts.    
