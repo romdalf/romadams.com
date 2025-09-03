@@ -122,6 +122,8 @@ nav:
         - kleidi:
           - portfolio/foss/kleidi/index.md
       - netapp:
+        - NFSv4 Kerberos with Kubernetes
+          - portfolio/ntap/nfsv4krb/rfc.md
         - neo client:
           - portfolio/ntap/neo/index.md 
         - netapp consoles for openshift:
