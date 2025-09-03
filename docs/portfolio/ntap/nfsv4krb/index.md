@@ -111,8 +111,9 @@ Local-Realms = EXAMPLE.COM
 Nobody-User = nobody
 Nobody-Group = nogroup
 ```
-- Install and configure SSSD so node NSS resolves AD users/groups; ensure nsswitch.conf includes “sss” for passwd/group.
-- Ensure the SVM/backend resolves the same identities consistently (LDAP/AD).
+
+* Install and configure SSSD so node NSS resolves AD users/groups; ensure nsswitch.conf includes “sss” for passwd/group.   
+* Ensure the SVM/backend resolves the same identities consistently (LDAP/AD).   
 
 ### ONTAP SVM configuration checklist (NFSv4 + Kerberos)
 
@@ -191,12 +192,12 @@ vserver export-policy check-access -vserver vs1 -volume projects -client-ip 10.0
 ```
 
 #### Considerations
-Troubleshooting:
-- Time: cluster time-service ntp server show
-- Kerberos/AD: event log show -severity NOTICE..EMERGENCY -message-name secd.*
-- DNS: vserver services name-service dns check -vserver vs1
-- LDAP: vserver services name-service ldap check -vserver vs1 -client-config ad-ldap
-- Ensure SVM v4-id-domain matches client idmapd domain; clients mount with nfsvers=4.1 and sec=krb5[p|i].
+!!!! tip   
+    * Time: ```cluster time-service ntp server show```   
+    * Kerberos/AD: ```event log show -severity NOTICE..EMERGENCY -message-name secd.*```   
+    * DNS: ```vserver services name-service dns check -vserver vs1```   
+    * LDAP: ```vserver services name-service ldap check -vserver vs1 -client-config ad-ldap```   
+    * Ensure SVM v4-id-domain matches client idmapd domain; clients mount with nfsvers=4.1 and sec=krb5[p|i].   
 
 !!! note
     * CIFS is not required for NFS Kerberos.   
@@ -268,16 +269,17 @@ spec:
 ```
 
 #### Considerations
-!!! note
+
+!!! note   
     Reason for unixPermissions: "0770"   
-    * Principle of least privilege: rwx for owner and group; no access for others. Even after Kerberos auth, “other” users on the realm can’t read/exec the PV root.   
-    * Group-collaboration: lets a team (shared GID) fully use the volume while keeping everyone else out. Fits multi-user SSH where users share a POSIX group.   
-    * Safe defaults with ONTAP “unix” security-style: applies at volume/qtree root at create time; you can further tighten/relax later or add NFSv4 ACLs.   
+      * Principle of least privilege: rwx for owner and group; no access for others. Even after Kerberos auth, “other” users on the realm can’t read/exec the PV root.   
+      * Group-collaboration: lets a team (shared GID) fully use the volume while keeping everyone else out. Fits multi-user SSH where users share a POSIX group.   
+      * Safe defaults with ONTAP “unix” security-style: applies at volume/qtree root at create time; you can further tighten/relax later or add NFSv4 ACLs.   
     When to adjust   
-    * Single-user volume: use "0700".   
-    * Read-only for others: "0750".   
-    * World-readable: "0755".   
-    * Team-share with enforced group inheritance: prefer setgid on the directory (02770) so new files inherit the group.     
+      * Single-user volume: use "0700".   
+      * Read-only for others: "0750".   
+      * World-readable: "0755".   
+      * Team-share with enforced group inheritance: prefer setgid on the directory (02770) so new files inherit the group.     
     Ensure the PV root is owned by the correct UID/GID (match your app’s runAsUser/fsGroup or an init job chown). "0770" with root:root won’t help your users; the group must match the consumers.   
 
 
@@ -377,9 +379,9 @@ spec:
 ```
 
 #### Considerations
-!!! note
-    No sidecar attached to the Pod to run ```kinit/krenew``` as the credentials are handled at the node's NFS mount level.   
-    A sidecar is to be used only for application-level Kerberos.   
+!!! note   
+    * No sidecar attached to the Pod to run ```kinit/krenew``` as the credentials are handled at the node's NFS mount level.   
+    * A sidecar is to be used only for application-level Kerberos.   
 
 ## Basic implementation for an application runtime with application-level Kerberos
 
