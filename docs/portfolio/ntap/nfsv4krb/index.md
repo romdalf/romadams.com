@@ -1,5 +1,19 @@
 # NetApp NFSv4 with Kerberos for containerized legacy and cloud-native applications 
 
+!!! warning     
+    This is a **personal work-in-progress** research document in a Request for Comments format, not a solution brief or technical report.  
+
+## Background
+In a Kubernetes environment, integrating Kerberos with NFSv4 on ONTAP using Trident, the NetApp Container Storage Interface (CSI) driver, combines storage orchestration with secure, strong authentication and encryption. This approach requires coordinating the Kubernetes nodes, the CSI driver, and the Kerberos authentication system to provision and mount volumes for pods dynamically. 
+
+A cloud-native application Pod running without an interactive shell environment for users (no direct connection to a shell at the container level) will only require a valid Kerberos ticket to access the file system without encountering any 'permission denied' operations. This is a decoupled architecture where services and users are authorized or authenticated at the application layer:   
+- authorization of services and users using a framework like Oauth2 granting third-parties with limited access to their data without revealing credentials.  
+- authentication of services and users using a framework like OpenID Connect (OIDC) built on top of OAuth2 validating identity for authentiction with user information to process capabilities like Single Sign-On.
+
+Some legacy applications would call for an interactive shell environment with one or multiple users to run the application or even access the Pod to interact with the application. When integrating with Kerberos, all users who will interact with the filesystem in any fashion will require a valid Kerberos ticket to avoid any permission denied operations. This represents a challenge during application deployment, and the code may need refactoring.
+
+ 
+
 ## Problem Statement
 With an ONTAP NFSv4 configured with Kerberos, all mounts will require a valid Kerberos ticket, and all entities, service and user, interacting at the filesystem level will also need a valid Kerberos ticket.  
 
@@ -12,16 +26,6 @@ The outcomes of such a configuration are:
 - Only root and an authenticated user with Kerberos will have access to the mount of the junction path **AND** all volumes from this junction path.   
 
 We can conclude that setting up the junction path with Kerberos will create a least privileged permission set for the whole tree, even if ```sys```  is defined for underlying volumes. Presenting the data path through NFSv4 with Kerberos authentication enforced a valid ticket for all services and users that would interact with the filesystem, even when a different authentication construct is forced at the export level, the Kerberos authentication takes precedence and enforces a least privileged permission set.
-
-## Background
-In a Kubernetes environment, integrating Kerberos with an NFSv4 configuration with ONTAP using Trident, the NetApp Container Storage Interface (CSI) driver, combines storage orchestration with secure, strong authentication and encryption. This approach requires coordinating the Kubernetes nodes, the CSI driver, and the Kerberos authentication system to provision and mount volumes for pods dynamically. 
-
-A cloud-native application workload running without an interactive shell environment will require a valid Kerberos ticket to access the file system without encountering any 'permission denied' operations. Then the application layer would handle authentication using a framework like OpenID Connect (OIDC), not limited to, to bring capabilities like user login through relying parties using their preferred identity provider(s).  
-
-Some legacy applications would call for an interactive shell environment with one or multiple users to run the application or even access the Pod to interact with the application. When integrating with Kerberos, all users who will interact with the filesystem in any fashion will require a valid Kerberos ticket to avoid any permission denied operations. This represents a challenge during application deployment, and the code may need refactoring.
-
-!!! warning     
-    This document should be considered a Request for Comments reference, rather than a solution brief or technical report.   
 
 ### Architectural components   
 - Kubernetes Control Plane: Manages all cluster resources, including Persistent Volumes (PVs) and Persistent Volume Claims (PVCs).
