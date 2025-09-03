@@ -271,16 +271,16 @@ spec:
 #### Considerations
 
 !!! note   
-    Reason for unixPermissions: "0770"   
+    * Reason for unixPermissions: "0770"   
       * Principle of least privilege: rwx for owner and group; no access for others. Even after Kerberos auth, “other” users on the realm can’t read/exec the PV root.   
       * Group-collaboration: lets a team (shared GID) fully use the volume while keeping everyone else out. Fits multi-user SSH where users share a POSIX group.   
       * Safe defaults with ONTAP “unix” security-style: applies at volume/qtree root at create time; you can further tighten/relax later or add NFSv4 ACLs.   
-    When to adjust   
+    * When to adjust   
       * Single-user volume: use "0700".   
       * Read-only for others: "0750".   
       * World-readable: "0755".   
       * Team-share with enforced group inheritance: prefer setgid on the directory (02770) so new files inherit the group.     
-    Ensure the PV root is owned by the correct UID/GID (match your app’s runAsUser/fsGroup or an init job chown). "0770" with root:root won’t help your users; the group must match the consumers.   
+    * Ensure the PV root is owned by the correct UID/GID (match your app’s runAsUser/fsGroup or an init job chown). "0770" with root:root won’t help your users; the group must match the consumers.   
 
 
 #### StorageClass
