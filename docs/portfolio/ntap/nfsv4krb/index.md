@@ -22,7 +22,7 @@ Some legacy applications would call for an interactive shell environment with on
 !!! warning     
     This document should be considered a Request for Comments reference, rather than a solution brief or technical report.   
 
-### Architectural components
+### Architectural components   
 - Kubernetes Control Plane: Manages all cluster resources, including Persistent Volumes (PVs) and Persistent Volume Claims (PVCs).
 - Trident CSI with NAS Driver: Interface between Kubernetes storage and the NFS server.
 - Key Distribution Center (KDC): Issues tickets for authentication, could be an Active Directory, FreeIPA, ...
@@ -97,6 +97,22 @@ set -euxo pipefail
 sudo dnf install -y nfs-utils krb5-workstation
 sudo install -m 0644 -o root -g root examples/node/krb5.conf /etc/krb5.conf
 sudo systemctl enable --now rpc-gssd
+echo "Join the realm and ensure /etc/krb5.keytab contains host/<node>@REALM."
+```
+SUSE (SLES/openSUSE):
+```bash
+set -euxo pipefail
+# Install NFS client + Kerberos client
+sudo zypper refresh
+sudo zypper install -y nfs-client krb5-client
+
+# Install krb5.conf (uses KEYRING ccaches by UID if you keep the template above)
+sudo install -m 0644 -o root -g root examples/node/krb5.conf /etc/krb5.conf
+
+# Enable NFS client stack and Kerberos helpers
+sudo systemctl enable --now nfs-client.target
+sudo systemctl enable --now rpc-gssd.service
+sudo systemctl enable --now nfs-idmapd.service
 echo "Join the realm and ensure /etc/krb5.keytab contains host/<node>@REALM."
 ```
 
