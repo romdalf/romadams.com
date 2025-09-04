@@ -1,7 +1,21 @@
-# NetApp NFSv4 with Kerberos for containerized legacy and cloud-native applications 
+# NetApp NFSv4 with Kerberos for containerized applications 
 
 !!! warning     
-    This is a **personal work-in-progress** research document in a *Request for Comments* format, not a solution brief or technical report.  
+    This document is a research document in a *Request for Comments* format, product of the NetApp Office of the CTO - Innovation & Solutions Group.
+
+    Status: **draft** 
+    Author(s):    
+    - Rom Adams, Principal Software Engineer, Office of the CTO - NetApp Inc.
+    Contributors:  
+    - Elliott Ecton, Technical Marketing Engineer, Shared Platform Product Management - NetApp Inc.
+    - Erik Stjerna, Professional Services Consultant, Consulting - NetApp Inc.
+    - Johannes Wagner, Sr Solution Architect, Solution Engineering - NetApp Inc.
+
+    Copyright Notes
+    Copyright (c) 2025 NetApp Inc. and the persons identified as the document authors and contributors. All rights reserved. https://www.netapp.com/company/legal/copyright/ 
+
+## Abstract
+This RFC highlights the challenges of implementing NFSv4 with Kerberos on Kubernetes for containerized vintage application and drafts solution proposals.
 
 ## Background
 In a Kubernetes environment, integrating NFSv4 with Kerberos on ONTAP using Trident, the NetApp Container Storage Interface (CSI), combines storage orchestration with secure, strong authentication and encryption. This approach requires coordinating the Kubernetes nodes, the CSI, and the Kerberos authentication to provision and mount volumes for pods dynamically.  
@@ -14,7 +28,11 @@ Kerberos is a client-server **authentication protocol** that uses tickets to all
 ACLs provide granular control over file and directory access to define **authorization**, allowing administrators to define who can read, write, or execute files and directories. 
 The NFSv4 server could enforce ACLs. It checks the user's authenticated identity against the ACLs to grant or deny access to resources. When a new file or subdirectory is created within a directory with an ACL, it inherits the access control entries (ACEs) tagged for inheritance from the parent directory's ACL. 
 
-When Kerberos is enabled, ONTAP NFSv4 enforces the authentication to verify the user identity. Once the authentication process is (successfully) done, the authorization process **could** enforce the ACLs too for authorization if enabled (https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html).
+When Kerberos is enabled, ONTAP NFSv4 enforces the authentication to verify the user identity. Once the authentication process is (successfully) done, the authorization process **could** enforce the ACLs too for authorization if enabled.
+
+References:   
+- ONTAP: https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html 
+- TR-4616 NFS Kerberos in ONTAP: https://www.netapp.com/pdf.html?item=/media/19384-tr-4616.pdf 
 
 ### Cloud-native application
 A cloud-native application Pod, running without an interactive shell environment for users (no direct connection to a shell at the container level), will only require a valid Kerberos ticket to access the file system without encountering any 'permission denied' operations. This is a decoupled architecture where services and users are authorized or authenticated at the application layer while the filesystem is handled by the CSI at the node level:   
