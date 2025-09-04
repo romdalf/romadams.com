@@ -1,4 +1,4 @@
-# NFSv4 with Kerberos for containerized applications 
+# NFSv4 authentication and authorizatoin for containerized applications 
 
 !!! warning "Status: **draft**"
 
@@ -18,7 +18,8 @@
 --- 
 
 ## Abstract
-This RFC outlines the technical and operational challenges of implementing NFSv4 with Kerberos authentication in Kubernetes environments, specifically for containerized legacy applications. While cloud-native applications benefit from a decoupled architecture that simplifies Kerberos integration via CSI drivers like NetApp Trident, legacy applications present unique constraints due to their reliance on interactive shell environments and persistent user contexts. The ephemeral and immutable nature of containers complicates Kerberos ticket management, realm joining, and dynamic user provisioning, which are essential for secure access to NFSv4 shares.
+This RFC outlines the technical and operational challenges of implementing NFSv4 with authentication and authorization to improve the security posture of containerized workloads in Kubernetes environments, specifically for legacy applications.   
+While cloud-native applications benefit from a decoupled architecture that simplifies authentication and authorization integration with NFSv4, legacy applications present unique constraints due to their reliance on interactive shell environments and persistent user contexts. The ephemeral and immutable nature of containers complicates authentication and authorization management which are essential for secure access to NFSv4 exports.
 
 --- 
 
