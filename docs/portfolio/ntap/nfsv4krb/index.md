@@ -12,7 +12,10 @@
     - Johannes Wagner, Sr Solution Architect, Solution Engineering - NetApp Inc.    
 
     **Copyright Notes**     
-    Copyright (c) 2025 NetApp Inc. and the persons identified as the document authors and contributors. All rights reserved. https://www.netapp.com/company/legal/copyright/ 
+    Copyright (c) 2025 NetApp Inc. and the persons identified as the document authors and contributors.    
+    All rights reserved. https://www.netapp.com/company/legal/copyright/ 
+
+--- 
 
 ## Abstract
 This RFC outlines the technical and operational challenges of implementing NFSv4 with Kerberos authentication in Kubernetes environments, specifically for containerized legacy applications. While cloud-native applications benefit from a decoupled architecture that simplifies Kerberos integration via CSI drivers like NetApp Trident, legacy applications present unique constraints due to their reliance on interactive shell environments and persistent user contexts. The ephemeral and immutable nature of containers complicates Kerberos ticket management, realm joining, and dynamic user provisioning, which are essential for secure access to NFSv4 shares.
@@ -33,8 +36,9 @@ The NFSv4 server could enforce ACLs. It checks the user's authenticated identity
 When Kerberos is enabled, ONTAP NFSv4 enforces the authentication to verify the user identity. Once the authentication process is (successfully) done, the authorization process **could** enforce the ACLs too for authorization if enabled.
 
 References:   
-- ONTAP: https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html 
-- TR-4616 NFS Kerberos in ONTAP: https://www.netapp.com/pdf.html?item=/media/19384-tr-4616.pdf 
+- NFS Kerberos in ONTAP, NetApp TR-4616: https://www.netapp.com/pdf.html?item=/media/19384-tr-4616.pdf    
+- ONTAP, NetApp: https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html    
+
 
 ### Cloud-native application
 A cloud-native application Pod, running without an interactive shell environment for users (no direct connection to a shell at the container level), will only require a valid Kerberos ticket to access the file system without encountering any 'permission denied' operations. This is a decoupled architecture where services and users are authorized or authenticated at the application layer while the filesystem is handled by the CSI at the node level:   
