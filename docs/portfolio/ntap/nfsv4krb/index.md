@@ -13,7 +13,7 @@
 
     **Copyright Notes**     
     Copyright (c) 2025 NetApp Inc. and the persons identified as the document authors and contributors.    
-    All rights reserved. [https://www.netapp.com/company/legal/copyright/](https://www.netapp.com/company/legal/copyright/)
+    All rights reserved [https://www.netapp.com/company/legal/copyright/](https://www.netapp.com/company/legal/copyright/).
 
 --- 
 
@@ -36,7 +36,7 @@ The NFSv4 server could enforce ACLs. It checks the user's authenticated identity
 When Kerberos is enabled, ONTAP NFSv4 enforces the authentication to verify the user identity. Once the authentication process is (successfully) done, the authorization process **could** enforce the ACLs too for authorization if enabled.
 
 References:   
-- NFS Kerberos in ONTAP, NetApp TR-4616: [https://www.netapp.com/pdf.html?item=/media/19384-tr-4616.pdf](https://www.netapp.com/pdf.html?item=/media/19384-tr-4616.pdf)    
+- NFS Kerberos in ONTAP, NetApp TR-4616: [https://www.netapp.com/media/19384-tr-4616.pdf](https://www.netapp.com/media/19384-tr-4616.pdf)    
 - ONTAP, NetApp: [https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html](https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html)    
 
 
@@ -55,12 +55,21 @@ Supporting a Kerberos will require to review the inner source of the application
 
 --- 
 
-## Solution Proposals
+# Solution Proposals
 
-#### Main objectives
+## Environment
+This section describes the working environment to reproduce the solution proposals.
+
+### Components
+
+
+
+### Main objectives
 1. Establish an iterative path to decouple the different challenges and solution path.  
 2. Establish a potential secure path to mount volumes using NFSv4 with Kerberos in Kubernetes using Trident.   
 3. Enable both application runtimes and multi-user SSH workflows with per-user authorization.   
+
+###
 
 ### Architectural components   
 - Kubernetes Control Plane: Manages all cluster resources, including Persistent Volumes (PVs) and Persistent Volume Claims (PVCs).
