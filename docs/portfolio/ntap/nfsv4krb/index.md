@@ -13,7 +13,7 @@
 
     **Copyright Notes**     
     Copyright (c) 2025 NetApp Inc. and the persons identified as the document authors and contributors.    
-    All rights reserved. https://www.netapp.com/company/legal/copyright/ 
+    All rights reserved. [https://www.netapp.com/company/legal/copyright/](https://www.netapp.com/company/legal/copyright/)
 
 --- 
 
@@ -36,8 +36,8 @@ The NFSv4 server could enforce ACLs. It checks the user's authenticated identity
 When Kerberos is enabled, ONTAP NFSv4 enforces the authentication to verify the user identity. Once the authentication process is (successfully) done, the authorization process **could** enforce the ACLs too for authorization if enabled.
 
 References:   
-- NFS Kerberos in ONTAP, NetApp TR-4616: https://www.netapp.com/pdf.html?item=/media/19384-tr-4616.pdf    
-- ONTAP, NetApp: https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html    
+- NFS Kerberos in ONTAP, NetApp TR-4616: [https://www.netapp.com/pdf.html?item=/media/19384-tr-4616.pdf](https://www.netapp.com/pdf.html?item=/media/19384-tr-4616.pdf)    
+- ONTAP, NetApp: [https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html](https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html)    
 
 
 ### Cloud-native application
