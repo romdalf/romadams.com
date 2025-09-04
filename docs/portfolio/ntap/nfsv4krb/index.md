@@ -1,9 +1,9 @@
 # NetApp NFSv4 with Kerberos for containerized applications 
 
-!!! warning     
+!!! warning "Status: **draft**"
+
     This document is a research document in a *Request for Comments* format, product of the NetApp Office of the CTO - Innovation & Solutions Group.
 
-    Status: **draft** 
     Author(s):    
     - Rom Adams, Principal Software Engineer, Office of the CTO - NetApp Inc.
     Contributors:  
