@@ -1,4 +1,4 @@
-# NetApp NFSv4 with Kerberos for containerized applications 
+# NFSv4 with Kerberos for containerized applications 
 
 !!! warning "Status: **draft**"
 

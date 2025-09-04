@@ -122,7 +122,7 @@ nav:
         - kleidi:
           - portfolio/foss/kleidi/index.md
       - netapp:
-        - NFSv4 Kerberos with Kubernetes:
+        - NFSv4 with Kerberos for containerized applications:
           - portfolio/ntap/nfsv4krb/index.md
         - neo client:
           - portfolio/ntap/neo/index.md 
