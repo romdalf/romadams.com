@@ -7,17 +7,17 @@
     Author(s):    
     - Rom Adams, Principal Software Engineer, Office of the CTO - NetApp Inc.
     Contributors:  
-    - Elliott Ecton, Technical Marketing Engineer, Shared Platform Product Management - NetApp Inc.
-    - Erik Stjerna, Professional Services Consultant, Consulting - NetApp Inc.
-    - Johannes Wagner, Sr Solution Architect, Solution Engineering - NetApp Inc.
+    - Elliott Ecton, Technical Marketing Engineer, Shared Platform Product Management - NetApp Inc.   
+    - Erik Stjerna, Professional Services Consultant, Consulting - NetApp Inc.    
+    - Johannes Wagner, Sr Solution Architect, Solution Engineering - NetApp Inc.    
 
-    Copyright Notes
+    Copyright Notes     
     Copyright (c) 2025 NetApp Inc. and the persons identified as the document authors and contributors. All rights reserved. https://www.netapp.com/company/legal/copyright/ 
 
 ## Abstract
-This RFC highlights the challenges of implementing NFSv4 with Kerberos on Kubernetes for containerized vintage application and drafts solution proposals.
+This RFC outlines the technical and operational challenges of implementing NFSv4 with Kerberos authentication in Kubernetes environments, specifically for containerized legacy applications. While cloud-native applications benefit from a decoupled architecture that simplifies Kerberos integration via CSI drivers like NetApp Trident, legacy applications present unique constraints due to their reliance on interactive shell environments and persistent user contexts. The ephemeral and immutable nature of containers complicates Kerberos ticket management, realm joining, and dynamic user provisioning, which are essential for secure access to NFSv4 shares.
 
-## Background
+## Introduction
 In a Kubernetes environment, integrating NFSv4 with Kerberos on ONTAP using Trident, the NetApp Container Storage Interface (CSI), combines storage orchestration with secure, strong authentication and encryption. This approach requires coordinating the Kubernetes nodes, the CSI, and the Kerberos authentication to provision and mount volumes for pods dynamically.  
 
 ### NFSv4 with Kerberos
@@ -47,7 +47,7 @@ This represents a challenge when the application is containerized as a container
 While the authentication at the Pod level would most likely follow the same logic as for a cloud-native application, users accessing an interactive shell with filesystem will have to authenticate even if authorization has been disabled.  
 Supporting a Kerberos will require to review the inner source of the application to address the dynamic management of Kerberos tickets to understand the different workflows address them via a modification of the deployment strategy up to a refactoring of the application to support the Kubernetes design constraints.  
 
-# Potential Solution Paths
+## Solution Proposals
 
 #### Main objectives
 1. Establish an iterative path to decouple the different challenges and solution path.  
