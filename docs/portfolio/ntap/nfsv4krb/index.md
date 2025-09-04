@@ -14,9 +14,7 @@ Kerberos is a client-server **authentication protocol** that uses tickets to all
 ACLs provide granular control over file and directory access to define **authorization**, allowing administrators to define who can read, write, or execute files and directories. 
 The NFSv4 server could enforce ACLs. It checks the user's authenticated identity against the ACLs to grant or deny access to resources. When a new file or subdirectory is created within a directory with an ACL, it inherits the access control entries (ACEs) tagged for inheritance from the parent directory's ACL. 
 
-Kerberos is for Authentication: It establishes that a user is who they claim to be. 
-ACLs are for Authorization: After authentication, ACLs determine what actions the authenticated user is allowed to perform. 
-When Kerberos is enabled, ONTAP NFSv4 enforces the authentication to verify the user identity and **could** enforce the ACLs too for authorization (https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html).
+When Kerberos is enabled, ONTAP NFSv4 enforces the authentication to verify the user identity. Once the authentication process is (successfully) done, the authorization process **could** enforce the ACLs too for authorization if enabled (https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html).
 
 ### Cloud-native application
 A cloud-native application Pod, running without an interactive shell environment for users (no direct connection to a shell at the container level), will only require a valid Kerberos ticket to access the file system without encountering any 'permission denied' operations. This is a decoupled architecture where services and users are authorized or authenticated at the application layer while the filesystem is handled by the CSI at the node level:   
@@ -33,9 +31,10 @@ Supporting a Kerberos will require to review the inner source of the application
 
 # Potential Solution Paths
 
-#### Main objectives  
-1. Establish a potential secure path to mount volumes using NFSv4 with Kerberos in Kubernetes using Trident.   
-2. Enable both application runtimes and multi-user SSH workflows with per-user authorization.   
+#### Main objectives
+1. Establish an iterative path to decouple the different challenges and solution path.  
+2. Establish a potential secure path to mount volumes using NFSv4 with Kerberos in Kubernetes using Trident.   
+3. Enable both application runtimes and multi-user SSH workflows with per-user authorization.   
 
 ### Architectural components   
 - Kubernetes Control Plane: Manages all cluster resources, including Persistent Volumes (PVs) and Persistent Volume Claims (PVCs).
