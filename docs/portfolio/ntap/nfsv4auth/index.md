@@ -1,4 +1,4 @@
-# NFSv4 authentication and authorizatoin for containerized applications 
+# NFSv4 with authentication and authorization for containerized applications 
 
 !!! warning "Status: **draft**"
 
