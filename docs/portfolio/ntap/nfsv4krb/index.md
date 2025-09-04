@@ -1,20 +1,35 @@
 # NetApp NFSv4 with Kerberos for containerized legacy and cloud-native applications 
 
 !!! warning     
-    This is a **personal work-in-progress** research document in a Request for Comments format, not a solution brief or technical report.  
+    This is a **personal work-in-progress** research document in a *Request for Comments* format, not a solution brief or technical report.  
 
 ## Background
-In a Kubernetes environment, integrating Kerberos with NFSv4 on ONTAP using Trident, the NetApp Container Storage Interface (CSI) driver, combines storage orchestration with secure, strong authentication and encryption. This approach requires coordinating the Kubernetes nodes, the CSI driver, and the Kerberos authentication system to provision and mount volumes for pods dynamically. 
+In a Kubernetes environment, integrating NFSv4 with Kerberos on ONTAP using Trident, the NetApp Container Storage Interface (CSI), combines storage orchestration with secure, strong authentication and encryption. This approach requires coordinating the Kubernetes nodes, the CSI, and the Kerberos authentication to provision and mount volumes for pods dynamically.  
+
+### NFSv4 with Kerberos
+NFSv4 with Kerberos performs authentication, verifying a user's identity through a trusted third-party service like Active Directory or OpenLDAP. NFSv4 also supports Access Control Lists (ACLs), which **could** be enforced by the NFSv4 server to determine user permissions for file and directory operations after authentication has occurred.   
+
+Kerberos is a client-server **authentication protocol** that uses tickets to allow nodes communicating over an insecure network to prove their identity to one another in a secure manner. When a client requests access to an NFSv4 share, the Kerberos client obtains a ticket from the Kerberos server, which is then used to authenticate the user to the NFSv4 server. The protocol can also provide additional capabilities like data encruption and data integrity improving the NFSv4 security posture. 
+
+ACLs provide granular control over file and directory access to define **authorization**, allowing administrators to define who can read, write, or execute files and directories. 
+The NFSv4 server could enforce ACLs. It checks the user's authenticated identity against the ACLs to grant or deny access to resources. When a new file or subdirectory is created within a directory with an ACL, it inherits the access control entries (ACEs) tagged for inheritance from the parent directory's ACL. 
+
+Kerberos is for Authentication: It establishes that a user is who they claim to be. 
+ACLs are for Authorization: After authentication, ACLs determine what actions the authenticated user is allowed to perform. 
+When Kerberos is enabled, ONTAP NFSv4 enforces the authentication to verify the user identity and **could** enforce the ACLs too for authorization (https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html).
 
 ### Cloud-native application
-A cloud-native application Pod running without an interactive shell environment for users (no direct connection to a shell at the container level) will only require a valid Kerberos ticket to access the file system without encountering any 'permission denied' operations. This is a decoupled architecture where services and users are authorized or authenticated at the application layer while the filesystem is handled by the CSI at the node level:   
+A cloud-native application Pod, running without an interactive shell environment for users (no direct connection to a shell at the container level), will only require a valid Kerberos ticket to access the file system without encountering any 'permission denied' operations. This is a decoupled architecture where services and users are authorized or authenticated at the application layer while the filesystem is handled by the CSI at the node level:   
 - A Kerberos ticket is negotiated at the node level by the CSI, verified by the NFS service, then the NFS export is mounted to the Pod.      
 - Authorization of services and users using a framework like Oauth2 granting third-parties with limited access to their data without revealing credentials.    
 - Authentication of services and users using a framework like OpenID Connect (OIDC) built on top of OAuth2 validating identity for authentiction with user information to process capabilities like Single Sign-On.  
 
 ### Containerized vintage application
-Containerized vintage applications might require an interactive shell environment for one or multiple users to access the application Pod and interact with the application and filesystem. When integrating with Kerberos, all users interacting with the filesystem will require a valid Kerberos ticket to avoid any 'permission denied' operations. This model doesn't present a decoupled architecture and highly depend on dynamic provisioning and rotation of Kerberos tickets.
-This represents a challenge during application deployment due to the ephemeral state and immutable nature of containers which might require to refactor both the Deployment strategy and the application code to support the Kubernetes design constraints.
+Vintage applications are usually built with an interactive shell environment for one or multiple users, service accounts or regular users, to run, update, and access the application and interact with the application and filesystem. When integrating with Kerberos, all users interacting with the filesystem will require a valid Kerberos ticket to avoid any 'permission denied' operations. This model doesn't present a decoupled architecture and highly depend on the underlying operating systems to be set up for dynamic management of Kerberos tickets.
+This represents a challenge when the application is containerized as a container image can not simply be join a realm or pre-user provisioning for security reasons. The ephemeral state and immutable nature of containers will also challenge any post-start configuration that will happen at the container image. 
+
+While the authentication at the Pod level would most likely follow the same logic as for a cloud-native application, users accessing an interactive shell with filesystem will have to authenticate even if authorization has been disabled.  
+Supporting a Kerberos will require to review the inner source of the application to address the dynamic management of Kerberos tickets to understand the different workflows address them via a modification of the deployment strategy up to a refactoring of the application to support the Kubernetes design constraints.  
 
 # Potential Solution Paths
 
