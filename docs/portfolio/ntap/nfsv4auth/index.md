@@ -1,4 +1,4 @@
-# NFSv4 with authentication and authorization for containerized applications 
+# Securing NFSv4 with authentication and authorization for containerized applications 
 
 !!! warning "Status: **draft**"
 
@@ -6,7 +6,7 @@
          
     **Author(s)**    
     - Rom Adams, Principal Software Engineer, Office of the CTO - NetApp Inc.   
-    **Contributors**     
+    **Contributor(s)**     
     - Elliott Ecton, Technical Marketing Engineer, Shared Platform Product Management - NetApp Inc.   
     - Erik Stjerna, Professional Services Consultant, Consulting - NetApp Inc.    
     - Johannes Wagner, Sr Solution Architect, Solution Engineering - NetApp Inc.    
