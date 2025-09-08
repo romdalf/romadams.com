@@ -1,4 +1,4 @@
-# Securing home direcotries for containerized vintage applications 
+# Securing home directories for containerized vintage applications 
 
 !!! warning "Status: **draft**"
 
