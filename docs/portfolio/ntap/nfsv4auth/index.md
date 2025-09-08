@@ -197,17 +197,15 @@ graph TD
             end
         end
         
-        NetPol_Ingress -- "Permitted Ingress" --> Container
+    NetPol_Ingress -- "Permitted Ingress" --> Container
         
-        %% --- New Egress Policy to Block NFS ---
-        NetPol_Egress[<br>🚫<br>Egress NetworkPolicy<br>Deny all NFS (2049/tcp)]
-        Container -- "Blocked Egress" --x NetPol_Egress
-
-        SecContext -- "Applies to" --> Container
-        K8sSecrets -- "Mounted into" --> Container
-        Container -- "Mounts" --> PVC
-        PVC -- "Binds to" --> PV
-    end
+    %% --- New Egress Policy to Block NFS ---
+    NetPol_Egress[<br>🚫<br>Egress NetworkPolicy<br>Deny all NFS (2049/tcp)]
+    Container -- "Blocked Egress" --x NetPol_Egress
+    SecContext -- "Applies to" --> Container
+    K8sSecrets -- "Mounted into" --> Container
+    Container -- "Mounts" --> PVC
+    PVC -- "Binds to" --> PV
 ```
 
 ### Containerized vintage application with user interactive shell and home directories
