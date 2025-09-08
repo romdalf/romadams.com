@@ -28,32 +28,32 @@ In a Kubernetes environment, integrating NFS home directories with ONTAP using T
 
 ```mermaid
 graph TD
-    subgraph "User Environment"
+    subgraph "User Interactive Environment"
         User[<br>👤<br>End User]
     end
 
     subgraph "Kubernetes Cluster"
-        subgraph "Pod: legacy-app-pod"
-            Container[<br>📦<br>Legacy App Container<br>sshd]
-            PVC[<br>📜<br>PersistentVolumeClaim<br>/home]
+        subgraph "Pod: vintage-app-pod"
+            Container[Vintage App<br>Container<br>with sshd]
+            PVC[PersistentVolumeClaim<br>/home]
         end
 
-        subgraph "Kubernetes Storage Layer"
-            PV[<br>💾<br>PersistentVolume<br>NFS]
-            CSI[<br>🔌<br>CSI Driver<br>NetApp Trident]
+        subgraph "Kubernetes Node"
+            PV[PersistentVolume<br>NFS]
+            CSI[CSI<br>NetApp Trident]
         end
     end
 
     subgraph "External Storage System"
-        NFS_Server[<br>🗄️<br>NetApp ONTAP<br>NFS Server]
-        Export[<br>📁<br>NFS Export<br>/home_legacy]
+        NFS_Server[NetApp ONTAP<br>NFS Server]
+        Export[NFS Export<br>/homedir_volume]
     end
 
     %% --- Define Interactions ---
     User -- "1. SSH Connection" --> Container
     Container -- "2. Mounts Volume via PVC" --> PVC
     PVC -- "3. Binds to" --> PV
-    PV -- "4. Provisioned & Managed by" --> CSI
+    PV -- "4. Managed by" --> CSI
     CSI -- "5. API Calls to Provision/Map" --> NFS_Server
     NFS_Server -- "6. Provides Export" --> Export
     PV -- "Points to" --> Export
