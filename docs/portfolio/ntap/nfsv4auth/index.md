@@ -178,6 +178,8 @@ graph TD
 
     subgraph "Kubernetes Cluster"
         NetPol[NetworkPolicy<br>Allow SSH from trusted IPs]
+        NetPolEgress[NetworkPolicy<br>Deny all NFS]
+
         User -- "SSH Traffic" --> NetPol
 
         subgraph "Pod Boundary"            
@@ -196,7 +198,6 @@ graph TD
             end
         end
         
-        NetPolEgress[NetworkPolicy<br>Deny all NFS]
 
         NetPol -- "Permitted Traffic" --> Container
         SecContext -- "Applies to" --> Container
