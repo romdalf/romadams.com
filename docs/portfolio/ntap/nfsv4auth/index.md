@@ -170,7 +170,39 @@ These 10 controls harden the pod's environment and isolate it from the rest of t
 - Leverage Runtime Security Monitoring: Deploy a cloud-native runtime security tool like Falco. It can monitor for suspicious activity inside the container in real-time, such as unexpected shell processes or modifications to critical configuration files.   
 - Control ```exec``` Access with RBAC: While users connect via SSH, administrators still have kubectl exec. Use Kubernetes RBAC (```Roles``` and ```RoleBindings```) to strictly limit who can get a shell in the pod through the Kubernetes API, closing a potential backdoor.    
 
+```mermaid
+graph TD
+    subgraph "External Network"
+        User[<br>👤<br>User/Attacker]
+    end
 
+    subgraph "Kubernetes Cluster"
+        NetPol[<br>🌐<br>NetworkPolicy<br>Allow SSH from trusted IPs]
+        User -- "SSH Traffic" --> NetPol
+
+        subgraph "Pod Boundary"            
+            subgraph "Pod Spec"
+                SecContext[<br>🔐<br>SecurityContext<br>- ReadOnlyRootFS<br>- RunAsUser: 1001]
+                K8sSecrets[<br>🔑<br>K8s Secret<br>authorized_keys]
+            end
+
+            subgraph "Running Pod"
+                Container[<br>📦<br>Legacy App Container]
+            end
+            
+            subgraph "Storage"
+               PVC[<br>📜<br>PersistentVolumeClaim<br>/home]
+               PV[<br>💾<br>PersistentVolume<br>Secure NFS Backend]
+            end
+        end
+        
+        NetPol -- "Permitted Traffic" --> Container
+        SecContext -- "Applies to" --> Container
+        K8sSecrets -- "Mounted into" --> Container
+        Container -- "Mounts" --> PVC
+        PVC -- "Binds to" --> PV
+    end
+``` 
 
 ### Containerized vintage application with user interactive shell and home directories
 
