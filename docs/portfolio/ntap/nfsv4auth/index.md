@@ -33,8 +33,8 @@ This model separates user/service identity from infrastructure permissions:
 
 - Filesystem Access (Infrastructure Layer): The application pod needs access to storage, like an NFS share. The Container Storage Interface (CSI) driver, running on the Kubernetes node, handles the technical requirements of mounting the storage. It authenticates the node or system service to the storage backend, mounts the volume, and makes it available to the pod. The end-user's identity is not involved in this process.    
 - User/Service Authorization (Application Layer): When a user or another service interacts with your application, they are authenticated and authorized by the application itself, often using modern identity protocols.    
-  - Authorization is managed with frameworks like OAuth2. This allows the application to grant other services limited, scoped access to its data on behalf of a user without ever sharing the user's credentials.    
-  - Authentication is handled with protocols like OpenID Connect (OIDC), which is built on OAuth2. OIDC verifies a user's identity through an external identity provider and provides the application with a secure token (like a JWT), enabling features like Single Sign-On (SSO).    
+    - Authorization is managed with frameworks like OAuth2. This allows the application to grant other services limited, scoped access to its data on behalf of a user without ever sharing the user's credentials.    
+    - Authentication is handled with protocols like OpenID Connect (OIDC), which is built on OAuth2. OIDC verifies a user's identity through an external identity provider and provides the application with a secure token (like a JWT), enabling features like Single Sign-On (SSO).    
 
 In this scenario, the application uses the user's authenticated session and OIDC token to decide what data to read or write to the mounted filesystem. The pod's permission to access the storage is a separate concern, managed entirely by the Kubernetes infrastructure.
 
@@ -64,17 +64,16 @@ graph TD
     User -- "1. Authenticates (OIDC)" --> IdP
     IdP -- "2. Issues Secure Token (JWT)" --> User
     User -- "3. API Request with Token" --> App
-    
     App -- "4. Authorizes Request &<br>Accesses Filesystem" --> Volume
-    
     CSI -- "A. System-level Auth & Mount" --> Storage
     Storage -- "B. Provides Volume" --> Volume
 ```
 
 ### Containerized vintage application
-intage applications often rely on an interactive shell environment where users log in directly to manage the application and interact with the filesystem. In a traditional environment, this access is tightly coupled with the operating system's authentication system.    
+Vintage applications often rely on an interactive shell environment where users log in directly to manage the application and interact with the filesystem. In a traditional environment, this access is tightly coupled with the operating system's authentication system.    
 
-This model creates significant challenges when containerized because it clashes with core cloud-native principles:    
+This model creates significant challenges when containerized because it clashes with core cloud-native principles:     
+
 - Tightly Coupled Architecture: The application's security model depends directly on the operating system handling user authentication for filesystem access. Unlike modern applications that manage identity separately, here, the container's OS is responsible for verifying who can touch which file.    
 - Conflict with Immutability: Containers are designed to be immutable and ephemeral. The traditional process of joining a machine to a security realm and provisioning users at the OS level is a form of post-start configuration that goes against this principle. For security reasons, you cannot pre-bake user credentials or machine secrets into a container image.    
 - Authentication at the OS Level: While a modern application would authenticate users at the application layer using protocols like OIDC, a vintage application forces this process down to the container's shell. A user needs to prove their identity directly to the container's OS to get the permissions needed to interact with the filesystem.   
@@ -88,15 +87,13 @@ graph TD
     end
 
     subgraph "Kubernetes Pod"
-        subgraph "Container (Monolithic Environment)"
-            style Container fill:#fff0f5,stroke:#c57fa5
+        subgraph "Containerized Vintage App"
             
             App[<br>Legacy App Logic]
             Shell[<br>Interactive Shell / Container OS]
-            Volume[<br>📁<br>Mounted Filesystem]
+            Volume[Mounted<br>Filesystem]
             
             subgraph "Challenge Zone"
-                style ChallengeZone fill:#ffebee,stroke:#d32f2f,stroke-dasharray: 5 5
                 Challenge1["<br>⚠️<br><b>Challenge 1: Immutability Conflict</b><br>Requires OS-level user provisioning,<br>conflicts with immutable images."]
                 Challenge2["<br>⚠️<br><b>Challenge 2: OS Dependency</b><br>Authentication is not handled by the app,<br>but by the container's OS."]
             end
