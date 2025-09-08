@@ -178,17 +178,17 @@ graph TD
     end
 
     subgraph "Kubernetes Cluster"
-        NetPol_Ingress[<br>🌐<br>Ingress NetworkPolicy<br>Allow SSH from trusted IPs]
+        NetPol_Ingress[Ingress NetworkPolicy<br>Allow SSH from trusted IPs]
         User -- "SSH Traffic" --> NetPol_Ingress
 
         subgraph "Pod Boundary"            
             subgraph "Pod Spec"
-                SecContext[<br>🔐<br>SecurityContext<br>- ReadOnlyRootFS<br>- RunAsUser: 1001]
-                K8sSecrets[<br>🔑<br>K8s Secret<br>authorized_keys]
+                SecContext[SecurityContext<br>ReadOnlyRootFS<br>RunAsUser 1001]
+                K8sSecrets[K8s Secret<br>authorized_keys]
             end
 
             subgraph "Running Pod"
-                Container[<br>📦<br>Legacy App Container]
+                Container[Legacy/Vintage<br>App Container]
             end
             
             subgraph "Storage"
@@ -196,6 +196,7 @@ graph TD
                PV[<br>💾<br>PersistentVolume<br>Secure NFS Backend]
             end
         end
+    end
         
     NetPol_Ingress -- "Permitted Ingress" --> Container
         
@@ -207,6 +208,7 @@ graph TD
     Container -- "Mounts" --> PVC
     PVC -- "Binds to" --> PV
 ```
+
 
 ### Containerized vintage application with user interactive shell and home directories
 
