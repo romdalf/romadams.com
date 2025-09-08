@@ -203,7 +203,7 @@ graph TD
         SecContext -- "Applies to" --> Container
         K8sSecrets -- "Mounted into" --> Container
         Container -- "Mounts" --> PVC
-        Container -- "Block External Traffic --x NetPolEgress
+        Container -- "Block External Traffic" --x NetPolEgress
         PVC -- "Binds to" --> PV
     end
 ``` 
