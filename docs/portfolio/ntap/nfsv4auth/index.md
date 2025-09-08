@@ -187,7 +187,7 @@ graph TD
             end
 
             subgraph "Running Pod"
-                Container[Legacy App Container]
+                Container[Legacy/Vinage<br>App Container]
             end
             
             subgraph "Storage"
@@ -202,7 +202,7 @@ graph TD
         SecContext -- "Applies to" --> Container
         K8sSecrets -- "Mounted into" --> Container
         Container -- "Mounts" --> PVC
-        container -- "Block External Traffic --x NetPolEgress
+        Container -- "Block External Traffic --x NetPolEgress
         PVC -- "Binds to" --> PV
     end
 ``` 
