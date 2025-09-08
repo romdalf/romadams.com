@@ -196,10 +196,13 @@ graph TD
             end
         end
         
+        NetPolEgress[NetworkPolicy<br>Deny all NFS]
+
         NetPol -- "Permitted Traffic" --> Container
         SecContext -- "Applies to" --> Container
         K8sSecrets -- "Mounted into" --> Container
         Container -- "Mounts" --> PVC
+        container -- "Block External Traffic --x NetPolEgress
         PVC -- "Binds to" --> PV
     end
 ``` 
