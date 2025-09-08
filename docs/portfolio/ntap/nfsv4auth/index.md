@@ -157,7 +157,9 @@ This section describes the working environment to reproduce the solution proposa
 ## The Kubernetes cloud-native declarative model
 These 10 controls harden the pod's environment and isolate it from the rest of the cluster, treating the container as a secure black box.   
 
-- Isolate with Network Policies: This is your pod's firewall. Create a ```NetworkPolicy``` to restrict SSH access (port 22) to only known, trusted IP ranges, like a corporate VPN or a bastion host.   
+- Isolate with Network Policies: This is your pod's firewall for a network defense-in-depth strategy. Even if an attacker compromise the container, these policies prevent them from using the pod to scan for or connect to other services on the network, including NFS. 
+    - Create a ```NetworkPolicy``` to restrict SSH access (port 22) to only known, trusted IP ranges, like a corporate VPN or a bastion host, and including application ports.
+    - Create a ```NetworkPolicy``` to deny all NFS traffic to/from the Pod Network.  
 - Run with a Read-Only Root Filesystem: In your pod spec, set ```securityContext.readOnlyRootFilesystem: true```. This makes the container's base image immutable, preventing attackers from modifying system binaries or libraries. The user's home directory must be a separate, writable volume.   
 - Use Secure Persistent Volumes (PV/PVC): The user's home directory must be persistent. Use a ```PersistentVolume``` pointing to a secure storage backend (like an NFSv4 share with Kerberos ```krb5p``` and ```root_squash``` enabled) and mount it into the pod.   
 - Enforce Non-Root Execution: The SSH process must not run as root. Use ```securityContext.runAsUser``` and ```securityContext.runAsGroup``` with a high-numbered UID/GID (e.g., ```1001```) to minimize privileges.   
@@ -176,11 +178,10 @@ graph TD
     end
 
     subgraph "Kubernetes Cluster"
-        NetPol[<br>🌐<br>NetworkPolicy<br>Allow SSH from trusted IPs]
-        User -- "SSH Traffic" --> NetPol
+        NetPol_Ingress[<br>🌐<br>Ingress NetworkPolicy<br>Allow SSH from trusted IPs]
+        User -- "SSH Traffic" --> NetPol_Ingress
 
-        subgraph "Pod Boundary"
-            
+        subgraph "Pod Boundary"            
             subgraph "Pod Spec"
                 SecContext[<br>🔐<br>SecurityContext<br>- ReadOnlyRootFS<br>- RunAsUser: 1001]
                 K8sSecrets[<br>🔑<br>K8s Secret<br>authorized_keys]
@@ -196,7 +197,12 @@ graph TD
             end
         end
         
-        NetPol -- "Permitted Traffic" --> Container
+        NetPol_Ingress -- "Permitted Ingress" --> Container
+        
+        %% --- New Egress Policy to Block NFS ---
+        NetPol_Egress[<br>🚫<br>Egress NetworkPolicy<br>Deny all NFS (2049/tcp)]
+        Container -- "Blocked Egress" --x NetPol_Egress
+
         SecContext -- "Applies to" --> Container
         K8sSecrets -- "Mounted into" --> Container
         Container -- "Mounts" --> PVC
