@@ -178,7 +178,6 @@ graph TD
 
     subgraph "Kubernetes Cluster"
         NetPol[NetworkPolicy<br>Allow SSH from trusted IPs]
-        NetPolEgress[NetworkPolicy<br>Deny NFS traffic <br>from/to Pod]
 
         User -- "SSH Traffic" --> NetPol
 
@@ -205,6 +204,7 @@ graph TD
         Container -- "Mounts" --> PVC
         PVC -- "Binds to" --> PV
     end
+    NetPolEgress[NetworkPolicy<br>Deny NFS traffic <br>from/to Pod]
     Container -- "Block External Traffic" --x NetPolEgress
 
 ``` 
