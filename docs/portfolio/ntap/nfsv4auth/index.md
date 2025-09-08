@@ -178,7 +178,7 @@ graph TD
 
     subgraph "Kubernetes Cluster"
         NetPol[NetworkPolicy<br>Allow SSH from trusted IPs]
-        NetPolEgress[NetworkPolicy<br>Deny all NFS]
+        NetPolEgress[NetworkPolicy<br>Deny NFS traffic <br>from/to Pod]
 
         User -- "SSH Traffic" --> NetPol
 
@@ -203,9 +203,10 @@ graph TD
         SecContext -- "Applies to" --> Container
         K8sSecrets -- "Mounted into" --> Container
         Container -- "Mounts" --> PVC
-        Container -- "Block External Traffic" --x NetPolEgress
         PVC -- "Binds to" --> PV
     end
+    Container -- "Block External Traffic" --x NetPolEgress
+
 ``` 
 
 ### Containerized vintage application with user interactive shell and home directories
