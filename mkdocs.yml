@@ -123,7 +123,7 @@ nav:
           - portfolio/foss/kleidi/index.md
       - netapp:
         - Securing home directories for containerized vintage applications:
-          - portfolio/ntap/nfsv4auth/index.md
+          - portfolio/ntap/k8svintageapp/index.md
         - neo client:
           - portfolio/ntap/neo/index.md 
         - netapp consoles for openshift:
