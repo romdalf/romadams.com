@@ -168,46 +168,8 @@ These 10 controls harden the pod's environment and isolate it from the rest of t
 - Build from Minimalist Base Images: Re-platform your legacy app onto a minimal base image like Alpine or a "distroless" image if possible. Remove all unnecessary tools (compilers, package managers, network utilities) from the final image to limit an attacker's toolkit.   
 - Apply Pod Security Standards (PSS): Enforce cluster-wide security guardrails. Apply the ```baseline``` or ```restricted``` Pod Security Standard to the namespace where your application runs to prevent insecure configurations like running privileged containers.   
 - Leverage Runtime Security Monitoring: Deploy a cloud-native runtime security tool like Falco. It can monitor for suspicious activity inside the container in real-time, such as unexpected shell processes or modifications to critical configuration files.   
-- Control ```exec``` Access with RBAC: While users connect via SSH, administrators still have kubectl exec. Use Kubernetes RBAC (```Roles``` and ```RoleBindings```) to strictly limit who can get a shell in the pod through the Kubernetes API, closing a potential backdoor.   
+- Control ```exec``` Access with RBAC: While users connect via SSH, administrators still have kubectl exec. Use Kubernetes RBAC (```Roles``` and ```RoleBindings```) to strictly limit who can get a shell in the pod through the Kubernetes API, closing a potential backdoor.    
 
-
-```mermaid
-graph TD
-    subgraph "External Network"
-        User[<br>👤<br>User/Attacker]
-    end
-
-    subgraph "Kubernetes Cluster"
-        NetPol_Ingress[Ingress NetworkPolicy<br>Allow SSH from trusted IPs]
-        User -- "SSH Traffic" --> NetPol_Ingress
-
-        subgraph "Pod Boundary"            
-            subgraph "Pod Spec"
-                SecContext[SecurityContext<br>ReadOnlyRootFS<br>RunAsUser 1001]
-                K8sSecrets[K8s Secret<br>authorized_keys]
-            end
-
-            subgraph "Running Pod"
-                Container[Legacy/Vintage<br>App Container]
-            end
-            
-            subgraph "Storage"
-               PVC[PersistentVolumeClaim<br>/home]
-               PV[PersistentVolume<br>Secure NFS Backend]
-            end
-        end
-    end
-        
-    NetPol_Ingress -- "Permitted Ingress" --> Container
-        
-    %% --- New Egress Policy to Block NFS ---
-    NetPol_Egress[Egress NetworkPolicy<br>Deny all NFS (2049/tcp)]
-    Container -- "Blocked Egress" --x NetPol_Egress
-    SecContext -- "Applies to" --> Container
-    K8sSecrets -- "Mounted into" --> Container
-    Container -- "Mounts" --> PVC
-    PVC -- "Binds to" --> PV
-```
 
 
 ### Containerized vintage application with user interactive shell and home directories
