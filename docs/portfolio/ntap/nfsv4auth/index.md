@@ -177,22 +177,22 @@ graph TD
     end
 
     subgraph "Kubernetes Cluster"
-        NetPol[<br>🌐<br>NetworkPolicy<br>Allow SSH from trusted IPs]
+        NetPol[NetworkPolicy<br>Allow SSH from trusted IPs]
         User -- "SSH Traffic" --> NetPol
 
         subgraph "Pod Boundary"            
             subgraph "Pod Spec"
-                SecContext[<br>🔐<br>SecurityContext<br>- ReadOnlyRootFS<br>- RunAsUser: 1001]
-                K8sSecrets[<br>🔑<br>K8s Secret<br>authorized_keys]
+                SecContext[SecurityContext<br>ReadOnlyRootFS<br>RunAsUser: 1001]
+                K8sSecrets[K8s Secret<br>authorized_keys]
             end
 
             subgraph "Running Pod"
-                Container[<br>📦<br>Legacy App Container]
+                Container[Legacy App Container]
             end
             
             subgraph "Storage"
-               PVC[<br>📜<br>PersistentVolumeClaim<br>/home]
-               PV[<br>💾<br>PersistentVolume<br>Secure NFS Backend]
+               PVC[PersistentVolumeClaim<br>/home]
+               PV[PersistentVolume<br>NetApp ONTAP<br>NFS Server]  
             end
         end
         
