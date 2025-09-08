@@ -192,8 +192,8 @@ graph TD
             end
             
             subgraph "Storage"
-               PVC[<br>📜<br>PersistentVolumeClaim<br>/home]
-               PV[<br>💾<br>PersistentVolume<br>Secure NFS Backend]
+               PVC[PersistentVolumeClaim<br>/home]
+               PV[PersistentVolume<br>Secure NFS Backend]
             end
         end
     end
@@ -201,7 +201,7 @@ graph TD
     NetPol_Ingress -- "Permitted Ingress" --> Container
         
     %% --- New Egress Policy to Block NFS ---
-    NetPol_Egress[<br>🚫<br>Egress NetworkPolicy<br>Deny all NFS (2049/tcp)]
+    NetPol_Egress[Egress NetworkPolicy<br>Deny all NFS (2049/tcp)]
     Container -- "Blocked Egress" --x NetPol_Egress
     SecContext -- "Applies to" --> Container
     K8sSecrets -- "Mounted into" --> Container
@@ -222,13 +222,13 @@ graph TD
     subgraph "Kubernetes Pod"
         subgraph "Containerized Vintage App"
             
-            App[<br>Legacy App Logic]
-            Shell[<br>Interactive Shell / Container OS]
+            App[Legacy App<br>Logic]
+            Shell[Interactive Shell<br>Container OS]
             Volume[Mounted<br>Filesystem]
             
             subgraph "Challenge Zone"
-                Challenge1["<br>⚠️<br><b>Challenge 1: Immutability Conflict</b><br>Requires OS-level user provisioning,<br>conflicts with immutable images."]
-                Challenge2["<br>⚠️<br><b>Challenge 2: OS Dependency</b><br>Authentication is not handled by the app,<br>but by the container's OS."]
+                Challenge1["<br>⚠️<br><b>Challenge 1: Immutability</b><br>OS-level user provisioning,<br>conflicts with immutable images."]
+                Challenge2["<br>⚠️<br><b>Challenge 2: OS Dependency</b><br>Authentication is not handled by<br>the app but by the container's OS."]
             end
 
         end
@@ -238,8 +238,6 @@ graph TD
     User -- "1. SSH Connection" --> Shell
     Shell -- "2. OS-level Authentication<br>(Authenticates User)" --> App
     App -- "3. Interacts with Filesystem<br>(Permissions based on OS User)" --> Volume
-    
-    classDef default fill:#fff,stroke:#333,stroke-width:2px;
 ```
 
 
