@@ -245,17 +245,39 @@ graph TD
 
 
 ### Additional Consideration: Unifying Authentication and Authorization at the Storage Layer
-Beyond the pod and container hardening, you can enforce a powerful, unified security model directly on the NFS server by combining Kerberos for authentication and NFSv4 ACLs for authorization. This pushes fine-grained access control to the storage layer itself, providing a robust last line of defense.    
+Beyond the pod and container hardening, you can enforce a unified security model directly on the NFS server by combining Kerberos for authentication and NFSv4 ACLs for authorization. This pushes fine-grained access control to the storage layer itself, providing a robust last line of defense.    
 
 - Kerberos for Authentication (Verifying "Who You Are"): Kerberos is a network authentication protocol that allows a user or service to securely prove its identity over an insecure network. When a pod needs to access the NFS share, Kerberos verifies the user's identity through a trusted third party, such as Active Directory. It uses secure tickets to handle this process, which can also be used to encrypt data in transit and ensure its integrity.   
 - NFSv4 ACLs for Authorization (Controlling "What You Can Do"): Once a user's identity is confirmed by Kerberos, the NFS server can then use Access Control Lists (ACLs) to determine their permissions. ACLs offer granular control, allowing you to define precisely who can read, write, or execute specific files and directories. When a new file is created, it automatically inherits the permissions from its parent directory, ensuring consistent security policies.   
 
 When combined, this creates a seamless security workflow: Kerberos first confirms the user's identity, and then the storage system (like NetApp ONTAP) enforces the ACLs to grant or deny access. This model tightly integrates authentication and authorization directly at the data layer.
 
-References:   
-- NFS Kerberos in ONTAP, NetApp TR-4616: [https://www.netapp.com/media/19384-tr-4616.pdf](https://www.netapp.com/media/19384-tr-4616.pdf)    
-- ONTAP, NetApp: [https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html](https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html)    
+However, such implementation for vintage application with user interactive environment introduces significant complexity because of the traditional, stateful, host-based security model to retrofit into an ephemeral and immutable container environment. In this model, the SSH connection is the single point of entry where the user's Kerberos identity is established for their entire session within the pod.
 
+- The SSH Session acts as the Kerberos Gateway. The process works like a domino effect, where the initial SSH authentication is the crucial first step that makes everything else possible:
+    - SSH Login: The user authenticates to the pod via SSH. The sshd daemon, configured with GSS-API, uses Kerberos to verify the user's identity.   
+    - Ticket Caching: Upon a successful login, a valid Kerberos ticket for that specific user is created and cached within the pod's environment (managed by the sssd sidecar).   
+    - Transparent Filesystem Access: From that point on, any action the user takes—whether running commands in their shell or using the legacy application—happens under their authenticated identity. When they try to access their home directory, the kernel transparently uses their cached Kerberos ticket to securely communicate with the NFS server.   
+- This highlights a key distinction: it's not just SSH users, but any process that needs to access the NFS share requires a Kerberos identity. For interactive users, the SSH login is the mechanism that provides it. For any non-interactive system processes running in the container (like a cron job or a background service), they would also need their own Kerberos identity, typically provided by a system keytab file.   
+
+#### Identity and Keytab Management
+The biggest hurdle is securely managing the identities of multiple users inside a container. In a traditional VM, each user has a persistent identity managed by the OS. In a container, this is much harder.   
+
+- Secure Keytab Distribution: Each user needs a keytab file to authenticate without a password. Securely distributing these sensitive files to an ephemeral pod is a major challenge. Baking them into the image is a severe security risk. Mounting them via Kubernetes Secrets is better, but managing secrets for numerous, potentially dynamic users, becomes a significant operational burden.   
+- Joining the Realm: A traditional machine "joins" a Kerberos realm, creating a host identity (host/fqdn). A container, being ephemeral, cannot easily do this. You would need a complex, automated process to register and unregister each pod's identity with the Kerberos Key Distribution Center (KDC) upon startup and shutdown.
+
+#### Ticket Lifecycle and Rotation
+Kerberos tickets have a limited lifetime for security and must be renewed. Managing this for multiple, concurrent user sessions inside a single container is complex.   
+
+- Ticket Caching: Each SSH session needs its own Kerberos ticket cache. The system must create, manage, and isolate these caches (e.g., using KEYRING or file-based caches like /tmp/krb5cc_UID) for every user, which can be difficult to configure correctly within a container's lifecycle.   
+- Automated Ticket Renewal: A long-running process, like a krb5-daemon or sssd, is typically needed to automatically renew tickets before they expire. Running and managing such a system-level daemon within a container, especially for multiple users, adds complexity and deviates from the single-process-per-container best practice. If a user's ticket expires during a long session, their access to the NFS share will fail.   
+
+#### Container Immutability and Networking
+The core principles of containerization conflict with the requirements of a traditional Kerberos client.   
+
+- Configuration Files: Kerberos requires configuration files like /etc/krb5.conf. While this can be managed with a ConfigMap, it means the container is less portable and has a hard dependency on the cluster's environment.    
+- Service Discovery: The container must be able to reliably find the Kerberos KDC and other services. This often requires specific DNS configurations (SRV records) and network policies to allow traffic to the KDC, which can be complex to manage in a Kubernetes network environment.    
+- Clock Skew: Kerberos is highly sensitive to time synchronization. If the container's clock drifts out of sync with the KDC's clock by more than a few minutes (typically 5), all authentication attempts will fail. Ensuring consistent time sync across all Kubernetes nodes and pods is critical.    
 
 ```mermaid
 graph TD
