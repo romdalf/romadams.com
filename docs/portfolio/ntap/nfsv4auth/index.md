@@ -113,19 +113,6 @@ graph TD
     PV -- "Points to" --> Export
 ```
 
-### NFSv4 with Kerberos
-NFSv4 with Kerberos performs authentication, verifying a user's identity through a trusted third-party service like Active Directory or OpenLDAP. NFSv4 also supports Access Control Lists (ACLs), which **could** be enforced by the NFSv4 server to determine user permissions for file and directory operations after authentication has occurred.   
-
-Kerberos is a client-server **authentication protocol** that uses tickets to allow nodes communicating over an insecure network to prove their identity to one another in a secure manner. When a client requests access to an NFSv4 share, the Kerberos client obtains a ticket from the Kerberos server, which is then used to authenticate the user to the NFSv4 server. The protocol can also provide additional capabilities like data encruption and data integrity improving the NFSv4 security posture. 
-
-ACLs provide granular control over file and directory access to define **authorization**, allowing administrators to define who can read, write, or execute files and directories. 
-The NFSv4 server could enforce ACLs. It checks the user's authenticated identity against the ACLs to grant or deny access to resources. When a new file or subdirectory is created within a directory with an ACL, it inherits the access control entries (ACEs) tagged for inheritance from the parent directory's ACL. 
-
-When Kerberos is enabled, ONTAP NFSv4 enforces the authentication to verify the user identity. Once the authentication process is (successfully) done, the authorization process **could** enforce the ACLs too for authorization if enabled.
-
-References:   
-- NFS Kerberos in ONTAP, NetApp TR-4616: [https://www.netapp.com/media/19384-tr-4616.pdf](https://www.netapp.com/media/19384-tr-4616.pdf)    
-- ONTAP, NetApp: [https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html](https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html)    
 
 
 --- 
@@ -155,6 +142,8 @@ This section describes the working environment to reproduce the solution proposa
 --- 
 
 ## The Kubernetes cloud-native declarative model
+
+### Overview
 These 10 controls harden the pod's environment and isolate it from the rest of the cluster, treating the container as a secure black box.   
 
 - Isolate with Network Policies: This is your pod's firewall for a network defense-in-depth strategy. Even if an attacker compromise the container, these policies prevent them from using the pod to scan for or connect to other services on the network, including NFS. 
@@ -209,9 +198,27 @@ graph TD
 
 ``` 
 
+### Threat modeling asessment and controls
+
+*Controls applied at the orchestration layer to isolate and secure the pod's environment.*
+
+ Control/Measure | Threat Mitigated | Implementation Method | Assessment & Notes |
+| :--- | :--- | :--- | :--- |
+| **1. Network Policies** | Lateral Movement, Unauthorized Network Access | `NetworkPolicy` YAML resources | **Critical.** Acts as a pod-level firewall. Egress policies are crucial to prevent the pod from initiating unauthorized outbound connections. |
+| **2. Read-Only Root Filesystem** | Malware Persistence, Binary Tampering | `securityContext.readOnlyRootFilesystem: true` | **High Impact.** Forces a clean separation between the immutable application and its state, but requires careful volume management for logs/temp files. |
+| **3. Secure Persistent Volumes** | Unauthenticated Storage Access, Data Exposure | `PersistentVolume` configured for a secure backend (e.g., Kerberos) | Pushes storage security to the specialized storage layer, which is a best practice. The pod itself doesn't hold storage credentials. |
+| **4. Run as Non-Root User** | Container-to-Node Privilege Escalation | `securityContext.runAsUser`, `runAsGroup` | **Fundamental.** The single most effective measure to limit the blast radius of a container compromise. |
+| **5. K8s Secrets for Keys** | Credential Exposure, Hardcoded Secrets | Mount `Secret` as a volume or environment variable | **Essential Hygiene.** Decouples sensitive data from the container image, allowing for centralized and secure management via the K8s API. |
+| **6. `initContainers` for Setup** | Insecure Default Permissions, Misconfiguration | `initContainers` definition in pod spec | Enables declarative, immutable hardening. Perfect for running `chattr` or complex permission setups on volumes before the main app starts. |
+| **7. Minimalist Base Images** | "Living off the Land" Attacks, CVE Surface | `Dockerfile` `FROM alpine` or distroless | **High Impact.** Drastically reduces the attacker's toolkit if they gain a shell. Fewer packages mean fewer potential vulnerabilities. |
+| **8. Pod Security Standards** | Insecure Pod Deployment, Privilege Escalation | Namespace labels for `baseline` or `restricted` policies | A proactive, cluster-wide guardrail that prevents insecure configurations from being deployed in the first place. |
+| **9. Runtime Security Monitoring** | Zero-Day Exploits, Active Threats | Deploy a runtime tool like Falco or Trivy | A **detective** control. Essential for observing active threats and policy violations that preventative controls might miss. |
+| **10. RBAC for `kubectl exec`** | Unauthorized Administrative Access, Backdoor | Kubernetes `Role` and `RoleBinding` | Secures the "break glass" access route. Ensures only authorized administrators can get a shell via the K8s API, complementing SSH controls. |
+
+
 ### Containerized vintage application with user interactive shell and home directories
 
-
+### Overview
 ```mermaid
 graph TD
     subgraph "User Environment"
@@ -239,11 +246,98 @@ graph TD
     App -- "3. Interacts with Filesystem<br>(Permissions based on OS User)" --> Volume
 ```
 
+### Threat modeling asessment and controls
+
+*Controls applied within the container to harden the OS and the services it runs.*
+
+| Control/Measure | Threat Mitigated | Implementation Method | Assessment & Notes |
+| :--- | :--- | :--- | :--- |
+| **1. `ForceCommand`** | Shell Startup Script Injection (`.bashrc`) | `sshd_config` or `~/.ssh/authorized_keys` | **Highly Effective.** Directly prevents malicious commands from being executed at login. Can be used to force a clean shell. |
+| **2. `ChrootDirectory`** | Filesystem Traversal, Information Disclosure | `sshd_config` directive | **Maximum Isolation.** The strongest sandboxing method for an SSH user, confining them strictly to their home directory. |
+| **3. Harden `sshd_config`** | Weak Ciphers, Root Login, Credential Stuffing | Strict `sshd_config` settings | Basic security hygiene. Disables weak protocols and risky features like password authentication and root login. |
+| **4. Immutable Startup Scripts** | Malicious Code Persistence, Unauthorized Changes | `chattr +i` on files like `.bashrc` | A powerful control that prevents modification even by the file's owner. Must be set by root (e.g., in an `initContainer`). |
+| **5. Disable SSH Tunneling** | Network Pivoting, Bypassing Firewalls | `AllowTcpForwarding no` in `sshd_config` | **Critical.** Prevents the pod from being used as a beachhead to attack other services inside the cluster network. |
+| **6. File Integrity Monitoring** | Undetected Tampering, Rootkits | AIDE configured inside the container | A **detective** control that provides an audit trail and alerts on unauthorized changes to critical files. |
+| **7. Session Auditing** | Un-auditable User Actions, Insider Threat | `auditd` service and rules | Essential for forensics and compliance. Logs all commands executed by users, creating a detailed activity record. |
+| **8. Strict Default `umask`** | Accidental Data Exposure Between Users | Set `umask 077` in `/etc/profile` | A simple but effective way to ensure that all user-created files are private by default. |
+| **9. Restricted Shell (rbash)** | Unauthorized Command Execution | Set user's login shell to `/bin/rbash` | Only suitable for highly restricted, task-based roles where users need a very limited set of commands. |
+| **10. Strict File Permissions** | Privilege Escalation, Unauthorized Access | `chmod` and `chown` on home directories | Enforce the principle of least privilege, ensuring users cannot read or write to each other's home directories. |
 
 
+### Additional Consideration: Unifying Authentication and Authorization at the Storage Layer
+Beyond the pod and container hardening, you can enforce a powerful, unified security model directly on the NFS server by combining Kerberos for authentication and NFSv4 ACLs for authorization. This pushes fine-grained access control to the storage layer itself, providing a robust last line of defense.    
+
+- Kerberos for Authentication (Verifying "Who You Are"): Kerberos is a network authentication protocol that allows a user or service to securely prove its identity over an insecure network. When a pod needs to access the NFS share, Kerberos verifies the user's identity through a trusted third party, such as Active Directory. It uses secure tickets to handle this process, which can also be used to encrypt data in transit and ensure its integrity.   
+- NFSv4 ACLs for Authorization (Controlling "What You Can Do"): Once a user's identity is confirmed by Kerberos, the NFS server can then use Access Control Lists (ACLs) to determine their permissions. ACLs offer granular control, allowing you to define precisely who can read, write, or execute specific files and directories. When a new file is created, it automatically inherits the permissions from its parent directory, ensuring consistent security policies.   
+
+When combined, this creates a seamless security workflow: Kerberos first confirms the user's identity, and then the storage system (like NetApp ONTAP) enforces the ACLs to grant or deny access. This model tightly integrates authentication and authorization directly at the data layer.
+
+References:   
+- NFS Kerberos in ONTAP, NetApp TR-4616: [https://www.netapp.com/media/19384-tr-4616.pdf](https://www.netapp.com/media/19384-tr-4616.pdf)    
+- ONTAP, NetApp: [https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html](https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html)    
 
 
+```mermaid
+graph TD
+    subgraph "Kubernetes Pod (Ephemeral & Immutable)"
+        User[<br>👤<br>End User]
 
+        subgraph "Main Container (Legacy App)"
+            LegacyApp[<br>📦<br>Legacy App Logic]
+            SSHD[<br>Daemon<br>SSH Daemon<br>GSSAPI Enabled]
+            FsAccess[<br>📁<br>Filesystem Access]
+        end
+
+        subgraph "Sidecar Container (Kerberos Helper)"
+            SSSD[<br>Daemon<br>SSSD<br>Ticket Caching/Renewal]
+            KeytabVol[<br>🔑<br>Mounted Keytabs<br>via K8s Secrets]
+        end
+        
+        User -- "SSH with GSSAPI Negotiation" --> SSHD
+        SSHD -- "GSSAPI Authentication Request" --> SSSD
+        SSSD -- "Uses" --> KeytabVol
+        
+        SSHD -- "Spawns User Shell" --> LegacyApp
+        LegacyApp -- "Accesses" --> FsAccess
+        FsAccess -- "Requests Kerberos Ticket" --> SSSD
+        
+        subgraph "Challenges Remaining"
+            style Challenges fill:#ffebee,stroke:#d32f2f,stroke-dasharray: 5 5
+            Challenge1["<br>⚠️<br><b>Challenge 1: Keytab Management</b><br>Still requires secure distribution & rotation of *user-specific* keytabs."]
+            Challenge2["<br>⚠️<br><b>Challenge 2: SSSD Complexity</b><br>SSSD's setup & state management in ephemeral sidecar."]
+            Challenge3["<br>⚠️<br><b>Challenge 3: Ticket Isolation</b><br>Ensuring isolated ticket caches for *multiple users* within the pod."]
+            Challenge4["<br>⚠️<br><b>Challenge 4: Clock Sync</b><br>Critical dependency on accurate time synchronization."]
+            Challenge5["<br>⚠️<br><b>Challenge 5: GSSAPI Configuration</b><br>Correct sshd_config and client setup for GSSAPI."]
+        end
+    end
+
+    subgraph "External Storage & Identity (Stateful)"
+        NFSServer[<br>🗄️<br>NFSv4 Server<br>with ACLs]
+        KDC[<br>🔑<br>Kerberos KDC<br>Active Directory / IdM]
+    end
+
+    %% --- Workflow with SSSD Sidecar ---
+    SSSD -- "1. Authenticates System/Users" --> KDC
+    KDC -- "2. Issues Secure Tickets" --> SSSD
+    SSSD -- "3. Provides Tickets to Main Container<br>(via shared volume/IPC/env)" --> FsAccess
+
+    FsAccess -- "4. File Op with Ticket" --> NFSServer
+    NFSServer -- "5. Checks ACLs" --> FsAccess
+
+    classDef default fill:#fff,stroke:#333,stroke-width:2px;
+```
+
+### Threat modeling asessment and controls
+
+*Controls that unify authentication and authorization directly at the data layer.*
+
+ Control/Measure | Threat Mitigated | Implementation Method | Assessment & Notes |
+| :--- | :--- | :--- | :--- |
+| **1. Kerberos Authentication** | Identity Spoofing, Unauthenticated Access | Kerberos KDC, `sssd` daemon, `krb5.conf` | **Gold Standard.** Provides strong, cryptographic authentication for network services but introduces significant complexity. |
+| **2. NFSv4 ACLs** | Improper Permissions, Data Exfiltration | `nfs4_setfacl` on the NFS server | Offers far more granular control than traditional POSIX permissions, allowing for complex authorization policies. |
+| **3. Data-in-Transit Encryption** | Eavesdropping, Man-in-the-Middle Attacks | `sec=krb5p` in NFS mount and export options | Encrypts all NFS traffic. **Critical** for protecting sensitive data but comes with a performance overhead. |
+| **4. SSSD Sidecar Pattern** | Manual Ticket Management, Expired Tickets | Sidecar container running `sssd` with a shared volume | **Architectural Solution.** Addresses the challenge of managing ticket rotation in an ephemeral container, but adds operational complexity. |
+| **5. GSS-API in SSH** | Cumbersome User Login, Insecure Credential Forwarding | `GSSAPIAuthentication yes` in `sshd_config` | **User Experience.** Enables a seamless Single Sign-On experience for SSH, where the user's Kerberos ticket is used for authentication. |
 
 
 --- 
