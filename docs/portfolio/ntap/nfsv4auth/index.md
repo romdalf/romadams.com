@@ -82,37 +82,7 @@ Adapting such an application to a containerized environment requires a significa
 
 ```mermaid
 graph TD
-    subgraph "User Environment"
-        User[<br>👤<br>User]
-    end
-
-    subgraph "Kubernetes Pod"
-        subgraph "Containerized Vintage App"
-            
-            App[<br>Legacy App Logic]
-            Shell[<br>Interactive Shell / Container OS]
-            Volume[Mounted<br>Filesystem]
-            
-            subgraph "Challenge Zone"
-                Challenge1["<br>⚠️<br><b>Challenge 1: Immutability Conflict</b><br>Requires OS-level user provisioning,<br>conflicts with immutable images."]
-                Challenge2["<br>⚠️<br><b>Challenge 2: OS Dependency</b><br>Authentication is not handled by the app,<br>but by the container's OS."]
-            end
-
-        end
-    end
-    
-    %% --- Tightly Coupled Flow ---
-    User -- "1. SSH Connection" --> Shell
-    Shell -- "2. OS-level Authentication<br>(Authenticates User)" --> App
-    App -- "3. Interacts with Filesystem<br>(Permissions based on OS User)" --> Volume
-    
-    classDef default fill:#fff,stroke:#333,stroke-width:2px;
-```
-
-### Containerized vintage application with user interactive shell and home directories
-```mermaid
-graph TD
-    subgraph "User Interactive Environment"
+    subgraph "User Interactive Env"
         User[<br>👤<br>End User]
     end
 
@@ -143,7 +113,61 @@ graph TD
     PV -- "Points to" --> Export
 ```
 
-### The Kubernetes cloud-native declarative model
+### NFSv4 with Kerberos
+NFSv4 with Kerberos performs authentication, verifying a user's identity through a trusted third-party service like Active Directory or OpenLDAP. NFSv4 also supports Access Control Lists (ACLs), which **could** be enforced by the NFSv4 server to determine user permissions for file and directory operations after authentication has occurred.   
+
+Kerberos is a client-server **authentication protocol** that uses tickets to allow nodes communicating over an insecure network to prove their identity to one another in a secure manner. When a client requests access to an NFSv4 share, the Kerberos client obtains a ticket from the Kerberos server, which is then used to authenticate the user to the NFSv4 server. The protocol can also provide additional capabilities like data encruption and data integrity improving the NFSv4 security posture. 
+
+ACLs provide granular control over file and directory access to define **authorization**, allowing administrators to define who can read, write, or execute files and directories. 
+The NFSv4 server could enforce ACLs. It checks the user's authenticated identity against the ACLs to grant or deny access to resources. When a new file or subdirectory is created within a directory with an ACL, it inherits the access control entries (ACEs) tagged for inheritance from the parent directory's ACL. 
+
+When Kerberos is enabled, ONTAP NFSv4 enforces the authentication to verify the user identity. Once the authentication process is (successfully) done, the authorization process **could** enforce the ACLs too for authorization if enabled.
+
+References:   
+- NFS Kerberos in ONTAP, NetApp TR-4616: [https://www.netapp.com/media/19384-tr-4616.pdf](https://www.netapp.com/media/19384-tr-4616.pdf)    
+- ONTAP, NetApp: [https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html](https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html)    
+
+
+--- 
+
+# Solution Proposals
+
+## Environment
+This section describes the working environment to reproduce the solution proposals.
+
+### Main objectives
+
+- Establish an iterative path to decouple the different challenges and solution path.  
+- Establish a potential secure path to mount volumes using NFSv4 with Kerberos in Kubernetes using Trident.   
+- Enable both application runtimes and multi-user SSH workflows with per-user authorization.   
+
+### Architectural components    
+
+- Kubernetes Control Plane: Manages all cluster resources, including Persistent Volumes (PVs) and Persistent Volume Claims (PVCs).   
+- Trident CSI with NAS Driver: Interface between Kubernetes storage and the NFS server.   
+- Key Distribution Center (KDC): Issues tickets for authentication, could be an Active Directory, FreeIPA, ...   
+- ONTAP NFSv4: expose the data path service, the export configuration, and validate authentication.    
+- Secrets Store CSI Driver: Optional component to mount secrets from external stores into Pods.   
+- Client credentials: Either node machine creds (host/<node>) or per-user delegated creds; do not use the server’s nfs/<server> key on the client.   
+- Application Pod: Contains the application container and the storage volume.   
+- Kerberos Configuration on nodes (krb5.conf, nfs-utils, idmap): Required for node-side Kerberos.     
+
+--- 
+
+## The Kubernetes cloud-native declarative model
+These 10 controls harden the pod's environment and isolate it from the rest of the cluster, treating the container as a secure black box.   
+
+- Isolate with Network Policies: This is your pod's firewall. Create a ```NetworkPolicy``` to restrict SSH access (port 22) to only known, trusted IP ranges, like a corporate VPN or a bastion host.   
+- Run with a Read-Only Root Filesystem: In your pod spec, set ```securityContext.readOnlyRootFilesystem: true```. This makes the container's base image immutable, preventing attackers from modifying system binaries or libraries. The user's home directory must be a separate, writable volume.   
+- Use Secure Persistent Volumes (PV/PVC): The user's home directory must be persistent. Use a ```PersistentVolume``` pointing to a secure storage backend (like an NFSv4 share with Kerberos ```krb5p``` and ```root_squash``` enabled) and mount it into the pod.   
+- Enforce Non-Root Execution: The SSH process must not run as root. Use ```securityContext.runAsUser``` and ```securityContext.runAsGroup``` with a high-numbered UID/GID (e.g., ```1001```) to minimize privileges.   
+- Manage SSH Keys with Kubernetes Secrets: Never bake SSH keys (```authorized_keys``` or host keys) into the image. Store them in Kubernetes ```Secrets``` and mount them as files into the pod at runtime. This allows for secure, centralized management.   
+- Use ```initContainers``` for Secure Setup: Apply traditional Linux hardening declaratively. An ```initContainer``` can run before your main application to set file permissions, apply chattr attributes, or perform other setup tasks on the persistent volume.   
+- Build from Minimalist Base Images: Re-platform your legacy app onto a minimal base image like Alpine or a "distroless" image if possible. Remove all unnecessary tools (compilers, package managers, network utilities) from the final image to limit an attacker's toolkit.   
+- Apply Pod Security Standards (PSS): Enforce cluster-wide security guardrails. Apply the ```baseline``` or ```restricted``` Pod Security Standard to the namespace where your application runs to prevent insecure configurations like running privileged containers.   
+- Leverage Runtime Security Monitoring: Deploy a cloud-native runtime security tool like Falco. It can monitor for suspicious activity inside the container in real-time, such as unexpected shell processes or modifications to critical configuration files.   
+- Control ```exec``` Access with RBAC: While users connect via SSH, administrators still have kubectl exec. Use Kubernetes RBAC (```Roles``` and ```RoleBindings```) to strictly limit who can get a shell in the pod through the Kubernetes API, closing a potential backdoor.   
+
 
 ```mermaid
 graph TD
@@ -156,7 +180,6 @@ graph TD
         User -- "SSH Traffic" --> NetPol
 
         subgraph "Pod Boundary"
-            style PodBoundary fill:#f0f6ff,stroke:#84b6f4
             
             subgraph "Pod Spec"
                 SecContext[<br>🔐<br>SecurityContext<br>- ReadOnlyRootFS<br>- RunAsUser: 1001]
@@ -179,66 +202,47 @@ graph TD
         Container -- "Mounts" --> PVC
         PVC -- "Binds to" --> PV
     end
+```
 
+### Containerized vintage application with user interactive shell and home directories
+
+
+```mermaid
+graph TD
+    subgraph "User Environment"
+        User[<br>👤<br>User]
+    end
+
+    subgraph "Kubernetes Pod"
+        subgraph "Containerized Vintage App"
+            
+            App[<br>Legacy App Logic]
+            Shell[<br>Interactive Shell / Container OS]
+            Volume[Mounted<br>Filesystem]
+            
+            subgraph "Challenge Zone"
+                Challenge1["<br>⚠️<br><b>Challenge 1: Immutability Conflict</b><br>Requires OS-level user provisioning,<br>conflicts with immutable images."]
+                Challenge2["<br>⚠️<br><b>Challenge 2: OS Dependency</b><br>Authentication is not handled by the app,<br>but by the container's OS."]
+            end
+
+        end
+    end
+    
+    %% --- Tightly Coupled Flow ---
+    User -- "1. SSH Connection" --> Shell
+    Shell -- "2. OS-level Authentication<br>(Authenticates User)" --> App
+    App -- "3. Interacts with Filesystem<br>(Permissions based on OS User)" --> Volume
+    
     classDef default fill:#fff,stroke:#333,stroke-width:2px;
 ```
 
 
-### NFSv4 with Kerberos
-NFSv4 with Kerberos performs authentication, verifying a user's identity through a trusted third-party service like Active Directory or OpenLDAP. NFSv4 also supports Access Control Lists (ACLs), which **could** be enforced by the NFSv4 server to determine user permissions for file and directory operations after authentication has occurred.   
-
-Kerberos is a client-server **authentication protocol** that uses tickets to allow nodes communicating over an insecure network to prove their identity to one another in a secure manner. When a client requests access to an NFSv4 share, the Kerberos client obtains a ticket from the Kerberos server, which is then used to authenticate the user to the NFSv4 server. The protocol can also provide additional capabilities like data encruption and data integrity improving the NFSv4 security posture. 
-
-ACLs provide granular control over file and directory access to define **authorization**, allowing administrators to define who can read, write, or execute files and directories. 
-The NFSv4 server could enforce ACLs. It checks the user's authenticated identity against the ACLs to grant or deny access to resources. When a new file or subdirectory is created within a directory with an ACL, it inherits the access control entries (ACEs) tagged for inheritance from the parent directory's ACL. 
-
-When Kerberos is enabled, ONTAP NFSv4 enforces the authentication to verify the user identity. Once the authentication process is (successfully) done, the authorization process **could** enforce the ACLs too for authorization if enabled.
-
-References:   
-- NFS Kerberos in ONTAP, NetApp TR-4616: [https://www.netapp.com/media/19384-tr-4616.pdf](https://www.netapp.com/media/19384-tr-4616.pdf)    
-- ONTAP, NetApp: [https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html](https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html)    
-
-
-### Cloud-native application
-A cloud-native application Pod, running without an interactive shell environment for users (no direct connection to a shell at the container level), will only require a valid Kerberos ticket to access the file system without encountering any 'permission denied' operations. This is a decoupled architecture where services and users are authorized or authenticated at the application layer while the filesystem is handled by the CSI at the node level:   
-- A Kerberos ticket is negotiated at the node level by the CSI, verified by the NFS service, then the NFS export is mounted to the Pod.      
-- Authorization of services and users using a framework like Oauth2 granting third-parties with limited access to their data without revealing credentials.    
-- Authentication of services and users using a framework like OpenID Connect (OIDC) built on top of OAuth2 validating identity for authentiction with user information to process capabilities like Single Sign-On.  
-
-### Containerized vintage application
-Vintage applications are usually built with an interactive shell environment for one or multiple users, service accounts or regular users, to run, update, and access the application and interact with the application and filesystem. When integrating with Kerberos, all users interacting with the filesystem will require a valid Kerberos ticket to avoid any 'permission denied' operations. This model doesn't present a decoupled architecture and highly depend on the underlying operating systems to be set up for dynamic management of Kerberos tickets.
-This represents a challenge when the application is containerized as a container image can not simply be join a realm or pre-user provisioning for security reasons. The ephemeral state and immutable nature of containers will also challenge any post-start configuration that will happen at the container image. 
-
-While the authentication at the Pod level would most likely follow the same logic as for a cloud-native application, users accessing an interactive shell with filesystem will have to authenticate even if authorization has been disabled.  
-Supporting a Kerberos will require to review the inner source of the application to address the dynamic management of Kerberos tickets to understand the different workflows address them via a modification of the deployment strategy up to a refactoring of the application to support the Kubernetes design constraints.  
-
---- 
-
-# Solution Proposals
-
-## Environment
-This section describes the working environment to reproduce the solution proposals.
-
-### Components
 
 
 
-### Main objectives
-1. Establish an iterative path to decouple the different challenges and solution path.  
-2. Establish a potential secure path to mount volumes using NFSv4 with Kerberos in Kubernetes using Trident.   
-3. Enable both application runtimes and multi-user SSH workflows with per-user authorization.   
 
-###
 
-### Architectural components   
-- Kubernetes Control Plane: Manages all cluster resources, including Persistent Volumes (PVs) and Persistent Volume Claims (PVCs).
-- Trident CSI with NAS Driver: Interface between Kubernetes storage and the NFS server.
-- Key Distribution Center (KDC): Issues tickets for authentication, could be an Active Directory, FreeIPA, ...
-- ONTAP NFSv4: expose the data path service, the export configuration, and validate authentication.
-- Secrets Store CSI Driver: Optional component to mount secrets from external stores into Pods.
-- Client credentials: Either node machine creds (host/<node>) or per-user delegated creds; do not use the server’s nfs/<server> key on the client.
-- Application Pod: Contains the application container and the storage volume.
-- Kerberos Configuration on nodes (krb5.conf, nfs-utils, idmap): Required for node-side Kerberos.   
+
 --- 
 
 ## Kerberos at the junction path with sys at volume level
