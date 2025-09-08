@@ -54,8 +54,8 @@ theme:
       toggle:
         icon: material/weather-night
         name: Switch to system preference
-# extra_css: 
-#   - stylesheets/extra.css
+extra_css: 
+  - stylesheets/extra.css
 extra:
   consent:
     actions:
