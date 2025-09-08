@@ -1,4 +1,4 @@
-# Securing home direcotries for vintage containerized applications 
+# Securing NFSv4 with authentication and authorization for containerized applications 
 
 !!! warning "Status: **draft**"
 
@@ -18,46 +18,13 @@
 --- 
 
 ## Abstract
-This RFC outlines the technical and operational challenges of implementing home directory management through NFS with an improved the security posture for containerized workloads in Kubernetes environments, specifically for legacy applications.   
-While cloud-native applications benefit from a decoupled architecture that simplifies authentication and authorization from the operating system layer, legacy applications present unique constraints due to their reliance on interactive shell environments, persistent user contexts, and the ephemeral and immutable nature of containers.
+This RFC outlines the technical and operational challenges of implementing NFSv4 with authentication and authorization to improve the security posture of containerized workloads in Kubernetes environments, specifically for legacy applications.   
+While cloud-native applications benefit from a decoupled architecture that simplifies authentication and authorization integration with NFSv4, legacy applications present unique constraints due to their reliance on interactive shell environments and persistent user contexts. The ephemeral and immutable nature of containers complicates authentication and authorization management which are essential for secure access to NFSv4 exports.
 
 --- 
 
 ## Introduction
-In a Kubernetes environment, integrating NFS home directories with ONTAP using Trident, the NetApp Container Storage Interface (CSI), combines storage orchestration with secure, strong authentication and encryption. However, this approach requires coordinating additional layers like the Kubernetes cloud-native declarative model, the CSI and NFS server, and traditional Linux administration measures.  
-
-```mermaid
-graph TD
-    subgraph "User Environment"
-        User[<br>👤<br>End User]
-    end
-
-    subgraph "Kubernetes Cluster"
-        subgraph "Pod: legacy-app-pod"
-            Container[<br>📦<br>Legacy App Container<br>sshd]
-            PVC[<br>📜<br>PersistentVolumeClaim<br>/home]
-        end
-
-        subgraph "Kubernetes Storage Layer"
-            PV[<br>💾<br>PersistentVolume<br>NFS]
-            CSI[<br>🔌<br>CSI Driver<br>NetApp Trident]
-        end
-    end
-
-    subgraph "External Storage System"
-        NFS_Server[<br>🗄️<br>NetApp ONTAP<br>NFS Server]
-        Export[<br>📁<br>NFS Export<br>/home_legacy]
-    end
-
-    %% --- Define Interactions ---
-    User -- "1. SSH Connection" --> Container
-    Container -- "2. Mounts Volume via PVC" --> PVC
-    PVC -- "3. Binds to" --> PV
-    PV -- "4. Provisioned & Managed by" --> CSI
-    CSI -- "5. API Calls to Provision/Map" --> NFS_Server
-    NFS_Server -- "6. Provides Export" --> Export
-    PV -- "Points to" --> Export
-```
+In a Kubernetes environment, integrating NFSv4 with Kerberos on ONTAP using Trident, the NetApp Container Storage Interface (CSI), combines storage orchestration with secure, strong authentication and encryption. This approach requires coordinating the Kubernetes nodes, the CSI, and the Kerberos authentication to provision and mount volumes for pods dynamically.  
 
 ### NFSv4 with Kerberos
 NFSv4 with Kerberos performs authentication, verifying a user's identity through a trusted third-party service like Active Directory or OpenLDAP. NFSv4 also supports Access Control Lists (ACLs), which **could** be enforced by the NFSv4 server to determine user permissions for file and directory operations after authentication has occurred.   
