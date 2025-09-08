@@ -1,4 +1,4 @@
-# Securing home direcotries for vintage containerized applications 
+# Securing home direcotries for containerized vintage applications 
 
 !!! warning "Status: **draft**"
 
@@ -18,7 +18,7 @@
 --- 
 
 ## Abstract
-This RFC outlines the technical and operational challenges of implementing home directory management through NFS with an improved the security posture for containerized workloads in Kubernetes environments, specifically for legacy applications.   
+This RFC outlines the technical and operational challenges of implementing home directory management through NFS with an improved the security posture for containerized workloads in Kubernetes environments, specifically for legacy/vintage applications.   
 While cloud-native applications benefit from a decoupled architecture that simplifies authentication and authorization from the operating system layer, legacy applications present unique constraints due to their reliance on interactive shell environments, persistent user contexts, and the ephemeral and immutable nature of containers.
 
 --- 
@@ -42,23 +42,22 @@ In this scenario, the application uses the user's authenticated session and OIDC
 graph TD
     subgraph "User & Identity Layer"
         User[<br>👤<br>User / Service]
-        IdP[<br>🆔<br>Identity Provider<br>OIDC / OAuth2]
+        IdP[Identity Provider<br>OIDC / OAuth2]
     end
 
     subgraph "Kubernetes Cluster"
         subgraph "Application Pod"
-            style AppPod fill:#e6f7ff,stroke:#84b6f4
-            App[<br>📲<br>Application Logic<br>Validates Token]
-            Volume[<br>📁<br>Mounted Volume<br>/data]
+            App[Application Logic<br>Validates Token]
+            Volume[Mounted Volume<br>/data]
         end
 
         subgraph "Infrastructure Layer"
-            CSI[<br>🔌<br>CSI Driver]
+            CSI[CSI<br>NetApp Trident]
         end
     end
 
     subgraph "External Storage System"
-        Storage[<br>🗄️<br>NFS / Storage Backend]
+        Storage[NetApp ONTAP<br>NFS Server]
     end
 
     %% --- Flows ---
@@ -70,8 +69,6 @@ graph TD
     
     CSI -- "A. System-level Auth & Mount" --> Storage
     Storage -- "B. Provides Volume" --> Volume
-
-    classDef default fill:#fff,stroke:#333,stroke-width:2px;
 ```
 
 ### Containerized vintage application
