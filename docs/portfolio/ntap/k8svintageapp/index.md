@@ -334,6 +334,30 @@ In a Kubernetes environment, accessing a secure storage volume involves a clear 
 - The CSI Driver's Role: A CSI driver, such as NetApp Trident, is responsible for the storage provisioning and mounting lifecycle. When a pod requests a PersistentVolume, the CSI driver communicates with the Kubernetes control plane and the external storage system (e.g., NetApp ONTAP). It handles the initial, system-level Kerberos authentication required to securely mount the NFS export to the appropriate Kubernetes node. This is a one-time setup operation for the volume.   
 - The Kernel's Role: The Linux kernel on the Kubernetes node is responsible for runtime file access. Once the CSI driver has successfully mounted the volume, the kernel's NFS client module manages all subsequent I/O operations. When the application performs a filesystem call, the kernel transparently handles the per-operation security requirements of the Kerberized NFS connection, using the credentials established during the initial mount.
 
+```mermaid
+sequenceDiagram
+    participant User as User/Operator
+    participant KubeAPI as Kube-API Server
+    participant Provisioner as Trident Controller
+    participant Kubelet as Kubelet
+    participant NodePlugin as CSI NFS Node Plugin
+    participant NFSserver as ONTAP NFSv4
+    participant KDC as KDC
+    participant AppPod as Application Pod
+
+    User->>KubeAPI: 1. Creates PVC referencing StorageClass
+    KubeAPI->>Provisioner: 2. New PVC
+    Provisioner->>NFSserver: 3. Create volume
+    Provisioner->>KubeAPI: 4. Create PV, bind PVC
+    KubeAPI->>Kubelet: 5. Schedule Pod
+    Kubelet->>NodePlugin: 6. NodePublishVolume (mount on node)
+    Kubelet->>KDC: 7. Node rpc.gssd uses node keytab or per-user cache
+    Kubelet->>NFSserver: 8. Kerberos negotiation (node-side)
+    NFSserver->>Kubelet: 9. Mount success
+    NodePlugin->>AppPod: 10. Bind-mount into Pod
+    AppPod->>NFSserver: 11. File I/O
+```
+
 This decoupling ensures the application remains portable and unaware of the infrastructure's security complexities (e.g., Kerberos), as the CSI driver manages the initial connection and the kernel handles all ongoing, transparent file access.
 
 **When would an application need Kerberos-awareness?**
