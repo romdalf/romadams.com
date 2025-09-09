@@ -363,6 +363,28 @@ This decoupling ensures the application remains portable and unaware of the infr
 **When would an application need Kerberos-awareness?**   
 When bypassing the Kubernetes' storage orchestration, the deployment is essentially treating the container like a traditional virtual machine, which has several critical implications. In other words, if a process or a user inside the container runs the mount command directly, the responsibility for authentication shifts from the infrastructure to the container itself.  
 
+```mermaid
+sequenceDiagram
+    participant User as User/Operator
+    participant KubeAPI as Kube-API Server
+    participant AppPod as Application Pod (App + Kerberos Sidecar)
+    participant KDC as KDC
+
+    User->>KubeAPI: 1. Apply ConfigMap (krb5.conf) and Secret (service keytab)
+    User->>KubeAPI: 2. Deploy Pod (App + Sidecar, shared ccache)
+
+    Note over AppPod: emptyDir(/var/run/krb5cc/app.ccache) shared by both containers
+
+    AppPod->>AppPod: 3. Sidecar starts
+    AppPod->>KDC: 4. Sidecar kinit -kt service.keytab SERVICE_PRINCIPAL
+    KDC-->>AppPod: 5. TGT issued to shared ccache
+    AppPod->>AppPod: 6. Sidecar loop renews/re-kinit periodically
+
+    AppPod->>KDC: 7. App requests service tickets as needed (GSSAPI)
+    KDC-->>AppPod: 8. Service ticket via shared ccache
+    AppPod->>ExternalSvc: 9. App calls Kerberos-protected service (HTTP, DB, etc.)
+```
+
 - Extreme privilege is required: the mount command requires elevated system privileges. The container must be started with the ```CAP_SYS_ADMIN``` capability, which is often called the "new root." This breaks nearly all container isolation, making the host kernel far more vulnerable to a container escape. This is a dangerous configuration and should be avoided.   
 - The Container is now Responsible for authentication: because the Kubernetes infrastructure is no longer involved, the container must handle the entire Kerberos authentication process for the mount itself. This means:   
         - A full Kerberos client (kinit, etc.) must be installed inside the container image.  
