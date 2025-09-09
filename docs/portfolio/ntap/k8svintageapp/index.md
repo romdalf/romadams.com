@@ -99,7 +99,7 @@ graph TD
     end
 
     subgraph "External Storage System"
-        NFS_Server[NetApp ONTAP<br>NFS Server]
+        NFSServer[NetApp ONTAP<br>NFS Server]
         Export[NFS Export<br>/homedir_volume]
     end
 
@@ -108,8 +108,8 @@ graph TD
     Container -- "2. Mounts Volume via PVC" --> PVC
     PVC -- "3. Binds to" --> PV
     PV -- "4. Managed by" --> CSI
-    CSI -- "5. API Calls to Provision/Map" --> NFS_Server
-    NFS_Server -- "6. Provides Export" --> Export
+    CSI -- "5. API Calls to Provision/Map" --> NFSServer
+    NFSServer -- "6. Provides Export" --> Export
     PV -- "Points to" --> Export
 ```
 
@@ -213,8 +213,8 @@ graph TD
             Volume[Mounted<br>Filesystem]
             
             subgraph "Challenge Zone"
-                Challenge1["<br>⚠️<br><b>Challenge 1: Immutability</b><br>OS-level user provisioning,<br>conflicts with immutable images."]
-                Challenge2["<br>⚠️<br><b>Challenge 2: OS Dependency</b><br>Authentication is not handled by<br>the app but by the container's OS."]
+                Challenge1["<b>Challenge 1: Immutability</b><br>OS-level user provisioning,<br>conflicts with immutable images."]
+                Challenge2["<b>Challenge 2: OS Dependency</b><br>Authentication is not handled by<br>the app but by the container's OS."]
             end
 
         end
@@ -260,6 +260,35 @@ However, such implementation for vintage application with user interactive envir
     - Transparent Filesystem Access: From that point on, any action the user takes—whether running commands in their shell or using the legacy application—happens under their authenticated identity. When they try to access their home directory, the kernel transparently uses their cached Kerberos ticket to securely communicate with the NFS server.   
 - This highlights a key distinction: it's not just SSH users, but any process that needs to access the NFS share requires a Kerberos identity. For interactive users, the SSH login is the mechanism that provides it. For any non-interactive system processes running in the container (like a cron job or a background service), they would also need their own Kerberos identity, typically provided by a system keytab file.   
 
+```mermaid
+graph TD
+    subgraph "Kubernetes Pod (Ephemeral & Immutable)"
+        UserSession[<br>👤<br>User Session]
+
+        subgraph "Challenge Zone"
+            style ChallengeZone fill:#ffebee,stroke:#d32f2f,stroke-dasharray: 5 5
+            Challenge1["<b>Challenge 1: Identity</b><br>How to securely manage user keytabs<br>in an ephemeral pod?"]
+            Challenge2["<b>Challenge 2: Ticket Lifecycle</b><br>How to manage ticket renewal for<br>multiple, long-running sessions?"]
+        end
+    end
+
+    subgraph "External Storage & Identity (Stateful)"
+        NFSServer[NetApp ONTAP<br>NFS Server w/o ACLs]
+        KDC[Kerberos KDC<br>Active Directory / IdM]
+    end
+
+    %% --- Workflow with Challenges ---
+    UserSession -- "1. File Operation (Read/Write)" --> NFSServer
+    
+    Challenge1 -- "Complicates" --> UserSession
+    Challenge2 -- "Complicates" --> UserSession
+
+    NFSServer -- "2. Who are you?<br>(Authentication Request)" --> KDC
+    KDC -- "3. Issues Secure Ticket<br>(Identity Verified)" --> NFSServer
+    NFSServer -- "4. What can you do?<br>(Checks NFSv4 ACLs)" --> NFSServer
+    NFSServer -- "5. Access Granted / Denied" --> UserSession
+```
+
 #### Identity and Keytab Management
 The biggest hurdle is securely managing the identities of multiple users inside a container. In a traditional VM, each user has a persistent identity managed by the OS. In a container, this is much harder.   
 
@@ -279,56 +308,6 @@ The core principles of containerization conflict with the requirements of a trad
 - Service Discovery: The container must be able to reliably find the Kerberos KDC and other services. This often requires specific DNS configurations (SRV records) and network policies to allow traffic to the KDC, which can be complex to manage in a Kubernetes network environment.    
 - Clock Skew: Kerberos is highly sensitive to time synchronization. If the container's clock drifts out of sync with the KDC's clock by more than a few minutes (typically 5), all authentication attempts will fail. Ensuring consistent time sync across all Kubernetes nodes and pods is critical.    
 
-```mermaid
-graph TD
-    subgraph "Kubernetes Pod (Ephemeral & Immutable)"
-        User[<br>👤<br>End User]
-
-        subgraph "Main Container (Legacy App)"
-            LegacyApp[<br>📦<br>Legacy App Logic]
-            SSHD[<br>Daemon<br>SSH Daemon<br>GSSAPI Enabled]
-            FsAccess[<br>📁<br>Filesystem Access]
-        end
-
-        subgraph "Sidecar Container (Kerberos Helper)"
-            SSSD[<br>Daemon<br>SSSD<br>Ticket Caching/Renewal]
-            KeytabVol[<br>🔑<br>Mounted Keytabs<br>via K8s Secrets]
-        end
-        
-        User -- "SSH with GSSAPI Negotiation" --> SSHD
-        SSHD -- "GSSAPI Authentication Request" --> SSSD
-        SSSD -- "Uses" --> KeytabVol
-        
-        SSHD -- "Spawns User Shell" --> LegacyApp
-        LegacyApp -- "Accesses" --> FsAccess
-        FsAccess -- "Requests Kerberos Ticket" --> SSSD
-        
-        subgraph "Challenges Remaining"
-            style Challenges fill:#ffebee,stroke:#d32f2f,stroke-dasharray: 5 5
-            Challenge1["<br>⚠️<br><b>Challenge 1: Keytab Management</b><br>Still requires secure distribution & rotation of *user-specific* keytabs."]
-            Challenge2["<br>⚠️<br><b>Challenge 2: SSSD Complexity</b><br>SSSD's setup & state management in ephemeral sidecar."]
-            Challenge3["<br>⚠️<br><b>Challenge 3: Ticket Isolation</b><br>Ensuring isolated ticket caches for *multiple users* within the pod."]
-            Challenge4["<br>⚠️<br><b>Challenge 4: Clock Sync</b><br>Critical dependency on accurate time synchronization."]
-            Challenge5["<br>⚠️<br><b>Challenge 5: GSSAPI Configuration</b><br>Correct sshd_config and client setup for GSSAPI."]
-        end
-    end
-
-    subgraph "External Storage & Identity (Stateful)"
-        NFSServer[<br>🗄️<br>NFSv4 Server<br>with ACLs]
-        KDC[<br>🔑<br>Kerberos KDC<br>Active Directory / IdM]
-    end
-
-    %% --- Workflow with SSSD Sidecar ---
-    SSSD -- "1. Authenticates System/Users" --> KDC
-    KDC -- "2. Issues Secure Tickets" --> SSSD
-    SSSD -- "3. Provides Tickets to Main Container<br>(via shared volume/IPC/env)" --> FsAccess
-
-    FsAccess -- "4. File Op with Ticket" --> NFSServer
-    NFSServer -- "5. Checks ACLs" --> FsAccess
-
-    classDef default fill:#fff,stroke:#333,stroke-width:2px;
-```
-
 ### Threat modeling asessment and controls
 
 *Controls that unify authentication and authorization directly at the data layer.*
@@ -340,3 +319,75 @@ graph TD
 | **3. Data-in-Transit Encryption** | Eavesdropping, Man-in-the-Middle Attacks | `sec=krb5p` in NFS mount and export options | Encrypts all NFS traffic. **Critical** for protecting sensitive data but comes with a performance overhead. |
 | **4. SSSD Sidecar Pattern** | Manual Ticket Management, Expired Tickets | Sidecar container running `sssd` with a shared volume | **Architectural Solution.** Addresses the challenge of managing ticket rotation in an ephemeral container, but adds operational complexity. |
 | **5. GSS-API in SSH** | Cumbersome User Login, Insecure Credential Forwarding | `GSSAPIAuthentication yes` in `sshd_config` | **User Experience.** Enables a seamless Single Sign-On experience for SSH, where the user's Kerberos ticket is used for authentication. |
+
+### Implementation considerations 
+
+#### Application vs User
+
+##### Application
+An application itself would typically not need a direct GSS-API integration for filesystem access. In a Kubernetes environment, the process is handled transparently by two different components working together: the CSI driver at setup and the kernel during runtime.   
+
+**CSI Driver and the Kernel** 
+In a Kubernetes environment, accessing a secure storage volume involves a clear separation of responsibilities between the application, the Container Storage Interface (CSI) driver, and the node's kernel. This decouples the application from the underlying storage infrastructure.    
+
+- The Application's Role: The application code is responsible only for its business logic. For file access, it uses standard POSIX system calls such as open(), read(), and write(). The application operates on a volume mounted at a specific path inside its container and has no awareness of the storage protocol (NFS), the authentication mechanism (Kerberos), or the provisioning process.   
+- The CSI Driver's Role: A CSI driver, such as NetApp Trident, is responsible for the storage provisioning and mounting lifecycle. When a pod requests a PersistentVolume, the CSI driver communicates with the Kubernetes control plane and the external storage system (e.g., NetApp ONTAP). It handles the initial, system-level Kerberos authentication required to securely mount the NFS export to the appropriate Kubernetes node. This is a one-time setup operation for the volume.   
+- The Kernel's Role: The Linux kernel on the Kubernetes node is responsible for runtime file access. Once the CSI driver has successfully mounted the volume, the kernel's NFS client module manages all subsequent I/O operations. When the application performs a filesystem call, the kernel transparently handles the per-operation security requirements of the Kerberized NFS connection, using the credentials established during the initial mount.
+
+This decoupling ensures the application remains portable and unaware of the infrastructure's security complexities (e.g., Kerberos), as the CSI driver manages the initial connection and the kernel handles all ongoing, transparent file access.
+
+**When would an application need Kerberos-awareness?**
+When bypassing the Kubernetes' storage orchestration, the deployment is essentially treating the container like a traditional virtual machine, which has several critical implications. In other words, if a process or a user inside the container runs the mount command directly, the responsibility for authentication shifts from the infrastructure to the container itself.  
+
+- Extreme privilege is required: the mount command requires elevated system privileges. The container must be started with the ```CAP_SYS_ADMIN``` capability, which is often called the "new root." This breaks nearly all container isolation, making the host kernel far more vulnerable to a container escape. This is a dangerous configuration and should be avoided.   
+- The Container is now Responsible for authentication: because the Kubernetes infrastructure is no longer involved, the container must handle the entire Kerberos authentication process for the mount itself. This means:   
+        - A full Kerberos client (kinit, etc.) must be installed inside the container image.  
+        - The container needs access to a keytab file to authenticate. This creates a significant secret management problem.  
+        - A process inside the container must run kinit to obtain a valid Kerberos ticket before attempting to run the mount command.  
+
+##### User
+Like the application, the behavior is mainly driven by the implementation, either leveraging the Kubernetes native orchestration or in-Pod mount and filesystem management. 
+
+**Kubernetes native orchestration**
+The authentication and authorization model would in theory support a system-level mount with Kubernetes-managed POSIX permissions.
+
+- Single-user per Pod connected via SSH
+    In this scenario, there is a separation between user login authentication and filesystem authorization, making the per-user Kerberos ticket for NFS access unnecessary. The user still authenticates to get an SSH shell, but this process is now completely decoupled from how the filesystem is accessed. Its only job is to verify the user's identity to let them into the pod.   
+- Filesystem Mount handled by CSI   
+    The CSI driver, acting on behalf of the system, handles the Kerberos authentication to the NFS server. It uses a system-level identity (often a machine keytab) to mount the entire share into the pod. At this stage, the individual SSH user's identity might be irrelevant. The mount is established for the pod itself.   
+- Filesystem Authorization handled by Kubernetes & POSIX   
+    This is the key difference. Once the volume is mounted, access control is no longer managed by individual Kerberos tickets. Instead, it's governed by standard Linux permissions:
+        - ```fsGroup```: Kubernetes ensures that all files within the volume are owned by this group ID.
+        - ```supplementalGroups```: The user's process is granted membership in these groups.
+        - ```fsGroupChangePolicy```: This policy ensures the permissions are correctly applied.
+
+Essentially, the user is authorized to access the files not because they have a personal Kerberos ticket, but because their process's group ID (managed by Kubernetes) matches the group ownership of the files on the already-mounted volume.
+
+This workflow would imply:   
+- System Mount: The Kubernetes CSI driver authenticates to the NFS server using a system-level Kerberos identity and mounts the volume into the pod.
+- User Login: The single user logs in via SSH, authenticated by the IdP (LDAP).
+- Permissions Applied: Kubernetes starts the user's process with the specified ```fsGroup``` and ```supplementalGroups``` IDs.
+- Filesystem Access: When the user's process tries to read or write a file, the kernel performs a standard POSIX permission check (UID/GID), which succeeds because the group memberships match.
+
+In this model, the Kerberos authentication happens only once at the system level, completely transparent to the end-user. The SSH session no longer acts as a "Kerberos Gateway" for filesystem access.
+
+**Single-user and multi-user Pod**
+The first part of the model—the system-level mount—remains perfectly valid. The CSI driver will still use a single, system-level Kerberos identity to authenticate to the NFS server and mount the volume into the pod. This process is completely independent of how many users will eventually connect.
+
+## Where the Model Breaks Down: Multi-User Authorization
+The authorization part of the model fails because ```fsGroup``` and ```supplementalGroups``` are pod-level settings, not dynamic user-level ones.   
+
+- Static Pod Identity: These settings are designed to grant a specific set of group permissions to the primary workload running in the pod. They are not designed to manage multiple, different users who log in interactively after the pod has started.   
+- Fallback to POSIX Permissions: When multiple users connect via SSH, their sessions are authenticated by the IdP (LDAP). Each user's process runs with the UID and GID assigned to them in the IdP. At this point, filesystem access is determined purely by the traditional POSIX permissions (read/write/execute based on user, group, and other) on the files themselves, as seen by the NFS server. The ```fsGroup``` and supplementalGroups from the pod manifest become largely irrelevant to these new user sessions.   
+
+This means no more the centralized, Kubernetes-native control over file permissions, reason why, putting a side the implementation complexity, the Kerberos model is better suited for multi-user environments:   
+
+- Each user authenticates via SSH using their personal Kerberos ticket.
+- The kernel uses this specific ticket for all NFS operations.
+- The NFS server can then use this strong, per-user identity to enforce granular permissions, often with NFSv4 ACLs.
+
+In summary, the system-level mount with ```fsGroup``` is ideal for a single-identity application workload. For a pod requiring multi-user, interactive access, the per-user Kerberos ticket model is the more robust and secure solution.
+
+**when would an user require Kerberos-awarness?**
+See **When would an application need Kerberos-awareness?** in previous Application section. 
+ 
