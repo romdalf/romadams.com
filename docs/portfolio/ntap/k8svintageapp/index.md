@@ -360,7 +360,7 @@ sequenceDiagram
 
 This decoupling ensures the application remains portable and unaware of the infrastructure's security complexities (e.g., Kerberos), as the CSI driver manages the initial connection and the kernel handles all ongoing, transparent file access.
 
-**When would an application need Kerberos-awareness?**
+**When would an application need Kerberos-awareness?**   
 When bypassing the Kubernetes' storage orchestration, the deployment is essentially treating the container like a traditional virtual machine, which has several critical implications. In other words, if a process or a user inside the container runs the mount command directly, the responsibility for authentication shifts from the infrastructure to the container itself.  
 
 - Extreme privilege is required: the mount command requires elevated system privileges. The container must be started with the ```CAP_SYS_ADMIN``` capability, which is often called the "new root." This breaks nearly all container isolation, making the host kernel far more vulnerable to a container escape. This is a dangerous configuration and should be avoided.   
@@ -372,7 +372,7 @@ When bypassing the Kubernetes' storage orchestration, the deployment is essentia
 #### User
 Like the application, the behavior is mainly driven by the implementation, either leveraging the Kubernetes native orchestration or in-Pod mount and filesystem management. 
 
-**Kubernetes native orchestration**
+**Kubernetes native orchestration**   
 The authentication and authorization model would in theory support a system-level mount with Kubernetes-managed POSIX permissions.
 
 - Single-user per Pod connected via SSH
@@ -397,10 +397,10 @@ This workflow would imply:
 
 In this model, the Kerberos authentication happens only once at the system level, completely transparent to the end-user. The SSH session no longer acts as a "Kerberos Gateway" for filesystem access.
 
-**Single-user and multi-user Pod**
+**Single-user and multi-user Pod**    
 The first part of the model—the system-level mount—remains perfectly valid. The CSI driver will still use a single, system-level Kerberos identity to authenticate to the NFS server and mount the volume into the pod. This process is completely independent of how many users will eventually connect.
 
-**Where the Model Breaks Down: Multi-User Authorization**
+**Where the Model Breaks Down: Multi-User Authorization**    
 The authorization part of the model fails because ```fsGroup``` and ```supplementalGroups``` are pod-level settings, not dynamic user-level ones.   
 
 - Static Pod Identity: These settings are designed to grant a specific set of group permissions to the primary workload running in the pod. They are not designed to manage multiple, different users who log in interactively after the pod has started.   
