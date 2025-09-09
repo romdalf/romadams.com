@@ -115,15 +115,15 @@ graph TD
 
 --- 
 
-# Solution Proposals
+## Solution Proposals
 
 This section describes the iterative process at the Kubernetes, base image, and storage layers to improve the security posture when containerizing a vintage application with a user interactive environment including home directories.  
 
 --- 
 
-## The Kubernetes cloud-native declarative model
+### The Kubernetes cloud-native declarative model
 
-### Overview
+#### Overview
 These 10 controls harden the pod's environment and isolate it from the rest of the cluster, treating the container as a secure black box.   
 
 - Isolate with Network Policies: This is your pod's firewall for a network defense-in-depth strategy. Even if an attacker compromise the container, these policies prevent them from using the pod to scan for or connect to other services on the network, including NFS. 
@@ -178,7 +178,7 @@ graph TD
 
 ``` 
 
-### Threat modeling asessment and controls
+#### Threat modeling asessment and controls
 
 *Controls applied at the orchestration layer to isolate and secure the pod's environment.*
 
@@ -198,7 +198,7 @@ graph TD
 
 ### Containerized vintage application with user interactive shell and home directories
 
-### Overview
+#### Overview
 ```mermaid
 graph TD
     subgraph "User Environment"
@@ -226,7 +226,7 @@ graph TD
     App -- "3. Interacts with Filesystem<br>(Permissions based on OS User)" --> Volume
 ```
 
-### Threat modeling asessment and controls
+#### Threat modeling asessment and controls
 
 *Controls applied within the container to harden the OS and the services it runs.*
 
@@ -308,7 +308,7 @@ The core principles of containerization conflict with the requirements of a trad
 - Service Discovery: The container must be able to reliably find the Kerberos KDC and other services. This often requires specific DNS configurations (SRV records) and network policies to allow traffic to the KDC, which can be complex to manage in a Kubernetes network environment.    
 - Clock Skew: Kerberos is highly sensitive to time synchronization. If the container's clock drifts out of sync with the KDC's clock by more than a few minutes (typically 5), all authentication attempts will fail. Ensuring consistent time sync across all Kubernetes nodes and pods is critical.    
 
-### Threat modeling asessment and controls
+#### Threat modeling asessment and controls
 
 *Controls that unify authentication and authorization directly at the data layer.*
 
@@ -320,11 +320,11 @@ The core principles of containerization conflict with the requirements of a trad
 | **4. SSSD Sidecar Pattern** | Manual Ticket Management, Expired Tickets | Sidecar container running `sssd` with a shared volume | **Architectural Solution.** Addresses the challenge of managing ticket rotation in an ephemeral container, but adds operational complexity. |
 | **5. GSS-API in SSH** | Cumbersome User Login, Insecure Credential Forwarding | `GSSAPIAuthentication yes` in `sshd_config` | **User Experience.** Enables a seamless Single Sign-On experience for SSH, where the user's Kerberos ticket is used for authentication. |
 
-### Implementation considerations 
+## Implementation considerations 
 
-#### Application vs User
+### Application vs User
 
-##### Application
+#### Application
 An application itself would typically not need a direct GSS-API integration for filesystem access. In a Kubernetes environment, the process is handled transparently by two different components working together: the CSI driver at setup and the kernel during runtime.   
 
 **CSI Driver and the Kernel** 
@@ -345,7 +345,7 @@ When bypassing the Kubernetes' storage orchestration, the deployment is essentia
         - The container needs access to a keytab file to authenticate. This creates a significant secret management problem.  
         - A process inside the container must run kinit to obtain a valid Kerberos ticket before attempting to run the mount command.  
 
-##### User
+#### User
 Like the application, the behavior is mainly driven by the implementation, either leveraging the Kubernetes native orchestration or in-Pod mount and filesystem management. 
 
 **Kubernetes native orchestration**
@@ -376,7 +376,7 @@ In this model, the Kerberos authentication happens only once at the system level
 **Single-user and multi-user Pod**
 The first part of the model—the system-level mount—remains perfectly valid. The CSI driver will still use a single, system-level Kerberos identity to authenticate to the NFS server and mount the volume into the pod. This process is completely independent of how many users will eventually connect.
 
-## Where the Model Breaks Down: Multi-User Authorization
+**Where the Model Breaks Down: Multi-User Authorization**
 The authorization part of the model fails because ```fsGroup``` and ```supplementalGroups``` are pod-level settings, not dynamic user-level ones.   
 
 - Static Pod Identity: These settings are designed to grant a specific set of group permissions to the primary workload running in the pod. They are not designed to manage multiple, different users who log in interactively after the pod has started.   
@@ -390,6 +390,7 @@ This means no more the centralized, Kubernetes-native control over file permissi
 
 In summary, the system-level mount with ```fsGroup``` is ideal for a single-identity application workload. For a pod requiring multi-user, interactive access, the per-user Kerberos ticket model is the more robust and secure solution.
 
-**when would an user require Kerberos-awarness?**  
+**when would an user require Kerberos-awarness?**   
+
 See **When would an application need Kerberos-awareness?** in previous Application section. 
  
