@@ -363,7 +363,8 @@ The authentication and authorization model would in theory support a system-leve
 
 Essentially, the user is authorized to access the files not because they have a personal Kerberos ticket, but because their process's group ID (managed by Kubernetes) matches the group ownership of the files on the already-mounted volume.
 
-This workflow would imply:   
+This workflow would imply:    
+
 - System Mount: The Kubernetes CSI driver authenticates to the NFS server using a system-level Kerberos identity and mounts the volume into the pod.
 - User Login: The single user logs in via SSH, authenticated by the IdP (LDAP).
 - Permissions Applied: Kubernetes starts the user's process with the specified ```fsGroup``` and ```supplementalGroups``` IDs.
@@ -388,6 +389,6 @@ This means no more the centralized, Kubernetes-native control over file permissi
 
 In summary, the system-level mount with ```fsGroup``` is ideal for a single-identity application workload. For a pod requiring multi-user, interactive access, the per-user Kerberos ticket model is the more robust and secure solution.
 
-**when would an user require Kerberos-awarness?**
+**when would an user require Kerberos-awarness?**  
 See **When would an application need Kerberos-awareness?** in previous Application section. 
  
