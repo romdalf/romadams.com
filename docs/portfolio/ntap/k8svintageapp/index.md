@@ -358,9 +358,9 @@ The authentication and authorization model would in theory support a system-leve
 - Filesystem Authorization handled by Kubernetes & POSIX   
     This is the key difference. Once the volume is mounted, access control is no longer managed by individual Kerberos tickets. Instead, it's governed by standard Linux permissions:  
 
-        - ```fsGroup```: Kubernetes ensures that all files within the volume are owned by this group ID.  
-        - ```supplementalGroups```: The user's process is granted membership in these groups.  
-        - ```fsGroupChangePolicy```: This policy ensures the permissions are correctly applied.  
+    ```fsGroup```: Kubernetes ensures that all files within the volume are owned by this group ID.  
+    ```supplementalGroups```: The user's process is granted membership in these groups.  
+    ```fsGroupChangePolicy```: This policy ensures the permissions are correctly applied.  
 
 Essentially, the user is authorized to access the files not because they have a personal Kerberos ticket, but because their process's group ID (managed by Kubernetes) matches the group ownership of the files on the already-mounted volume.
 
