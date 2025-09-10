@@ -930,6 +930,67 @@ Name Service Switch Database: hosts
    Name Service Source Order: dns, files
 ```
 
+```
+podman volume create keytab-storage
+keytab-storage
+
+podman volume inspect keytab-storage
+[
+     {
+          "Name": "keytab-storage",
+          "Driver": "local",
+          "Mountpoint": "/home/ec2-user/.local/share/containers/storage/volumes/keytab-storage/_data",
+          "CreatedAt": "2025-09-10T16:28:26.27678136Z",
+          "Labels": {},
+          "Scope": "local",
+          "Options": {},
+          "MountCount": 0,
+          "NeedsCopyUp": true,
+          "NeedsChown": true,
+          "LockNumber": 2
+     }
+]
+
+ls -al /home/ec2-user/.local/share/containers/storage/volumes/keytab-storage/_data
+total 4
+drwxr-xr-x 2 ec2-user users  27 Sep 10 16:29 .
+drwx------ 3 ec2-user users  19 Sep 10 16:28 ..
+-rw------- 1 ec2-user users 196 Sep 10 16:29 client.keytab
+
+chmod 644 /home/ec2-user/.local/share/containers/storage/volumes/keytab-storage/_data/client.keytab
+
+podman run -d --name nginx-keytab-server -p 8080:80 -v keytab-storage:/usr/share/nginx/html:ro,Z docker.io/library/nginx:latest
+Trying to pull docker.io/library/nginx:latest...
+Getting image source signatures
+Copying blob a785b80f5a67 done   |
+Copying blob d107e437f729 done   |
+Copying blob f1c4d397f477 done   |
+Copying blob cb497a329a81 done   |
+Copying blob f72106e86507 done   |
+Copying blob 899c83fc198b done   |
+Copying blob 6c50e4e0c439 done   |
+Copying config 41f689c209 done   |
+Writing manifest to image destination
+WARN[0005] Failed to mount subscriptions, skipping entry in /etc/containers/mounts.conf: open /etc/zypp/credentials.d/SCCcredentials: permission denied
+36ca20a52f2082ff3ef4993fb9681d6dd3ea8c1e490f14670b6f2de4f5136aec
+```
+
+```
+nfs kerberos interface enable -lif nfs_smb_management_1 -spn nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL -keytab-uri http://172.31.46.200:8080/client.keytab
+
+Warning: Keys for encryption types "des-cbc-crc,des3-cbc-sha1,aes128-cts-hmac-sha1-96,aes256-cts-hmac-sha1-96" are required for Vserver "svmnfsv4"
+         but found keys only for encryption types "aes128-cts-hmac-sha1-96,aes256-cts-hmac-sha1-96". Keys for encryption types
+         "des-cbc-crc,des3-cbc-sha1" for service principal name "nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL" are missing. Available keys will be
+         imported. Do you want to continue? {y|n}: y
+
+nfs kerberos interface show
+               Logical
+Vserver        Interface     Address         Kerberos SPN
+-------------- ------------- --------------- -------- -----------------------
+svmnfsv4       nfs_smb_management_1
+                             172.31.47.242   enabled  nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL
+```
+
 
 #### Deploying Pod
 
