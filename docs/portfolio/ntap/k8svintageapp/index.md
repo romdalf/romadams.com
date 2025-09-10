@@ -760,7 +760,7 @@ The password data field can be double check with ```base64 -d``` to verify that 
 
 Create a TridentBackendConfig:
 
-```
+```YAML
 apiVersion: trident.netapp.io/v1
 kind: TridentBackendConfig
 metadata:
@@ -781,7 +781,8 @@ spec:
 ```
 kubectl apply -f tbc.yaml
 tridentbackendconfig.trident.netapp.io/ontap-nas created
-
+```
+```YAML
 apiVersion: trident.netapp.io/v1
 kind: TridentBackendConfig
 metadata:
@@ -818,7 +819,7 @@ status:
 
 Create a StorageClass:
 
-```
+```YAML
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -845,7 +846,7 @@ ontap-nfsv4   csi.trident.netapp.io   Delete          Immediate           true  
 
 Create a test PVC:
 
-```
+```YAML
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -866,4 +867,40 @@ persistentvolumeclaim/data-krb created
 kubectl get pvc -w
 NAME       STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
 data-krb   Bound    pvc-a6ce2f55-0579-47b8-b04e-805e4b4278b9   1Gi        RWX            ontap-nfsv4    <unset>                 7s
+```
+
+Create a test Pod:
+
+```YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kerberos-user-pod-hardened
+spec:
+  securityContext:
+    runAsUser: 1907600003
+    runAsGroup: 5005
+    fsGroup: 5005
+    supplementalGroups: [5005]
+    fsGroupChangePolicy: "OnRootMismatch"
+    runAsNonRoot: true # 
+  containers:
+    - name: test-container
+      image: busybox:latest
+      command: ["/bin/sh", "-c", "sleep 3600"]
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        privileged: false
+        readOnlyRootFilesystem: false
+
+      volumeMounts:
+        - name: nfs-data
+          mountPath: "/data/home" 
+  volumes:
+    - name: nfs-data
+      persistentVolumeClaim:
+        claimName: data-krb
 ```
