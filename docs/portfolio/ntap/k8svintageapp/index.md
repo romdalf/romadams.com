@@ -450,7 +450,7 @@ The followings provide a lightweight lab environment in AWS to perform an iterat
 - Kubernetes instance, Suse 15.6 with hostname ip-172-31-46-200
 - FSxN instance with SVM name svmnfsv4
 
-##### FreeIPA server
+#### FreeIPA server
 
 Instance is a Suse 15.6 with latest updates installed including ```podman```. 
 
@@ -543,7 +543,7 @@ Here are screenshots of the GUI with all the details, including the user, groups
 ![](../../../images/Screenshot%20from%202025-09-10%2017-01-55.png)
 ![](../../../images/Screenshot%20from%202025-09-10%2017-02-01.png)
 
-##### Kubernetes node
+#### Kubernetes node
 
 Instance is a Suse 15.6 with latest updates installed including ```podman podman-docker nfs-client krb5-client sssd-tools krb5-client ca-certificates-mozilla adcli sssd-ad libipa_hbac0 sssd-ipa```. 
 
@@ -874,6 +874,64 @@ kubectl get pvc -w
 NAME       STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
 data-krb   Bound    pvc-a6ce2f55-0579-47b8-b04e-805e4b4278b9   1Gi        RWX            ontap-nfsv4    <unset>                 7s
 ```
+
+
+#### ONTAP 
+
+```
+ipa host-add svmnfsv4.net.domain.local --force
+--------------------------------------
+Added host "svmnfsv4.net.domain.local"
+--------------------------------------
+  Host name: svmnfsv4.net.domain.local
+  Principal name: host/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL
+  Principal alias: host/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL
+  Password: False
+  Keytab: False
+  Managed by: svmnfsv4.net.domain.local
+
+ipa dnsrecord-add net.domain.local svmnfsv4 --a-rec=172.31.47.242
+  Record name: svmnfsv4
+  A record: 172.31.47.242
+
+ipa service-add nfs/svmnfsv4.net.domain.local
+--------------------------------------------------------------
+Added service "nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL"
+--------------------------------------------------------------
+  Principal name: nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL
+  Principal alias: nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL
+  Managed by: svmnfsv4.net.domain.local
+
+ipa-getkeytab -p nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL -k /tmp/client-ntap.keytab -e aes256-cts-hmac-sha1-96,aes128-cts-hmac-sha1-96
+Keytab successfully retrieved and stored in: /tmp/client-ntap.keytab
+```
+
+
+```
+services name-service dns create -domains net.domain.local -name-servers 172.31.32.73
+
+services name-service dns show
+                                                    Name
+Vserver         Domains                             Servers
+--------------- ----------------------------------- ----------------
+svmnfsv4        net.domain.local                    172.31.32.73
+
+services name-service dns check -name-server 172.31.32.73
+
+       Name Server: 172.31.32.73
+Name Server Status: up
+    Status Details: Response time (msec): 1
+
+services name-service ns-switch modify -database hosts dns, files
+
+services name-service ns-switch show -database hosts
+
+Name Service Switch Database: hosts
+   Name Service Source Order: dns, files
+```
+
+
+#### Deploying Pod
 
 Create a test Pod:
 
