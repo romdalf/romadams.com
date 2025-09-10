@@ -662,7 +662,7 @@ id admin
 uid=1907600000(admin) gid=1907600000(admins) groups=1907600000(admins)
 ```
 
-This will confirm a working connection between the host and the KDC to retrieve tickets and verify identities. Now, we can install a test Kubernetes environment using ```kind``` et ```kubectl```. 
+This will confirm a working connection between the host and the KDC to retrieve tickets and verify identities. Now, we can install a test Kubernetes environment using ```kind```,```kubectl```, and ```helm```. 
 
 Deploy a test environment:
 
@@ -683,10 +683,61 @@ You can now use your cluster with:
 kubectl cluster-info --context kind-kind
 
 Thanks for using kind! 😊
-ec2-user@ip-172-31-46-200:~> kubectl get nodes
+```
+
+Verify the readyness of the cluster
+```
+ec2-user@ip-172-31-46-200:~> kubectl get nodes -w
 NAME                 STATUS     ROLES           AGE   VERSION
 kind-control-plane   NotReady   control-plane   20s   v1.34.0
+kind-control-plane   Ready    control-plane   47s   v1.34.0
 ```
+
+Deploy NetApp Trident
+
+```
+helm repo add netapp-trident https://netapp.github.io/trident-helm-chart
+helm install trident netapp-trident/trident-operator --version 100.2506.0 --create-namespace --namespace trident
+
+NAME: trident
+LAST DEPLOYED: Wed Sep 10 08:57:25 2025
+NAMESPACE: trident
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+Thank you for installing trident-operator, which will deploy and manage NetApp's Trident CSI
+storage provisioner for Kubernetes.
+
+Your release is named 'trident' and is installed into the 'trident' namespace.
+Please note that there must be only one instance of Trident (and trident-operator) in a Kubernetes cluster.
+
+To configure Trident to manage storage resources, you will now need to configure at least one storage
+backend and add a matching storageClass.
+
+Examples of backend and storageClass definitions are available at official NetApp Trident documentation.
+
+Further, You may find all Trident releases and source code online at https://github.com/NetApp/trident.
+
+To learn more about the release, try:
+
+  $ helm status trident
+  $ helm get all trident
+```
+
+Verify the deployment
+```
+kubectl get pods -n trident -w
+NAME                                  READY   STATUS              RESTARTS   AGE
+trident-controller-689cfc669f-flg7j   0/6     ContainerCreating   0          2s
+trident-node-linux-8cdx4              0/2     ContainerCreating   0          1s
+trident-operator-b999469bc-4r7rd      1/1     Running             0          39s
+trident-node-linux-8cdx4              1/2     Running             0          5s
+trident-node-linux-8cdx4              1/2     Running             0          10s
+trident-controller-689cfc669f-flg7j   6/6     Running             0          14s
+trident-node-linux-8cdx4              2/2     Running             0          31s
+```
+
 
 
 
