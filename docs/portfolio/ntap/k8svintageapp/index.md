@@ -537,6 +537,12 @@ scp /home/ec2-user/.local/share/containers/storage/volumes/aaa.net.domain.local/
 
 Last, update the ```/etc/resolv.conf``` to ```127.0.0.1```. 
 
+Here are screenshots of the GUI with all the details, including the user, groups, hosts added later on. 
+
+![](../../../images/Screenshot%20from%202025-09-10%2017-01-48.png)
+![](../../../images/Screenshot%20from%202025-09-10%2017-01-55.png)
+![](../../../images/Screenshot%20from%202025-09-10%2017-02-01.png)
+
 ##### Kubernetes node
 
 Instance is a Suse 15.6 with latest updates installed including ```podman podman-docker nfs-client krb5-client sssd-tools krb5-client ca-certificates-mozilla adcli sssd-ad libipa_hbac0 sssd-ipa```. 
@@ -907,7 +913,7 @@ spec:
         claimName: data-krb
 ```
 
-Without a valid configuration of the Kubernetes node, the Pod creation will failed: 
+Without a valid DNS connection at the ONTAP level, the Pod creation will failed: 
 
 ```YAML
 kubectl -n default describe pod/kerberos-user-pod-hardened
