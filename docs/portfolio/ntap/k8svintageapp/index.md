@@ -727,7 +727,7 @@ To learn more about the release, try:
 
 Verify the deployment
 ```
-kubectl get pods -n trident -w
+kubectl -n trident get pods -w
 NAME                                  READY   STATUS              RESTARTS   AGE
 trident-controller-689cfc669f-flg7j   0/6     ContainerCreating   0          2s
 trident-node-linux-8cdx4              0/2     ContainerCreating   0          1s
@@ -738,6 +738,132 @@ trident-controller-689cfc669f-flg7j   6/6     Running             0          14s
 trident-node-linux-8cdx4              2/2     Running             0          31s
 ```
 
+Setting up Trident Backend Configuration to interact with the SVM. First create a secret: 
 
+```
+kubectl create secret generic ontap-nas --namespace trident --from-literal=username=vsadmin --from-literal=password=SVMTrident234         
+secret/ontap-nas created
+``` 
+Verify creation
 
+```
+kubectl get secret -n trident
+NAME                            TYPE                 DATA   AGE
+ontap-nas                       Opaque               2      13s
+sh.helm.release.v1.trident.v1   helm.sh/release.v1   1      29m
+trident-csi                     Opaque               6      29m
+trident-encryption-keys         Opaque               1      29m
 
+kubectl get secret -n trident ontap-nas -o yaml
+```
+The password data field can be double check with ```base64 -d``` to verify that the password didn't get truncated.
+
+Create a TridentBackendConfig:
+
+```
+apiVersion: trident.netapp.io/v1
+kind: TridentBackendConfig
+metadata:
+  name: ontap-nas
+  namespace: trident
+spec:
+  version: 1
+  backendName: fsx-ontap
+  storageDriverName: ontap-nas
+  managementLIF: 172.31.47.242
+  svm: svmnfsv4
+  nasType: nfs
+  nfsMountOptions: nfsvers=4.1, sec=krb5
+  credentials:
+    name: ontap-nas
+```
+
+```
+kubectl apply -f tbc.yaml
+tridentbackendconfig.trident.netapp.io/ontap-nas created
+
+apiVersion: trident.netapp.io/v1
+kind: TridentBackendConfig
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"trident.netapp.io/v1","kind":"TridentBackendConfig","metadata":{"annotations":{},"name":"ontap-nas","namespace":"trident"},"spec":{"backendName":"fsx-ontap","credentials":{"name":"ontap-nas"},"managementLIF":"172.31.47.242","nasType":"nfs","nfsMountOptions":"nfsvers=4.1, sec=krb5","storageDriverName":"ontap-nas","svm":"svmnfsv4","version":1}}
+  creationTimestamp: "2025-09-10T09:49:23Z"
+  finalizers:
+  - trident.netapp.io
+  generation: 1
+  name: ontap-nas
+  namespace: trident
+  resourceVersion: "6534"
+  uid: c079e1e4-f515-4e6e-8cc2-18417ac16731
+spec:
+  backendName: fsx-ontap
+  credentials:
+    name: ontap-nas
+  managementLIF: 172.31.47.242
+  nasType: nfs
+  nfsMountOptions: nfsvers=4.1, sec=krb5
+  storageDriverName: ontap-nas
+  svm: svmnfsv4
+  version: 1
+status:
+  backendInfo:
+    backendName: fsx-ontap
+    backendUUID: 99b00c6b-edd7-4c9d-8a9e-d55fe09ba48f
+  deletionPolicy: delete
+  lastOperationStatus: Success
+  message: Backend 'fsx-ontap' created
+  phase: Bound
+```
+
+Create a StorageClass:
+
+```
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ontap-nfsv4
+provisioner: csi.trident.netapp.io
+mountOptions:
+  - nfsvers=4.1
+  - sec=krb5
+  - nolock
+parameters:
+  backendType: "ontap-nas"
+allowVolumeExpansion: true
+volumeBindingMode: Immediate
+```
+
+```
+kubectl apply -f sc.yaml
+storageclass.storage.k8s.io/ontap-nfsv4 created
+
+kubectl get sc/ontap-nfsv4
+NAME          PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+ontap-nfsv4   csi.trident.netapp.io   Delete          Immediate           true                   10s
+```
+
+Create a test PVC:
+
+```
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-krb
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ontap-nfsv4
+  resources:
+    requests:
+      storage: 1Gi
+```
+
+```
+kubectl apply -f pvc.yaml
+persistentvolumeclaim/data-krb created
+
+kubectl get pvc -w
+NAME       STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+data-krb   Bound    pvc-a6ce2f55-0579-47b8-b04e-805e4b4278b9   1Gi        RWX            ontap-nfsv4    <unset>                 7s
+```
