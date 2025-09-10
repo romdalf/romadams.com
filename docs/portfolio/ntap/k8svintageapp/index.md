@@ -320,7 +320,7 @@ The core principles of containerization conflict with the requirements of a trad
 | **4. SSSD Sidecar Pattern** | Manual Ticket Management, Expired Tickets | Sidecar container running `sssd` with a shared volume | **Architectural Solution.** Addresses the challenge of managing ticket rotation in an ephemeral container, but adds operational complexity. |
 | **5. GSS-API in SSH** | Cumbersome User Login, Insecure Credential Forwarding | `GSSAPIAuthentication yes` in `sshd_config` | **User Experience.** Enables a seamless Single Sign-On experience for SSH, where the user's Kerberos ticket is used for authentication. |
 
-## Implementation considerations 
+## Desing Considerations 
 
 ### Application vs User
 
@@ -440,3 +440,253 @@ In summary, the system-level mount with ```fsGroup``` is ideal for a single-iden
 
 See **When would an application need Kerberos-awareness?** in previous Application section. 
  
+
+## Implementation
+
+### Components
+The followings provide a lightweight lab environment in AWS to perform an iterative test plan.    
+
+- FreeIPA instance, Suse 15.6, with hostname ip-172-31-32-73
+- Kubernetes instance, Suse 15.6 with hostname ip-172-31-46-200
+- FSxN instance with SVM name svmnfsv4
+
+##### FreeIPA server
+
+Instance is a Suse 15.6 with latest updates installed including ```podman```. 
+
+Create a persistent volume for FreeIPA:
+```
+podman volume create aaa.net.domain.local
+```
+
+Create a Pod with the necessary ports and mounts:
+```
+podman pod create \
+    --name aaa.net.domain.local \
+    --restart=always \
+    -p 80:80 \
+    -p 443:443 \
+    -p 389:389 \
+    -p 636:636 \
+    -p 88:88 \
+    -p 464:464 \
+    -p 88:88/udp \
+    -p 464:464/udp \
+    -p 123:123/udp \
+    -p 53:53/tcp \
+    -p 53:53/udp \
+    -v /etc/localtime:/etc/localtime:ro \
+    -v /sys/fs/cgroup:/sys/fs/cgroup \
+    -v aaa.net.domain.local:/data:Z
+```
+
+!!! warning
+    These ports are privileged and require to modify the sysctl.conf to allow the mapping with, e.g., ```net.ipv4.ip_unprivileged_port_start=53```.    
+    Then reload sysctl. 
+
+Create the container with the associated Pod:
+
+```
+podman run -it \
+    --name aaa \
+    --pod aaa.net.domain.local \
+    --restart=always \
+    docker.io/freeipa/freeipa-server:almalinux-9-4.12.2
+```
+
+This will kick-off the interactive process to setup the domain. Once done, the prompt should return the container shell which will allow us to add our kubernetes host:
+
+```
+kinit admin
+ipa host-add ip-172-31-46-200.net.domain.local --force
+----------------------------------------------
+Added host "ip-172-31-46-200.net.domain.local"
+----------------------------------------------
+  Host name: ip-172-31-46-200.net.domain.local
+  Principal name: host/ip-172-31-46-200.net.domain.local@NET.DOMAIN.LOCAL
+  Principal alias: host/ip-172-31-46-200.net.domain.local@NET.DOMAIN.LOCAL
+  Password: False
+  Keytab: False
+  Managed by: ip-172-31-46-200.net.domain.local
+
+ipa-getkeytab -s aaa.net.domain.local -p host/ip-172-31-46-200.net.domain.local -k /data/client.keytab
+Keytab successfully retrieved and stored in: /data/client.keytab
+```
+
+At this stage, exit the shell to return to the host shell and copy the keytab and ca.crt to the kubernetes node:
+```
+podman volume inspect aaa.net.domain.local
+[
+     {
+          "Name": "aaa.net.domain.local",
+          "Driver": "local",
+          "Mountpoint": "/home/ec2-user/.local/share/containers/storage/volumes/aaa.net.domain.local/_data",
+          "CreatedAt": "2025-09-09T13:04:34.649436415Z",
+          "Labels": {},
+          "Scope": "local",
+          "Options": {},
+          "MountCount": 0,
+          "NeedsCopyUp": true,
+          "LockNumber": 0
+     }
+]
+
+scp /home/ec2-user/.local/share/containers/storage/volumes/aaa.net.domain.local/_data/client.keytab ip-172-31-46-200:~/
+scp /home/ec2-user/.local/share/containers/storage/volumes/aaa.net.domain.local/_data/etc/ipa/ca.crt ip-172-31-46-200:~/
+``` 
+
+Last, update the ```/etc/resolv.conf``` to ```127.0.0.1```. 
+
+##### Kubernetes node
+
+Instance is a Suse 15.6 with latest updates installed including ```podman podman-docker nfs-client krb5-client sssd-tools krb5-client ca-certificates-mozilla adcli sssd-ad libipa_hbac0 sssd-ipa```. 
+
+Setup the host to join the FreeIPA domain realm. 
+
+Setup the retrieved files to the right directory:
+```
+cp ~/client.keytab /etc/krb5.keytab
+chmod 600 /etc/krb5.keytab 
+mkdir /etc/ipa
+cp ~/ca.crt /etc/ipa/ca.crt
+```
+
+Configure ```/etc/krb5.conf```
+
+```
+# To opt out of the system crypto-policies configuration of krb5, remove the
+# symlink at /etc/krb5.conf.d/crypto-policies which will not be recreated.
+includedir  /etc/krb5.conf.d
+
+[libdefaults]
+    dns_canonicalize_hostname = false
+    rdns = false
+    verify_ap_req_nofail = true
+    default_ccache_name = KEYRING:persistent:%{uid}
+
+    default_realm = NET.DOMAIN.LOCAL
+    dns_lookup_realm = false
+    dns_lookup_kdc = true
+    ticket_lifetime = 24h
+    forwardable = true
+
+[realms]
+    NET.DOMAIN.LOCAL = {
+      kdc = aaa.net.domain.local:88
+      master_kdc = aaa.net.domain.local:88
+      admin_server = aaa.net.domain.local:749
+      default_domain = net.domain.local
+      kinit_anchors = FILE:/etc/ipa/ca.crt
+  }
+
+[domain_realm]
+    .net.domain.local = NET.DOMAIN.LOCAL
+    net.domain.local = NET.DOMAIN.LOCAL
+
+[logging]
+    kdc = FILE:/var/log/krb5/krb5kdc.log
+    admin_server = FILE:/var/log/krb5/kadmind.log
+    default = SYSLOG:NOTICE:DAEMON
+``` 
+
+Then protect the configuration file ```chmod 600 /etc/krb5.keytab```. 
+At this stage, running ```kinit admin``` should ask for credentials from the realm. If not, troubleshoot the error.
+
+
+Configure ```/etc/sssd/sssd.conf```
+
+```
+[sssd]
+config_file_version = 2
+services = nss, pam
+domains = NET.DOMAIN.LOCAL
+
+[nss]
+filter_groups = root
+filter_users = root
+
+[pam]
+
+[domain/NET.DOMAIN.LOCAL]
+id_provider = ipa
+auth_provider = ipa
+chpass_provider = ipa
+access_provider = ipa
+ipa_server = _srv_
+ipa_domain = net.domain.local
+ldap_tls_cacert = /etc/ipa/ca.crt
+cache_credentials = True
+```
+
+Then protect the configuration file ```chmod 600 /etc/sssd/sssd.conf```. 
+Run the ```pam-config``` to setup the creation of homedir for the realm users ```pam-config -a --sss --mkhomedir```.
+Then start the ```sssd``` with ```systemctl enable --now sssd``` that should return a similar status:
+
+```
+● sssd.service - System Security Services Daemon
+     Loaded: loaded (/usr/lib/systemd/system/sssd.service; enabled; preset: disabled)
+     Active: active (running) since Wed 2025-09-10 08:15:52 UTC; 34min ago
+   Main PID: 6069 (sssd)
+      Tasks: 5
+        CPU: 304ms
+     CGroup: /system.slice/sssd.service
+             ├─6069 /usr/sbin/sssd -i --logger=files
+             ├─6070 /usr/lib/sssd/sssd_be --domain NET.DOMAIN.LOCAL --uid 0 --gid 0 --logger=files
+             ├─6071 /usr/lib/sssd/sssd_nss --uid 0 --gid 0 --logger=files
+             ├─6072 /usr/lib/sssd/sssd_pam --uid 0 --gid 0 --logger=files
+             └─6073 /usr/lib/sssd/sssd_pac --uid 0 --gid 0 --logger=files
+
+Sep 10 08:15:52 ip-172-31-46-200 sssd_pac[6073]: Starting up
+Sep 10 08:15:52 ip-172-31-46-200 systemd[1]: Started System Security Services Daemon.
+Sep 10 08:30:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 1
+Sep 10 08:30:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 1
+Sep 10 08:30:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 1
+Sep 10 08:30:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 2
+Sep 10 08:45:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 1
+Sep 10 08:45:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 1
+Sep 10 08:45:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 1
+Sep 10 08:45:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 2
+```
+
+If the status is different, troubleshoot the error. 
+Make sure that ```/etc/nsswitch.conf``` has ```sss``` added as follows:
+
+```
+passwd:         compat sss
+group:          compat sss
+```
+Then issue the following command to valide the full setup:
+
+```
+id admin
+uid=1907600000(admin) gid=1907600000(admins) groups=1907600000(admins)
+```
+
+This will confirm a working connection between the host and the KDC to retrieve tickets and verify identities. Now, we can install a test Kubernetes environment using ```kind``` et ```kubectl```. 
+
+Deploy a test environment:
+
+```
+kind create cluster
+using podman due to KIND_EXPERIMENTAL_PROVIDER
+enabling experimental podman provider
+Creating cluster "kind" ...
+ ✓ Ensuring node image (kindest/node:v1.34.0) 🖼
+ ✓ Preparing nodes 📦
+ ✓ Writing configuration 📜
+ ✓ Starting control-plane 🕹️
+ ✓ Installing CNI 🔌
+ ✓ Installing StorageClass 💾
+Set kubectl context to "kind-kind"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-kind
+
+Thanks for using kind! 😊
+ec2-user@ip-172-31-46-200:~> kubectl get nodes
+NAME                 STATUS     ROLES           AGE   VERSION
+kind-control-plane   NotReady   control-plane   20s   v1.34.0
+```
+
+
+
