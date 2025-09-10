@@ -881,7 +881,9 @@ spec:
     runAsUser: 1907600003
     runAsGroup: 5005
     fsGroup: 5005
-    supplementalGroups: [5005]
+    supplementalGroups: 
+      - 5005
+      - 6006
     fsGroupChangePolicy: "OnRootMismatch"
     runAsNonRoot: true # 
   containers:
@@ -907,7 +909,7 @@ spec:
 
 Without a valid configuration of the Kubernetes node, the Pod creation will failed: 
 
-```
+```YAML
 kubectl -n default describe pod/kerberos-user-pod-hardened
 Name:             kerberos-user-pod-hardened
 Namespace:        default
@@ -978,4 +980,5 @@ Events:
   Warning  FailedMount             4s                  kubelet                  (combined from similar events): MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_44_00.896273985/token: invalid argument
   ```
 
-  
+
+
