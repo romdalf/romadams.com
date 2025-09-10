@@ -904,3 +904,78 @@ spec:
       persistentVolumeClaim:
         claimName: data-krb
 ```
+
+Without a valid configuration of the Kubernetes node, the Pod creation will failed: 
+
+```
+kubectl -n default describe pod/kerberos-user-pod-hardened
+Name:             kerberos-user-pod-hardened
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             kind-control-plane/10.89.0.2
+Start Time:       Wed, 10 Sep 2025 13:41:52 +0000
+Labels:           <none>
+Annotations:      <none>
+Status:           Pending
+IP:
+IPs:              <none>
+Containers:
+  test-container:
+    Container ID:
+    Image:         busybox:latest
+    Image ID:
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /bin/sh
+      -c
+      sleep 3600
+    State:          Waiting
+      Reason:       ContainerCreating
+    Ready:          False
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /data/home from nfs-data (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-pxtvz (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False
+  Initialized                 True
+  Ready                       False
+  ContainersReady             False
+  PodScheduled                True
+Volumes:
+  nfs-data:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  data-krb
+    ReadOnly:   false
+  kube-api-access-pxtvz:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason                  Age                 From                     Message
+  ----     ------                  ----                ----                     -------
+  Normal   Scheduled               2m12s               default-scheduler        Successfully assigned default/kerberos-user-pod-hardened to kind-control-plane
+  Warning  FailedMount             2m12s               kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_41_52.745191187/token: invalid argument
+  Normal   SuccessfulAttachVolume  2m11s               attachdetach-controller  AttachVolume.Attach succeeded for volume "pvc-a6ce2f55-0579-47b8-b04e-805e4b4278b9"
+  Warning  FailedMount             2m11s               kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_41_53.1682578617/token: invalid argument
+  Warning  FailedMount             2m10s               kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_41_54.2395044034/token: invalid argument
+  Warning  FailedMount             2m8s                kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_41_56.1951977758/token: invalid argument
+  Warning  FailedMount             2m4s                kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_42_00.1065201153/token: invalid argument
+  Warning  FailedMount             116s                kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_42_08.2529551102/token: invalid argument
+  Warning  FailedMount             100s                kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_42_24.885628129/token: invalid argument
+  Warning  FailedMount             68s                 kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_42_56.1737328939/token: invalid argument
+  Warning  FailedMount             61s (x8 over 2m5s)  kubelet                  MountVolume.SetUp failed for volume "pvc-a6ce2f55-0579-47b8-b04e-805e4b4278b9" : rpc error: code = Internal desc = error mounting NFS volume 172.31.47.242:/trident_pvc_a6ce2f55_0579_47b8_b04e_805e4b4278b9 on mountpoint /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~csi/pvc-a6ce2f55-0579-47b8-b04e-805e4b4278b9/mount: exit status 32
+  Warning  FailedMount             4s                  kubelet                  (combined from similar events): MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_44_00.896273985/token: invalid argument
+  ```
+
+  
