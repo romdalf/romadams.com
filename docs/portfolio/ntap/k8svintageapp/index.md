@@ -1018,6 +1018,19 @@ nc -zv 172.31.47.242 2049
 ip-172-31-47-242.eu-west-3.compute.internal [172.31.47.242] 2049 (nfs) open
 ```
 
+
+```
+sudo  mount -t nfs -vvvv 172.31.47.242:/vol1 /mnt/test/
+mount.nfs: timeout set for Thu Sep 11 07:46:23 2025
+mount.nfs: trying text-based options 'vers=4.2,addr=172.31.47.242,clientaddr=172.31.46.200'
+
+mount |grep 172
+172.31.47.242:/vol1 on /mnt/test type nfs4 (rw,relatime,vers=4.2,rsize=65536,wsize=65536,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,clientaddr=172.31.46.200,local_lock=none,addr=172.31.47.242)
+```
+
+
+
+
 #### Deploying Pod
 
 Create a test Pod:
