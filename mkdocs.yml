@@ -124,8 +124,8 @@ nav:
       - netapp:
         - Securing home directories for containerized vintage applications:
           - portfolio/ntap/k8svintageapp/index.md
-        - Securing NFSv4 with Kerberos for containerized applications:
-          - portfolio/ntap/k8svintageapp/nfs.md
+        # - Securing NFSv4 with Kerberos for containerized applications:
+        #   - portfolio/ntap/k8svintageapp/nfs.md
         - neo client:
           - portfolio/ntap/neo/index.md 
         - netapp consoles for openshift:
