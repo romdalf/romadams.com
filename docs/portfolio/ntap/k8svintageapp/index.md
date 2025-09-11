@@ -1028,7 +1028,15 @@ mount |grep 172
 172.31.47.242:/vol1 on /mnt/test type nfs4 (rw,relatime,vers=4.2,rsize=65536,wsize=65536,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,clientaddr=172.31.46.200,local_lock=none,addr=172.31.47.242)
 ```
 
+```
+sudo mount -t nfs4 -vvvv -o sec=krb5 172.31.47.242:/trident_pvc_9e64b913_7d64_48e1_b640_6aea5e0b0951 /mnt/test/
+mount.nfs4: timeout set for Thu Sep 11 14:09:28 2025
+mount.nfs4: trying text-based options 'sec=krb5,vers=4.2,addr=172.31.47.242,clientaddr=172.31.46.200'
+mount |grep 172
+172.31.47.242:/trident_pvc_9e64b913_7d64_48e1_b640_6aea5e0b0951 on /mnt/test type nfs4 (rw,relatime,vers=4.2,rsize=65536,wsize=65536,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=krb5,clientaddr=172.31.46.200,local_lock=none,addr=172.31.47.242)
+```
 
+rebinding via kubelet fails to accept permission.
 
 
 #### Deploying Pod
