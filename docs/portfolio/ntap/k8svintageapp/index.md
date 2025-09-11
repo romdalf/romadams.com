@@ -991,6 +991,32 @@ svmnfsv4       nfs_smb_management_1
                              172.31.47.242   enabled  nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL
 ```
 
+```
+kerberos interface show -vserver svmnfsv4 -lif nfs_smb_management_1
+  (vserver nfs kerberos interface show)
+
+                   Vserver: svmnfsv4
+         Logical Interface: nfs_smb_management_1
+                IP Address: 172.31.47.242
+          Kerberos Enabled: enabled
+    Service Principal Name: nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL
+Permitted Encryption Types: aes-128, aes-256
+      Machine Account Name: -
+```
+
+```
+ export-policy rule show -vserver svmnfsv4 -policyname kerberos
+             Policy          Rule    Access   Client                RO
+Vserver      Name            Index   Protocol Match                 Rule
+------------ --------------- ------  -------- --------------------- ---------
+svmnfsv4     kerberos        1       nfs4     172.31.32.0/20,       krb5
+                                              10.89.0.0/24
+```
+
+```
+nc -zv 172.31.47.242 2049
+ip-172-31-47-242.eu-west-3.compute.internal [172.31.47.242] 2049 (nfs) open
+```
 
 #### Deploying Pod
 
