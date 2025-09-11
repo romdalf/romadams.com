@@ -875,8 +875,47 @@ NAME       STATUS   VOLUME                                     CAPACITY   ACCESS
 data-krb   Bound    pvc-a6ce2f55-0579-47b8-b04e-805e4b4278b9   1Gi        RWX            ontap-nfsv4    <unset>                 7s
 ```
 
+#### Deploying Pod
 
-#### ONTAP 
+Create a test Pod:
+
+```YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kerberos-user-pod-hardened
+spec:
+  securityContext:
+    runAsUser: 1907600003
+    runAsGroup: 5005
+    fsGroup: 5005
+    supplementalGroups: 
+      - 5005
+      - 6006
+    fsGroupChangePolicy: "OnRootMismatch"
+    runAsNonRoot: true # 
+  containers:
+    - name: test-container
+      image: busybox:latest
+      command: ["/bin/sh", "-c", "sleep 3600"]
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        privileged: false
+        readOnlyRootFilesystem: false
+
+      volumeMounts:
+        - name: nfs-data
+          mountPath: "/data/home" 
+  volumes:
+    - name: nfs-data
+      persistentVolumeClaim:
+        claimName: data-krb
+```
+
+#### Troubleshooting  
 
 ```
 ipa host-add svmnfsv4.net.domain.local --force
@@ -1036,121 +1075,15 @@ mount |grep 172
 172.31.47.242:/trident_pvc_9e64b913_7d64_48e1_b640_6aea5e0b0951 on /mnt/test type nfs4 (rw,relatime,vers=4.2,rsize=65536,wsize=65536,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=krb5,clientaddr=172.31.46.200,local_lock=none,addr=172.31.47.242)
 ```
 
-rebinding via kubelet fails to accept permission.
+rebinding via kubelet fails to accept permission even when forcing a admin-level token.
 
 
-#### Deploying Pod
+### Obvervations
 
-Create a test Pod:
+While the system-level mount succeeds at the host level through the CSI driver identicating a healthy connection between the hosts and ONTAP, the container observed a silent failure from ```kubelet``` when attempting to recursively run the ```chown``` and ```chmod``` command to grant access to the specificed group ID(s).  
 
-```YAML
-apiVersion: v1
-kind: Pod
-metadata:
-  name: kerberos-user-pod-hardened
-spec:
-  securityContext:
-    runAsUser: 1907600003
-    runAsGroup: 5005
-    fsGroup: 5005
-    supplementalGroups: 
-      - 5005
-      - 6006
-    fsGroupChangePolicy: "OnRootMismatch"
-    runAsNonRoot: true # 
-  containers:
-    - name: test-container
-      image: busybox:latest
-      command: ["/bin/sh", "-c", "sleep 3600"]
-      securityContext:
-        allowPrivilegeEscalation: false
-        capabilities:
-          drop:
-          - ALL
-        privileged: false
-        readOnlyRootFilesystem: false
+The root cause is linked to the entire kubernetes stack up to the Pod presented as non-root including ```kubelet``` leading to ```NFS4ERR_ACCESS```. As such the ONTAP will map the request to a non-privileged user leading to the silent failure. While he test container process starts with ```uid=1907600003```and is a member of groups ```5005``` and ```6006```, when trying to write to the volume, the NFS checks the file's permissions with no matching permissions.
+ 
+While a ```no_root_squash``` or setting  ```-superuser krb5``` at the policy level would, in theory, address the behavior, the next error is linked to a authorization mismatched at the GSS due to the wrong security primitives being presented.  While presenting the appropriate authentication at the node level, the container is presenting itself with the wrong one, not a ```NFS4ERR_BAD_CRED``` or ```NFS4ERR_EXPIRED``` but returning ```NFSV4ERR_WRONG_SEC``` from ONTAP, the wrong type of ID presented based on the overall Kerberos authentication and authorization chain. 
 
-      volumeMounts:
-        - name: nfs-data
-          mountPath: "/data/home" 
-  volumes:
-    - name: nfs-data
-      persistentVolumeClaim:
-        claimName: data-krb
-```
-
-Without a valid DNS connection at the ONTAP level, the Pod creation will failed: 
-
-```YAML
-kubectl -n default describe pod/kerberos-user-pod-hardened
-Name:             kerberos-user-pod-hardened
-Namespace:        default
-Priority:         0
-Service Account:  default
-Node:             kind-control-plane/10.89.0.2
-Start Time:       Wed, 10 Sep 2025 13:41:52 +0000
-Labels:           <none>
-Annotations:      <none>
-Status:           Pending
-IP:
-IPs:              <none>
-Containers:
-  test-container:
-    Container ID:
-    Image:         busybox:latest
-    Image ID:
-    Port:          <none>
-    Host Port:     <none>
-    Command:
-      /bin/sh
-      -c
-      sleep 3600
-    State:          Waiting
-      Reason:       ContainerCreating
-    Ready:          False
-    Restart Count:  0
-    Environment:    <none>
-    Mounts:
-      /data/home from nfs-data (rw)
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-pxtvz (ro)
-Conditions:
-  Type                        Status
-  PodReadyToStartContainers   False
-  Initialized                 True
-  Ready                       False
-  ContainersReady             False
-  PodScheduled                True
-Volumes:
-  nfs-data:
-    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
-    ClaimName:  data-krb
-    ReadOnly:   false
-  kube-api-access-pxtvz:
-    Type:                    Projected (a volume that contains injected data from multiple sources)
-    TokenExpirationSeconds:  3607
-    ConfigMapName:           kube-root-ca.crt
-    Optional:                false
-    DownwardAPI:             true
-QoS Class:                   BestEffort
-Node-Selectors:              <none>
-Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
-                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
-Events:
-  Type     Reason                  Age                 From                     Message
-  ----     ------                  ----                ----                     -------
-  Normal   Scheduled               2m12s               default-scheduler        Successfully assigned default/kerberos-user-pod-hardened to kind-control-plane
-  Warning  FailedMount             2m12s               kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_41_52.745191187/token: invalid argument
-  Normal   SuccessfulAttachVolume  2m11s               attachdetach-controller  AttachVolume.Attach succeeded for volume "pvc-a6ce2f55-0579-47b8-b04e-805e4b4278b9"
-  Warning  FailedMount             2m11s               kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_41_53.1682578617/token: invalid argument
-  Warning  FailedMount             2m10s               kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_41_54.2395044034/token: invalid argument
-  Warning  FailedMount             2m8s                kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_41_56.1951977758/token: invalid argument
-  Warning  FailedMount             2m4s                kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_42_00.1065201153/token: invalid argument
-  Warning  FailedMount             116s                kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_42_08.2529551102/token: invalid argument
-  Warning  FailedMount             100s                kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_42_24.885628129/token: invalid argument
-  Warning  FailedMount             68s                 kubelet                  MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_42_56.1737328939/token: invalid argument
-  Warning  FailedMount             61s (x8 over 2m5s)  kubelet                  MountVolume.SetUp failed for volume "pvc-a6ce2f55-0579-47b8-b04e-805e4b4278b9" : rpc error: code = Internal desc = error mounting NFS volume 172.31.47.242:/trident_pvc_a6ce2f55_0579_47b8_b04e_805e4b4278b9 on mountpoint /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~csi/pvc-a6ce2f55-0579-47b8-b04e-805e4b4278b9/mount: exit status 32
-  Warning  FailedMount             4s                  kubelet                  (combined from similar events): MountVolume.SetUp failed for volume "kube-api-access-pxtvz" : chown /var/lib/kubelet/pods/1d098de9-734e-4cc9-85d5-c164de13ece4/volumes/kubernetes.io~projected/kube-api-access-pxtvz/..2025_09_10_13_44_00.896273985/token: invalid argument
-  ```
-
-
-
+The root cause is linked to a mismatch at the client level, ONTAP has granted one access at the node level to mount and access the filesystem, ```kubelet``` is also granted if set with the superuser, but the security context is not applied at the pod process level, calling for the process, the container, to present valid credentials. This can be done through the usage of a side car or running the SSSD within the container.
