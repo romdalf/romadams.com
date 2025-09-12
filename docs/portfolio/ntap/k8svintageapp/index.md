@@ -1091,7 +1091,7 @@ The root cause is linked to a mismatch at the client level, ONTAP has granted on
 
 ## Potential mitigations
 
-### Running as a VM
+### Running as a virtual machine
 Today's Kubernetes project called Kubevirt is widely used as an alternative to the most common hypervisors on the market, providing the benefit of traditional virtual machines along with containers for unified cloud-native deployment and management strategies.   
 This option would reduce the complexity of retrofiting a vintage application to containers when considering the deep coupled integration from an operationg system, libraries, filesystem, and user management. 
 
