@@ -1087,3 +1087,84 @@ The root cause is linked to the entire kubernetes stack up to the Pod presented 
 While a ```no_root_squash``` or setting  ```-superuser krb5``` at the policy level would, in theory, address the behavior, the next error is linked to a authorization mismatched at the GSS due to the wrong security primitives being presented.  While presenting the appropriate authentication at the node level, the container is presenting itself with the wrong one, not a ```NFS4ERR_BAD_CRED``` or ```NFS4ERR_EXPIRED``` but returning ```NFSV4ERR_WRONG_SEC``` from ONTAP, the wrong type of ID presented based on the overall Kerberos authentication and authorization chain. 
 
 The root cause is linked to a mismatch at the client level, ONTAP has granted one access at the node level to mount and access the filesystem, ```kubelet``` is also granted if set with the superuser, but the security context is not applied at the pod process level, calling for the process, the container, to present valid credentials. This can be done through the usage of a side car or running the SSSD within the container.
+
+
+## Potential mitigations
+
+### Running as a VM
+Today's Kubernetes project called Kubevirt is widely used as an alternative to the most common hypervisors on the market, providing the benefit of traditional virtual machines along with containers for unified cloud-native deployment and management strategies.   
+This option would reduce the complexity of retrofiting a vintage application to containers when considering the deep coupled integration from an operationg system, libraries, filesystem, and user management. 
+
+### Pod with integrated SSSD 
+This approach is basically attempting to mimic the behavior of a full standing virtual machine in a container by handling the Kerberos handshake at the Pod level. From an overall workflow, the process would: 
+
+1. Storage Provisioning: this initial phase is a standard, automated process for provisioning storage in Kubernetes using a Trident CSI. This will provide a managed volume via Trident opening for snapshot, cloning, and local and remote backup with Trident Protect. 
+2. Pod mount and user Access: this phase mounts the storage from within its own Pod environment, bypassing the standard kubelet mount process, with internal Kerberos ticket handling within the Pod leveraging built-in container image Kerberos utilities (kinit) to contact the KDC and acquire a service ticket for the NFS export. This can also include the user management access into the running pod. Their login is authenticated against the same central IdM/KDC, giving them access to the interactive shell and the securely mounted filesystem.
+
+```mermaid
+sequenceDiagram
+    participant User as User/Operator
+    participant KubeAPI as Kube-API Server
+    participant TridentCSI as Trident CSI Driver
+    participant ONTAP as NetApp ONTAP
+    participant AppPod as Application Pod (with krb5/nfs utils)
+    participant KDC as IdM/KDC (FreeIPA/AD)
+
+    %% --- Phase 1: Storage Provisioning ---
+    Note over User, ONTAP: Phase 1: Storage Provisioning (Admin Task)
+    User->>KubeAPI: 1. Apply PVC manifest
+    KubeAPI->>TridentCSI: 2. Request new volume for PVC
+    TridentCSI->>ONTAP: 3. Create volume & export
+    ONTAP-->>TridentCSI: 4. PV details (e.g., export path)
+    TridentCSI->>KubeAPI: 5. Create PV object, bind to PVC
+
+    %% --- Phase 2: Pod Deployment and In-Container Mount ---
+    Note over User, KDC: Phase 2: Application Pod Mount & User Access
+    User->>KubeAPI: 6. Deploy Pod manifest (references PVC)
+    KubeAPI->>AppPod: 7. Schedule & start Pod container
+
+    AppPod->>AppPod: 8. Startup script in container runs
+    AppPod->>KDC: 9. Container's kinit gets ticket for NFS SPN
+    KDC-->>AppPod: 10. Service ticket issued to container
+    AppPod->>ONTAP: 11. Container runs: mount -t nfs4 -o sec=krb5 ...
+    ONTAP-->>AppPod: 12. NFS export mounted inside the Pod
+
+    %% --- Optional User Access Flow ---
+    participant EndUser as End User
+    EndUser->>AppPod: 13. SSH to Pod (authenticated via KDC)
+```
+
+Reference: ![Kubernetes Kerberos](https://github.com/whyistheinternetbroken/k8s-kerberos/tree/main)
+
+### Pod with sidecar
+The Pod with integrated SSSD requires either a build image with scripts or an initContainer handling the registration with FreeIPA to have dynamic registration, which might be complex and open another set of security challenges too.    
+
+The Pod with sidecar implementation addresses the following requirements:   
+- **Separation of concerns:** The sidecar handles all the complex Kerberos logic, allowing the application container to remain lightweight and focused on its core function.   
+- **Security:** Only the sidecar needs access to the sensitive keytab file. The main application only ever sees the less-sensitive ticket cache.   
+- **Automated renewal:** The sidecar ensures the Kerberos tickets are automatically renewed, preventing authentication failures for long-running applications without manual intervention.   
+- **Simplified application development:** Developers don't need to embed Kerberos dependencies or logic into their application images. The sidecar pattern is managed at the platform level.   
+
+Compare to previous diagram, the following workflow is handling the Kerberos authentication, caching, and rotation through a sidecar:
+
+```mermaid
+sequenceDiagram
+    participant User as User/Operator
+    participant KubeAPI as Kube-API Server
+    participant AppPod as Application Pod (App + Kerberos Sidecar)
+    participant KDC as KDC
+
+    User->>KubeAPI: 1. Apply ConfigMap (krb5.conf) and Secret (service keytab)
+    User->>KubeAPI: 2. Deploy Pod (App + Sidecar, shared ccache)
+
+    Note over AppPod: emptyDir(/var/run/krb5cc/app.ccache) shared by both containers
+
+    AppPod->>AppPod: 3. Sidecar starts
+    AppPod->>KDC: 4. Sidecar kinit -kt service.keytab SERVICE_PRINCIPAL
+    KDC-->>AppPod: 5. TGT issued to shared ccache
+    AppPod->>AppPod: 6. Sidecar loop renews/re-kinit periodically
+
+    AppPod->>KDC: 7. App requests service tickets as needed (GSSAPI)
+    KDC-->>AppPod: 8. Service ticket via shared ccache
+    AppPod->>ExternalSvc: 9. App calls Kerberos-protected service (HTTP, DB, etc.)
+```
