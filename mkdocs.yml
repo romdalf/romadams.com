@@ -119,6 +119,8 @@ nav:
           - portfolio/foss/abacc/index.md 
         - dialup: 
           - portfolio/foss/dialup/index.md 
+        - eu federated cloud:
+          - portfolio/foss/eufc/index.md
         - kleidi:
           - portfolio/foss/kleidi/index.md
       - netapp:
