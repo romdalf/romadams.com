@@ -1,0 +1,3269 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://romadams.com/portfolio/ntap/k8svintageapp/">
+      
+      
+        <link rel="prev" href="../../foss/kleidi/">
+      
+      
+        <link rel="next" href="../neo/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21+insiders-4.53.17">
+    
+    
+      
+        <title>Securing home directories for containerized vintage applications - romadams.com</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.010a373c.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Red+Hat+Text:300,300i,400,400i,700,700i%7CRed+Hat+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Red Hat Text";--md-code-font:"Red Hat Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#securing-home-directories-for-containerized-vintage-applications" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="romadams.com" class="md-header__button md-logo" aria-label="romadams.com" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M399 384.2c-22.1-38.4-63.6-64.2-111-64.2h-64c-47.4 0-88.9 25.8-111 64.2 35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8M0 256a256 256 0 1 1 512 0 256 256 0 1 1-512 0m256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            romadams.com
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Securing home directories for containerized vintage applications
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="red"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="red"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/romdalf/romadams.com" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    romdalf/romadams.com
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../.." class="md-tabs__link">
+          
+  
+  
+    
+  
+  about
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="romadams.com" class="md-nav__button md-logo" aria-label="romadams.com" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M399 384.2c-22.1-38.4-63.6-64.2-111-64.2h-64c-47.4 0-88.9 25.8-111 64.2 35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8M0 256a256 256 0 1 1 512 0 256 256 0 1 1-512 0m256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144"/></svg>
+
+    </a>
+    romadams.com
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/romdalf/romadams.com" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    romdalf/romadams.com
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../.." class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    about
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1" id="__nav_1_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    about
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    portfolio
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1_2" id="__nav_1_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    portfolio
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_2_2" id="__nav_1_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    foss
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    foss
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_2_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../foss/abacc/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    abacc-rag
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    abacc-rag
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_2_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../foss/dialup/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    dialup
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    dialup
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_2_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../foss/eufc/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    unified eu sovereign cloud hub
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    unified eu sovereign cloud hub
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_2_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../foss/kleidi/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    kleidi
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    kleidi
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1_2_3" id="__nav_1_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    netapp
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    netapp
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_3_1" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="./" class="md-nav__link md-nav__link--active">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Securing home directories for containerized vintage applications
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_3_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_2_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Securing home directories for containerized vintage applications
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_3_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../neo/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    neo client
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    neo client
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_3_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../trident/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    netapp consoles for openshift
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    netapp consoles for openshift
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_2_4" id="__nav_1_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    red hat
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    red hat
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_4_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../rdht/namespace/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    namespace
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    namespace
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_4_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../rdht/appresources/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    app resources
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    app resources
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_4_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../rdht/s2i/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    source2image
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    source2image
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_4_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../rdht/helm/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    helm charts
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    helm charts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#abstract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Abstract
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Introduction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Introduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cloud-native-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cloud-native application
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#containerized-vintage-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Containerized vintage application
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#solution-proposals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Solution Proposals
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Solution Proposals">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-kubernetes-cloud-native-declarative-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Kubernetes cloud-native declarative model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Kubernetes cloud-native declarative model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#threat-modeling-asessment-and-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Threat modeling asessment and controls
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#containerized-vintage-application-with-user-interactive-shell-and-home-directories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Containerized vintage application with user interactive shell and home directories
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Containerized vintage application with user interactive shell and home directories">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#threat-modeling-asessment-and-controls_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Threat modeling asessment and controls
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-consideration-unifying-authentication-and-authorization-at-the-storage-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Consideration: Unifying Authentication and Authorization at the Storage Layer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Additional Consideration: Unifying Authentication and Authorization at the Storage Layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#identity-and-keytab-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identity and Keytab Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ticket-lifecycle-and-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ticket Lifecycle and Rotation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#container-immutability-and-networking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Container Immutability and Networking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#threat-modeling-asessment-and-controls_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Threat modeling asessment and controls
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#desing-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Desing Considerations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Desing Considerations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#application-vs-user" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application vs User
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Application vs User">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#application" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#user" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Components
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#freeipa-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FreeIPA server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kubernetes-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kubernetes node
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploying-pod" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deploying Pod
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#obvervations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Obvervations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#potential-mitigations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Potential mitigations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Potential mitigations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-as-a-virtual-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running as a virtual machine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pod-with-integrated-sssd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pod with integrated SSSD
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pod-with-sidecar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pod with sidecar
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="securing-home-directories-for-containerized-vintage-applications">Securing home directories for containerized vintage applications</h1>
+<div class="admonition warning">
+<p class="admonition-title">Status: <strong>draft</strong></p>
+<p>This document is a research document in a <em>Request for Comments</em> (RFC) format, product of the NetApp Office of the CTO - Innovation &amp; Solutions Group.</p>
+<p><strong>Author(s)</strong>  <br />
+- Rom Adams, Principal Software Engineer, Office of the CTO - NetApp Inc. <br />
+<strong>Contributor(s)</strong>   <br />
+- Elliott Ecton, Technical Marketing Engineer, Shared Platform Product Management - NetApp Inc. <br />
+- Erik Stjerna, Professional Services Consultant, Consulting - NetApp Inc.  <br />
+- Johannes Wagner, Sr Solution Architect, Solution Engineering - NetApp Inc.    </p>
+<p><strong>Copyright Notes</strong>   <br />
+Copyright (c) 2025 NetApp Inc. and the persons identified as the document authors and contributors.  <br />
+All rights reserved <a href="https://www.netapp.com/company/legal/copyright/">https://www.netapp.com/company/legal/copyright/</a>.</p>
+</div>
+<hr />
+<h2 id="abstract">Abstract</h2>
+<p>This RFC outlines the technical and operational challenges of implementing home directory management through NFS with an improved the security posture for containerized workloads in Kubernetes environments, specifically for legacy/vintage applications. <br />
+While cloud-native applications benefit from a decoupled architecture that simplifies authentication and authorization from the operating system layer, legacy applications present unique constraints due to their reliance on interactive shell environments, persistent user contexts, and the ephemeral and immutable nature of containers.</p>
+<hr />
+<h2 id="introduction">Introduction</h2>
+<p>In a Kubernetes environment, integrating NFS home directories with ONTAP using Trident, the NetApp Container Storage Interface (CSI), combines storage orchestration with secure, strong authentication and encryption. However, this approach requires coordinating additional layers like the Kubernetes cloud-native declarative model, and traditional Linux administration measures, and the CSI and NFS server.  </p>
+<h3 id="cloud-native-application">Cloud-native application</h3>
+<p>In a modern cloud-native architecture, applications are decoupled from the underlying infrastructure, including how storage is accessed and how users are authenticated. A containerized application, designed without a direct interactive shell for users, handles identity and access control at the application layer, not at the operating system level.    </p>
+<p>This model separates user/service identity from infrastructure permissions:     </p>
+<ul>
+<li>Filesystem Access (Infrastructure Layer): The application pod needs access to storage, like an NFS share. The Container Storage Interface (CSI) driver, running on the Kubernetes node, handles the technical requirements of mounting the storage. It authenticates the node or system service to the storage backend, mounts the volume, and makes it available to the pod. The end-user's identity is not involved in this process.    </li>
+<li>User/Service Authorization (Application Layer): When a user or another service interacts with your application, they are authenticated and authorized by the application itself, often using modern identity protocols.    <ul>
+<li>Authorization is managed with frameworks like OAuth2. This allows the application to grant other services limited, scoped access to its data on behalf of a user without ever sharing the user's credentials.    </li>
+<li>Authentication is handled with protocols like OpenID Connect (OIDC), which is built on OAuth2. OIDC verifies a user's identity through an external identity provider and provides the application with a secure token (like a JWT), enabling features like Single Sign-On (SSO).    </li>
+</ul>
+</li>
+</ul>
+<p>In this scenario, the application uses the user's authenticated session and OIDC token to decide what data to read or write to the mounted filesystem. The pod's permission to access the storage is a separate concern, managed entirely by the Kubernetes infrastructure.</p>
+<pre class="mermaid"><code>graph TD
+    subgraph "User &amp; Identity Layer"
+        User[&lt;br&gt;👤&lt;br&gt;User / Service]
+        IdP[Identity Provider&lt;br&gt;OIDC / OAuth2]
+    end
+
+    subgraph "Kubernetes Cluster"
+        subgraph "Application Pod"
+            App[Application Logic&lt;br&gt;Validates Token]
+            Volume[Mounted Volume&lt;br&gt;/data]
+        end
+
+        subgraph "Infrastructure Layer"
+            CSI[CSI&lt;br&gt;NetApp Trident]
+        end
+    end
+
+    subgraph "External Storage System"
+        Storage[NetApp ONTAP&lt;br&gt;NFS Server]
+    end
+
+    %% --- Flows ---
+    User -- "1. Authenticates (OIDC)" --&gt; IdP
+    IdP -- "2. Issues Secure Token (JWT)" --&gt; User
+    User -- "3. API Request with Token" --&gt; App
+    App -- "4. Authorizes Request &amp;&lt;br&gt;Accesses Filesystem" --&gt; Volume
+    CSI -- "A. System-level Auth &amp; Mount" --&gt; Storage
+    Storage -- "B. Provides Volume" --&gt; Volume</code></pre>
+<h3 id="containerized-vintage-application">Containerized vintage application</h3>
+<p>Vintage applications often rely on an interactive shell environment where users log in directly to manage the application and interact with the filesystem. In a traditional environment, this access is tightly coupled with the operating system's authentication system.    </p>
+<p>This model creates significant challenges when containerized because it clashes with core cloud-native principles:     </p>
+<ul>
+<li>Tightly Coupled Architecture: The application's security model depends directly on the operating system handling user authentication for filesystem access. Unlike modern applications that manage identity separately, here, the container's OS is responsible for verifying who can touch which file.    </li>
+<li>Conflict with Immutability: Containers are designed to be immutable and ephemeral. The traditional process of joining a machine to a security realm and provisioning users at the OS level is a form of post-start configuration that goes against this principle. For security reasons, you cannot pre-bake user credentials or machine secrets into a container image.    </li>
+<li>Authentication at the OS Level: While a modern application would authenticate users at the application layer using protocols like OIDC, a vintage application forces this process down to the container's shell. A user needs to prove their identity directly to the container's OS to get the permissions needed to interact with the filesystem.   </li>
+</ul>
+<p>Adapting such an application to a containerized environment requires a significant overhaul. It involves rethinking the entire deployment strategy to manage dynamic user authentication within an ephemeral container or, more effectively, refactoring the application to decouple it from the underlying operating system, moving it closer to a true cloud-native design.    </p>
+<pre class="mermaid"><code>graph TD
+    subgraph "User Interactive Env"
+        User[&lt;br&gt;👤&lt;br&gt;End User]
+    end
+
+    subgraph "Kubernetes Cluster"
+        subgraph "Pod: vintage-app-pod"
+            Container[Vintage App&lt;br&gt;Container&lt;br&gt;with sshd]
+            PVC[PersistentVolumeClaim&lt;br&gt;/home]
+        end
+
+        subgraph "Kubernetes Node"
+            PV[PersistentVolume&lt;br&gt;NFS]
+            CSI[CSI&lt;br&gt;NetApp Trident]
+        end
+    end
+
+    subgraph "External Storage System"
+        NFSServer[NetApp ONTAP&lt;br&gt;NFS Server]
+        Export[NFS Export&lt;br&gt;/homedir_volume]
+    end
+
+    %% --- Define Interactions ---
+    User -- "1. SSH Connection" --&gt; Container
+    Container -- "2. Mounts Volume via PVC" --&gt; PVC
+    PVC -- "3. Binds to" --&gt; PV
+    PV -- "4. Managed by" --&gt; CSI
+    CSI -- "5. API Calls to Provision/Map" --&gt; NFSServer
+    NFSServer -- "6. Provides Export" --&gt; Export
+    PV -- "Points to" --&gt; Export</code></pre>
+<hr />
+<h2 id="solution-proposals">Solution Proposals</h2>
+<p>This section describes the iterative process at the Kubernetes, base image, and storage layers to improve the security posture when containerizing a vintage application with a user interactive environment including home directories.  </p>
+<hr />
+<h3 id="the-kubernetes-cloud-native-declarative-model">The Kubernetes cloud-native declarative model</h3>
+<h4 id="overview">Overview</h4>
+<p>These 10 controls harden the pod's environment and isolate it from the rest of the cluster, treating the container as a secure black box.   </p>
+<ul>
+<li>Isolate with Network Policies: This is your pod's firewall for a network defense-in-depth strategy. Even if an attacker compromise the container, these policies prevent them from using the pod to scan for or connect to other services on the network, including NFS. <ul>
+<li>Create a <code>NetworkPolicy</code> to restrict SSH access (port 22) to only known, trusted IP ranges, like a corporate VPN or a bastion host, and including application ports.</li>
+<li>Create a <code>NetworkPolicy</code> to deny all NFS traffic to/from the Pod Network.  </li>
+</ul>
+</li>
+<li>Run with a Read-Only Root Filesystem: In your pod spec, set <code>securityContext.readOnlyRootFilesystem: true</code>. This makes the container's base image immutable, preventing attackers from modifying system binaries or libraries. The user's home directory must be a separate, writable volume.   </li>
+<li>Use Secure Persistent Volumes (PV/PVC): The user's home directory must be persistent. Use a <code>PersistentVolume</code> pointing to a secure storage backend (like an NFSv4 share with Kerberos <code>krb5p</code> and <code>root_squash</code> enabled) and mount it into the pod.   </li>
+<li>Enforce Non-Root Execution: The SSH process must not run as root. Use <code>securityContext.runAsUser</code> and <code>securityContext.runAsGroup</code> with a high-numbered UID/GID (e.g., <code>1001</code>) to minimize privileges.   </li>
+<li>Manage SSH Keys with Kubernetes Secrets: Never bake SSH keys (<code>authorized_keys</code> or host keys) into the image. Store them in Kubernetes <code>Secrets</code> and mount them as files into the pod at runtime. This allows for secure, centralized management.   </li>
+<li>Use <code>initContainers</code> for Secure Setup: Apply traditional Linux hardening declaratively. An <code>initContainer</code> can run before your main application to set file permissions, apply chattr attributes, or perform other setup tasks on the persistent volume.   </li>
+<li>Build from Minimalist Base Images: Re-platform your legacy app onto a minimal base image like Alpine or a "distroless" image if possible. Remove all unnecessary tools (compilers, package managers, network utilities) from the final image to limit an attacker's toolkit.   </li>
+<li>Apply Pod Security Standards (PSS): Enforce cluster-wide security guardrails. Apply the <code>baseline</code> or <code>restricted</code> Pod Security Standard to the namespace where your application runs to prevent insecure configurations like running privileged containers.   </li>
+<li>Leverage Runtime Security Monitoring: Deploy a cloud-native runtime security tool like Falco. It can monitor for suspicious activity inside the container in real-time, such as unexpected shell processes or modifications to critical configuration files.   </li>
+<li>Control <code>exec</code> Access with RBAC: While users connect via SSH, administrators still have kubectl exec. Use Kubernetes RBAC (<code>Roles</code> and <code>RoleBindings</code>) to strictly limit who can get a shell in the pod through the Kubernetes API, closing a potential backdoor.    </li>
+</ul>
+<pre class="mermaid"><code>graph TD
+    subgraph "External Network"
+        User[&lt;br&gt;👤&lt;br&gt;User/Attacker]
+    end
+
+    subgraph "Kubernetes Cluster"
+        NetPol[NetworkPolicy&lt;br&gt;Allow SSH from trusted IPs]
+
+        User -- "SSH Traffic" --&gt; NetPol
+
+        subgraph "Pod Boundary"            
+            subgraph "Pod Spec"
+                SecContext[SecurityContext&lt;br&gt;ReadOnlyRootFS&lt;br&gt;RunAsUser: 1001]
+                K8sSecrets[K8s Secret&lt;br&gt;authorized_keys]
+            end
+
+            subgraph "Running Pod"
+                Container[Legacy/Vinage&lt;br&gt;App Container]
+            end
+
+            subgraph "Storage"
+               PVC[PersistentVolumeClaim&lt;br&gt;/home]
+               PV[PersistentVolume&lt;br&gt;NetApp ONTAP&lt;br&gt;NFS Server]  
+            end
+        end
+
+
+        NetPol -- "Permitted Traffic" --&gt; Container
+        SecContext -- "Applies to" --&gt; Container
+        K8sSecrets -- "Mounted into" --&gt; Container
+        Container -- "Mounts" --&gt; PVC
+        PVC -- "Binds to" --&gt; PV
+    end
+    NetPolEgress[NetworkPolicy&lt;br&gt;Deny NFS traffic &lt;br&gt;from/to Pod]
+    Container -- "Block External Traffic" --x NetPolEgress
+</code></pre>
+<h4 id="threat-modeling-asessment-and-controls">Threat modeling asessment and controls</h4>
+<p><em>Controls applied at the orchestration layer to isolate and secure the pod's environment.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Control/Measure</th>
+<th style="text-align: left;">Threat Mitigated</th>
+<th style="text-align: left;">Implementation Method</th>
+<th style="text-align: left;">Assessment &amp; Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>1. Network Policies</strong></td>
+<td style="text-align: left;">Lateral Movement, Unauthorized Network Access</td>
+<td style="text-align: left;"><code>NetworkPolicy</code> YAML resources</td>
+<td style="text-align: left;"><strong>Critical.</strong> Acts as a pod-level firewall. Egress policies are crucial to prevent the pod from initiating unauthorized outbound connections.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2. Read-Only Root Filesystem</strong></td>
+<td style="text-align: left;">Malware Persistence, Binary Tampering</td>
+<td style="text-align: left;"><code>securityContext.readOnlyRootFilesystem: true</code></td>
+<td style="text-align: left;"><strong>High Impact.</strong> Forces a clean separation between the immutable application and its state, but requires careful volume management for logs/temp files.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3. Secure Persistent Volumes</strong></td>
+<td style="text-align: left;">Unauthenticated Storage Access, Data Exposure</td>
+<td style="text-align: left;"><code>PersistentVolume</code> configured for a secure backend (e.g., Kerberos)</td>
+<td style="text-align: left;">Pushes storage security to the specialized storage layer, which is a best practice. The pod itself doesn't hold storage credentials.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>4. Run as Non-Root User</strong></td>
+<td style="text-align: left;">Container-to-Node Privilege Escalation</td>
+<td style="text-align: left;"><code>securityContext.runAsUser</code>, <code>runAsGroup</code></td>
+<td style="text-align: left;"><strong>Fundamental.</strong> The single most effective measure to limit the blast radius of a container compromise.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>5. K8s Secrets for Keys</strong></td>
+<td style="text-align: left;">Credential Exposure, Hardcoded Secrets</td>
+<td style="text-align: left;">Mount <code>Secret</code> as a volume or environment variable</td>
+<td style="text-align: left;"><strong>Essential Hygiene.</strong> Decouples sensitive data from the container image, allowing for centralized and secure management via the K8s API.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>6. <code>initContainers</code> for Setup</strong></td>
+<td style="text-align: left;">Insecure Default Permissions, Misconfiguration</td>
+<td style="text-align: left;"><code>initContainers</code> definition in pod spec</td>
+<td style="text-align: left;">Enables declarative, immutable hardening. Perfect for running <code>chattr</code> or complex permission setups on volumes before the main app starts.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>7. Minimalist Base Images</strong></td>
+<td style="text-align: left;">"Living off the Land" Attacks, CVE Surface</td>
+<td style="text-align: left;"><code>Dockerfile</code> <code>FROM alpine</code> or distroless</td>
+<td style="text-align: left;"><strong>High Impact.</strong> Drastically reduces the attacker's toolkit if they gain a shell. Fewer packages mean fewer potential vulnerabilities.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>8. Pod Security Standards</strong></td>
+<td style="text-align: left;">Insecure Pod Deployment, Privilege Escalation</td>
+<td style="text-align: left;">Namespace labels for <code>baseline</code> or <code>restricted</code> policies</td>
+<td style="text-align: left;">A proactive, cluster-wide guardrail that prevents insecure configurations from being deployed in the first place.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>9. Runtime Security Monitoring</strong></td>
+<td style="text-align: left;">Zero-Day Exploits, Active Threats</td>
+<td style="text-align: left;">Deploy a runtime tool like Falco or Trivy</td>
+<td style="text-align: left;">A <strong>detective</strong> control. Essential for observing active threats and policy violations that preventative controls might miss.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>10. RBAC for <code>kubectl exec</code></strong></td>
+<td style="text-align: left;">Unauthorized Administrative Access, Backdoor</td>
+<td style="text-align: left;">Kubernetes <code>Role</code> and <code>RoleBinding</code></td>
+<td style="text-align: left;">Secures the "break glass" access route. Ensures only authorized administrators can get a shell via the K8s API, complementing SSH controls.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="containerized-vintage-application-with-user-interactive-shell-and-home-directories">Containerized vintage application with user interactive shell and home directories</h3>
+<h4 id="overview_1">Overview</h4>
+<pre class="mermaid"><code>graph TD
+    subgraph "User Environment"
+        User[&lt;br&gt;👤&lt;br&gt;User]
+    end
+
+    subgraph "Kubernetes Pod"
+        subgraph "Containerized Vintage App"
+
+            App[Legacy App&lt;br&gt;Logic]
+            Shell[Interactive Shell&lt;br&gt;Container OS]
+            Volume[Mounted&lt;br&gt;Filesystem]
+
+            subgraph "Challenge Zone"
+                Challenge1["&lt;b&gt;Challenge 1: Immutability&lt;/b&gt;&lt;br&gt;OS-level user provisioning,&lt;br&gt;conflicts with immutable images."]
+                Challenge2["&lt;b&gt;Challenge 2: OS Dependency&lt;/b&gt;&lt;br&gt;Authentication is not handled by&lt;br&gt;the app but by the container's OS."]
+            end
+
+        end
+    end
+
+    %% --- Tightly Coupled Flow ---
+    User -- "1. SSH Connection" --&gt; Shell
+    Shell -- "2. OS-level Authentication&lt;br&gt;(Authenticates User)" --&gt; App
+    App -- "3. Interacts with Filesystem&lt;br&gt;(Permissions based on OS User)" --&gt; Volume</code></pre>
+<h4 id="threat-modeling-asessment-and-controls_1">Threat modeling asessment and controls</h4>
+<p><em>Controls applied within the container to harden the OS and the services it runs.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Control/Measure</th>
+<th style="text-align: left;">Threat Mitigated</th>
+<th style="text-align: left;">Implementation Method</th>
+<th style="text-align: left;">Assessment &amp; Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>1. <code>ForceCommand</code></strong></td>
+<td style="text-align: left;">Shell Startup Script Injection (<code>.bashrc</code>)</td>
+<td style="text-align: left;"><code>sshd_config</code> or <code>~/.ssh/authorized_keys</code></td>
+<td style="text-align: left;"><strong>Highly Effective.</strong> Directly prevents malicious commands from being executed at login. Can be used to force a clean shell.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2. <code>ChrootDirectory</code></strong></td>
+<td style="text-align: left;">Filesystem Traversal, Information Disclosure</td>
+<td style="text-align: left;"><code>sshd_config</code> directive</td>
+<td style="text-align: left;"><strong>Maximum Isolation.</strong> The strongest sandboxing method for an SSH user, confining them strictly to their home directory.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3. Harden <code>sshd_config</code></strong></td>
+<td style="text-align: left;">Weak Ciphers, Root Login, Credential Stuffing</td>
+<td style="text-align: left;">Strict <code>sshd_config</code> settings</td>
+<td style="text-align: left;">Basic security hygiene. Disables weak protocols and risky features like password authentication and root login.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>4. Immutable Startup Scripts</strong></td>
+<td style="text-align: left;">Malicious Code Persistence, Unauthorized Changes</td>
+<td style="text-align: left;"><code>chattr +i</code> on files like <code>.bashrc</code></td>
+<td style="text-align: left;">A powerful control that prevents modification even by the file's owner. Must be set by root (e.g., in an <code>initContainer</code>).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>5. Disable SSH Tunneling</strong></td>
+<td style="text-align: left;">Network Pivoting, Bypassing Firewalls</td>
+<td style="text-align: left;"><code>AllowTcpForwarding no</code> in <code>sshd_config</code></td>
+<td style="text-align: left;"><strong>Critical.</strong> Prevents the pod from being used as a beachhead to attack other services inside the cluster network.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>6. File Integrity Monitoring</strong></td>
+<td style="text-align: left;">Undetected Tampering, Rootkits</td>
+<td style="text-align: left;">AIDE configured inside the container</td>
+<td style="text-align: left;">A <strong>detective</strong> control that provides an audit trail and alerts on unauthorized changes to critical files.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>7. Session Auditing</strong></td>
+<td style="text-align: left;">Un-auditable User Actions, Insider Threat</td>
+<td style="text-align: left;"><code>auditd</code> service and rules</td>
+<td style="text-align: left;">Essential for forensics and compliance. Logs all commands executed by users, creating a detailed activity record.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>8. Strict Default <code>umask</code></strong></td>
+<td style="text-align: left;">Accidental Data Exposure Between Users</td>
+<td style="text-align: left;">Set <code>umask 077</code> in <code>/etc/profile</code></td>
+<td style="text-align: left;">A simple but effective way to ensure that all user-created files are private by default.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>9. Restricted Shell (rbash)</strong></td>
+<td style="text-align: left;">Unauthorized Command Execution</td>
+<td style="text-align: left;">Set user's login shell to <code>/bin/rbash</code></td>
+<td style="text-align: left;">Only suitable for highly restricted, task-based roles where users need a very limited set of commands.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>10. Strict File Permissions</strong></td>
+<td style="text-align: left;">Privilege Escalation, Unauthorized Access</td>
+<td style="text-align: left;"><code>chmod</code> and <code>chown</code> on home directories</td>
+<td style="text-align: left;">Enforce the principle of least privilege, ensuring users cannot read or write to each other's home directories.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="additional-consideration-unifying-authentication-and-authorization-at-the-storage-layer">Additional Consideration: Unifying Authentication and Authorization at the Storage Layer</h3>
+<p>Beyond the pod and container hardening, you can enforce a unified security model directly on the NFS server by combining Kerberos for authentication and NFSv4 ACLs for authorization. This pushes fine-grained access control to the storage layer itself, providing a robust last line of defense.    </p>
+<ul>
+<li>Kerberos for Authentication (Verifying "Who You Are"): Kerberos is a network authentication protocol that allows a user or service to securely prove its identity over an insecure network. When a pod needs to access the NFS share, Kerberos verifies the user's identity through a trusted third party, such as Active Directory. It uses secure tickets to handle this process, which can also be used to encrypt data in transit and ensure its integrity.   </li>
+<li>NFSv4 ACLs for Authorization (Controlling "What You Can Do"): Once a user's identity is confirmed by Kerberos, the NFS server can then use Access Control Lists (ACLs) to determine their permissions. ACLs offer granular control, allowing you to define precisely who can read, write, or execute specific files and directories. When a new file is created, it automatically inherits the permissions from its parent directory, ensuring consistent security policies.   </li>
+</ul>
+<p>When combined, this creates a seamless security workflow: Kerberos first confirms the user's identity, and then the storage system (like NetApp ONTAP) enforces the ACLs to grant or deny access. This model tightly integrates authentication and authorization directly at the data layer.</p>
+<p>However, such implementation for vintage application with user interactive environment introduces significant complexity because of the traditional, stateful, host-based security model to retrofit into an ephemeral and immutable container environment. In this model, the SSH connection is the single point of entry where the user's Kerberos identity is established for their entire session within the pod.</p>
+<ul>
+<li>The SSH Session acts as the Kerberos Gateway. The process works like a domino effect, where the initial SSH authentication is the crucial first step that makes everything else possible:<ul>
+<li>SSH Login: The user authenticates to the pod via SSH. The sshd daemon, configured with GSS-API, uses Kerberos to verify the user's identity.   </li>
+<li>Ticket Caching: Upon a successful login, a valid Kerberos ticket for that specific user is created and cached within the pod's environment (managed by the sssd sidecar).   </li>
+<li>Transparent Filesystem Access: From that point on, any action the user takes—whether running commands in their shell or using the legacy application—happens under their authenticated identity. When they try to access their home directory, the kernel transparently uses their cached Kerberos ticket to securely communicate with the NFS server.   </li>
+</ul>
+</li>
+<li>This highlights a key distinction: it's not just SSH users, but any process that needs to access the NFS share requires a Kerberos identity. For interactive users, the SSH login is the mechanism that provides it. For any non-interactive system processes running in the container (like a cron job or a background service), they would also need their own Kerberos identity, typically provided by a system keytab file.   </li>
+</ul>
+<pre class="mermaid"><code>graph TD
+    subgraph "Kubernetes Pod (Ephemeral &amp; Immutable)"
+        UserSession[&lt;br&gt;👤&lt;br&gt;User Session]
+
+        subgraph "Challenge Zone"
+            style ChallengeZone fill:#ffebee,stroke:#d32f2f,stroke-dasharray: 5 5
+            Challenge1["&lt;b&gt;Challenge 1: Identity&lt;/b&gt;&lt;br&gt;How to securely manage user keytabs&lt;br&gt;in an ephemeral pod?"]
+            Challenge2["&lt;b&gt;Challenge 2: Ticket Lifecycle&lt;/b&gt;&lt;br&gt;How to manage ticket renewal for&lt;br&gt;multiple, long-running sessions?"]
+        end
+    end
+
+    subgraph "External Storage &amp; Identity (Stateful)"
+        NFSServer[NetApp ONTAP&lt;br&gt;NFS Server w/o ACLs]
+        KDC[Kerberos KDC&lt;br&gt;Active Directory / IdM]
+    end
+
+    %% --- Workflow with Challenges ---
+    UserSession -- "1. File Operation (Read/Write)" --&gt; NFSServer
+
+    Challenge1 -- "Complicates" --&gt; UserSession
+    Challenge2 -- "Complicates" --&gt; UserSession
+
+    NFSServer -- "2. Who are you?&lt;br&gt;(Authentication Request)" --&gt; KDC
+    KDC -- "3. Issues Secure Ticket&lt;br&gt;(Identity Verified)" --&gt; NFSServer
+    NFSServer -- "4. What can you do?&lt;br&gt;(Checks NFSv4 ACLs)" --&gt; NFSServer
+    NFSServer -- "5. Access Granted / Denied" --&gt; UserSession</code></pre>
+<h4 id="identity-and-keytab-management">Identity and Keytab Management</h4>
+<p>The biggest hurdle is securely managing the identities of multiple users inside a container. In a traditional VM, each user has a persistent identity managed by the OS. In a container, this is much harder.   </p>
+<ul>
+<li>Secure Keytab Distribution: Each user needs a keytab file to authenticate without a password. Securely distributing these sensitive files to an ephemeral pod is a major challenge. Baking them into the image is a severe security risk. Mounting them via Kubernetes Secrets is better, but managing secrets for numerous, potentially dynamic users, becomes a significant operational burden.   </li>
+<li>Joining the Realm: A traditional machine "joins" a Kerberos realm, creating a host identity (host/fqdn). A container, being ephemeral, cannot easily do this. You would need a complex, automated process to register and unregister each pod's identity with the Kerberos Key Distribution Center (KDC) upon startup and shutdown.</li>
+</ul>
+<h4 id="ticket-lifecycle-and-rotation">Ticket Lifecycle and Rotation</h4>
+<p>Kerberos tickets have a limited lifetime for security and must be renewed. Managing this for multiple, concurrent user sessions inside a single container is complex.   </p>
+<ul>
+<li>Ticket Caching: Each SSH session needs its own Kerberos ticket cache. The system must create, manage, and isolate these caches (e.g., using KEYRING or file-based caches like /tmp/krb5cc_UID) for every user, which can be difficult to configure correctly within a container's lifecycle.   </li>
+<li>Automated Ticket Renewal: A long-running process, like a krb5-daemon or sssd, is typically needed to automatically renew tickets before they expire. Running and managing such a system-level daemon within a container, especially for multiple users, adds complexity and deviates from the single-process-per-container best practice. If a user's ticket expires during a long session, their access to the NFS share will fail.   </li>
+</ul>
+<h4 id="container-immutability-and-networking">Container Immutability and Networking</h4>
+<p>The core principles of containerization conflict with the requirements of a traditional Kerberos client.   </p>
+<ul>
+<li>Configuration Files: Kerberos requires configuration files like /etc/krb5.conf. While this can be managed with a ConfigMap, it means the container is less portable and has a hard dependency on the cluster's environment.    </li>
+<li>Service Discovery: The container must be able to reliably find the Kerberos KDC and other services. This often requires specific DNS configurations (SRV records) and network policies to allow traffic to the KDC, which can be complex to manage in a Kubernetes network environment.    </li>
+<li>Clock Skew: Kerberos is highly sensitive to time synchronization. If the container's clock drifts out of sync with the KDC's clock by more than a few minutes (typically 5), all authentication attempts will fail. Ensuring consistent time sync across all Kubernetes nodes and pods is critical.    </li>
+</ul>
+<h4 id="threat-modeling-asessment-and-controls_2">Threat modeling asessment and controls</h4>
+<p><em>Controls that unify authentication and authorization directly at the data layer.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Control/Measure</th>
+<th style="text-align: left;">Threat Mitigated</th>
+<th style="text-align: left;">Implementation Method</th>
+<th style="text-align: left;">Assessment &amp; Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>1. Kerberos Authentication</strong></td>
+<td style="text-align: left;">Identity Spoofing, Unauthenticated Access</td>
+<td style="text-align: left;">Kerberos KDC, <code>sssd</code> daemon, <code>krb5.conf</code></td>
+<td style="text-align: left;"><strong>Gold Standard.</strong> Provides strong, cryptographic authentication for network services but introduces significant complexity.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2. NFSv4 ACLs</strong></td>
+<td style="text-align: left;">Improper Permissions, Data Exfiltration</td>
+<td style="text-align: left;"><code>nfs4_setfacl</code> on the NFS server</td>
+<td style="text-align: left;">Offers far more granular control than traditional POSIX permissions, allowing for complex authorization policies.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3. Data-in-Transit Encryption</strong></td>
+<td style="text-align: left;">Eavesdropping, Man-in-the-Middle Attacks</td>
+<td style="text-align: left;"><code>sec=krb5p</code> in NFS mount and export options</td>
+<td style="text-align: left;">Encrypts all NFS traffic. <strong>Critical</strong> for protecting sensitive data but comes with a performance overhead.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>4. SSSD Sidecar Pattern</strong></td>
+<td style="text-align: left;">Manual Ticket Management, Expired Tickets</td>
+<td style="text-align: left;">Sidecar container running <code>sssd</code> with a shared volume</td>
+<td style="text-align: left;"><strong>Architectural Solution.</strong> Addresses the challenge of managing ticket rotation in an ephemeral container, but adds operational complexity.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>5. GSS-API in SSH</strong></td>
+<td style="text-align: left;">Cumbersome User Login, Insecure Credential Forwarding</td>
+<td style="text-align: left;"><code>GSSAPIAuthentication yes</code> in <code>sshd_config</code></td>
+<td style="text-align: left;"><strong>User Experience.</strong> Enables a seamless Single Sign-On experience for SSH, where the user's Kerberos ticket is used for authentication.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="desing-considerations">Desing Considerations</h2>
+<h3 id="application-vs-user">Application vs User</h3>
+<h4 id="application">Application</h4>
+<p>An application itself would typically not need a direct GSS-API integration for filesystem access. In a Kubernetes environment, the process is handled transparently by two different components working together: the CSI driver at setup and the kernel during runtime.   </p>
+<p><strong>CSI Driver and the Kernel</strong> 
+In a Kubernetes environment, accessing a secure storage volume involves a clear separation of responsibilities between the application, the Container Storage Interface (CSI) driver, and the node's kernel. This decouples the application from the underlying storage infrastructure.    </p>
+<ul>
+<li>The Application's Role: The application code is responsible only for its business logic. For file access, it uses standard POSIX system calls such as <code>open()</code>, <code>read()</code>, and <code>write()</code>. The application operates on a volume mounted at a specific path inside its container and has no awareness of the storage protocol (NFS), the authentication mechanism (Kerberos), or the provisioning process.   </li>
+<li>The CSI Driver's Role: A CSI driver, such as NetApp Trident, is responsible for the storage provisioning and mounting lifecycle. When a pod requests a PersistentVolume, the CSI driver communicates with the Kubernetes control plane and the external storage system (e.g., NetApp ONTAP). It handles the initial, system-level Kerberos authentication required to securely mount the NFS export to the appropriate Kubernetes node. This is a one-time setup operation for the volume.   </li>
+<li>The Kernel's Role: The Linux kernel on the Kubernetes node is responsible for runtime file access. Once the CSI driver has successfully mounted the volume, the kernel's NFS client module manages all subsequent I/O operations. When the application performs a filesystem call, the kernel transparently handles the per-operation security requirements of the Kerberized NFS connection, using the credentials established during the initial mount.</li>
+</ul>
+<pre class="mermaid"><code>sequenceDiagram
+    participant User as User/Operator
+    participant KubeAPI as Kube-API Server
+    participant Provisioner as Trident Controller
+    participant Kubelet as Kubelet
+    participant NodePlugin as CSI NFS Node Plugin
+    participant NFSserver as ONTAP NFSv4
+    participant KDC as KDC
+    participant AppPod as Application Pod
+
+    User-&gt;&gt;KubeAPI: 1. Creates PVC referencing StorageClass
+    KubeAPI-&gt;&gt;Provisioner: 2. New PVC
+    Provisioner-&gt;&gt;NFSserver: 3. Create volume
+    Provisioner-&gt;&gt;KubeAPI: 4. Create PV, bind PVC
+    KubeAPI-&gt;&gt;Kubelet: 5. Schedule Pod
+    Kubelet-&gt;&gt;NodePlugin: 6. NodePublishVolume (mount on node)
+    Kubelet-&gt;&gt;KDC: 7. Node rpc.gssd uses node keytab or per-user cache
+    Kubelet-&gt;&gt;NFSserver: 8. Kerberos negotiation (node-side)
+    NFSserver-&gt;&gt;Kubelet: 9. Mount success
+    NodePlugin-&gt;&gt;AppPod: 10. Bind-mount into Pod
+    AppPod-&gt;&gt;NFSserver: 11. File I/O</code></pre>
+<p>This decoupling ensures the application remains portable and unaware of the infrastructure's security complexities (e.g., Kerberos), as the CSI driver manages the initial connection and the kernel handles all ongoing, transparent file access.</p>
+<p><strong>When would an application need Kerberos-awareness?</strong> <br />
+When bypassing the Kubernetes' storage orchestration, the deployment is essentially treating the container like a traditional virtual machine, which has several critical implications. In other words, if a process or a user inside the container runs the mount command directly, the responsibility for authentication shifts from the infrastructure to the container itself.  </p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant User as User/Operator
+    participant KubeAPI as Kube-API Server
+    participant AppPod as Application Pod (App + Kerberos Sidecar)
+    participant KDC as KDC
+
+    User-&gt;&gt;KubeAPI: 1. Apply ConfigMap (krb5.conf) and Secret (service keytab)
+    User-&gt;&gt;KubeAPI: 2. Deploy Pod (App + Sidecar, shared ccache)
+
+    Note over AppPod: emptyDir(/var/run/krb5cc/app.ccache) shared by both containers
+
+    AppPod-&gt;&gt;AppPod: 3. Sidecar starts
+    AppPod-&gt;&gt;KDC: 4. Sidecar kinit -kt service.keytab SERVICE_PRINCIPAL
+    KDC--&gt;&gt;AppPod: 5. TGT issued to shared ccache
+    AppPod-&gt;&gt;AppPod: 6. Sidecar loop renews/re-kinit periodically
+
+    AppPod-&gt;&gt;KDC: 7. App requests service tickets as needed (GSSAPI)
+    KDC--&gt;&gt;AppPod: 8. Service ticket via shared ccache
+    AppPod-&gt;&gt;ExternalSvc: 9. App calls Kerberos-protected service (HTTP, DB, etc.)</code></pre>
+<ul>
+<li>Extreme privilege is required: the mount command requires elevated system privileges. The container must be started with the <code>CAP_SYS_ADMIN</code> capability, which is often called the "new root." This breaks nearly all container isolation, making the host kernel far more vulnerable to a container escape. This is a dangerous configuration and should be avoided.   </li>
+<li>The Container is now Responsible for authentication: because the Kubernetes infrastructure is no longer involved, the container must handle the entire Kerberos authentication process for the mount itself. This means: <br />
+        - A full Kerberos client (kinit, etc.) must be installed inside the container image.<br />
+        - The container needs access to a keytab file to authenticate. This creates a significant secret management problem.<br />
+        - A process inside the container must run kinit to obtain a valid Kerberos ticket before attempting to run the mount command.  </li>
+</ul>
+<h4 id="user">User</h4>
+<p>Like the application, the behavior is mainly driven by the implementation, either leveraging the Kubernetes native orchestration or in-Pod mount and filesystem management. </p>
+<p><strong>Kubernetes native orchestration</strong> <br />
+The authentication and authorization model would in theory support a system-level mount with Kubernetes-managed POSIX permissions.</p>
+<ul>
+<li>Single-user per Pod connected via SSH
+    In this scenario, there is a separation between user login authentication and filesystem authorization, making the per-user Kerberos ticket for NFS access unnecessary. The user still authenticates to get an SSH shell, but this process is now completely decoupled from how the filesystem is accessed. Its only job is to verify the user's identity to let them into the pod.   </li>
+<li>Filesystem Mount handled by CSI <br />
+    The CSI driver, acting on behalf of the system, handles the Kerberos authentication to the NFS server. It uses a system-level identity (often a machine keytab) to mount the entire share into the pod. At this stage, the individual SSH user's identity might be irrelevant. The mount is established for the pod itself.   </li>
+<li>
+<p>Filesystem Authorization handled by Kubernetes &amp; POSIX <br />
+    This is the key difference. Once the volume is mounted, access control is no longer managed by individual Kerberos tickets. Instead, it's governed by standard Linux permissions:  </p>
+<p><code>fsGroup</code>: Kubernetes ensures that all files within the volume are owned by this group ID.<br />
+<code>supplementalGroups</code>: The user's process is granted membership in these groups.<br />
+<code>fsGroupChangePolicy</code>: This policy ensures the permissions are correctly applied.  </p>
+</li>
+</ul>
+<p>Essentially, the user is authorized to access the files not because they have a personal Kerberos ticket, but because their process's group ID (managed by Kubernetes) matches the group ownership of the files on the already-mounted volume.</p>
+<p>This workflow would imply:    </p>
+<ul>
+<li>System Mount: The Kubernetes CSI driver authenticates to the NFS server using a system-level Kerberos identity and mounts the volume into the pod.</li>
+<li>User Login: The single user logs in via SSH, authenticated by the IdP (LDAP).</li>
+<li>Permissions Applied: Kubernetes starts the user's process with the specified <code>fsGroup</code> and <code>supplementalGroups</code> IDs.</li>
+<li>Filesystem Access: When the user's process tries to read or write a file, the kernel performs a standard POSIX permission check (UID/GID), which succeeds because the group memberships match.</li>
+</ul>
+<p>In this model, the Kerberos authentication happens only once at the system level, completely transparent to the end-user. The SSH session no longer acts as a "Kerberos Gateway" for filesystem access.</p>
+<p><strong>Single-user and multi-user Pod</strong>  <br />
+The first part of the model—the system-level mount—remains perfectly valid. The CSI driver will still use a single, system-level Kerberos identity to authenticate to the NFS server and mount the volume into the pod. This process is completely independent of how many users will eventually connect.</p>
+<p><strong>Where the Model Breaks Down: Multi-User Authorization</strong>  <br />
+The authorization part of the model fails because <code>fsGroup</code> and <code>supplementalGroups</code> are pod-level settings, not dynamic user-level ones.   </p>
+<ul>
+<li>Static Pod Identity: These settings are designed to grant a specific set of group permissions to the primary workload running in the pod. They are not designed to manage multiple, different users who log in interactively after the pod has started.   </li>
+<li>Fallback to POSIX Permissions: When multiple users connect via SSH, their sessions are authenticated by the IdP (LDAP). Each user's process runs with the UID and GID assigned to them in the IdP. At this point, filesystem access is determined purely by the traditional POSIX permissions (read/write/execute based on user, group, and other) on the files themselves, as seen by the NFS server. The <code>fsGroup</code> and supplementalGroups from the pod manifest become largely irrelevant to these new user sessions.   </li>
+</ul>
+<p>This means no more the centralized, Kubernetes-native control over file permissions, reason why, putting a side the implementation complexity, the Kerberos model is better suited for multi-user environments:   </p>
+<ul>
+<li>Each user authenticates via SSH using their personal Kerberos ticket.</li>
+<li>The kernel uses this specific ticket for all NFS operations.</li>
+<li>The NFS server can then use this strong, per-user identity to enforce granular permissions, often with NFSv4 ACLs.</li>
+</ul>
+<p>In summary, the system-level mount with <code>fsGroup</code> is ideal for a single-identity application workload. For a pod requiring multi-user, interactive access, the per-user Kerberos ticket model is the more robust and secure solution.</p>
+<p><strong>when would an user require Kerberos-awarness?</strong>   </p>
+<p>See <strong>When would an application need Kerberos-awareness?</strong> in previous Application section. </p>
+<h2 id="implementation">Implementation</h2>
+<h3 id="components">Components</h3>
+<p>The followings provide a lightweight lab environment in AWS to perform an iterative test plan.    </p>
+<ul>
+<li>FreeIPA instance, Suse 15.6, with hostname ip-172-31-32-73</li>
+<li>Kubernetes instance, Suse 15.6 with hostname ip-172-31-46-200</li>
+<li>FSxN instance with SVM name svmnfsv4</li>
+</ul>
+<h4 id="freeipa-server">FreeIPA server</h4>
+<p>Instance is a Suse 15.6 with latest updates installed including <code>podman</code>. </p>
+<p>Create a persistent volume for FreeIPA:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>podman volume create aaa.net.domain.local
+</span></code></pre></div></p>
+<p>Create a Pod with the necessary ports and mounts:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>podman pod create \
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    --name aaa.net.domain.local \
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    --restart=always \
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    -p 80:80 \
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    -p 443:443 \
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    -p 389:389 \
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    -p 636:636 \
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    -p 88:88 \
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    -p 464:464 \
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    -p 88:88/udp \
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    -p 464:464/udp \
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    -p 123:123/udp \
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    -p 53:53/tcp \
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    -p 53:53/udp \
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    -v /etc/localtime:/etc/localtime:ro \
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    -v /sys/fs/cgroup:/sys/fs/cgroup \
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    -v aaa.net.domain.local:/data:Z
+</span></code></pre></div></p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>These ports are privileged and require to modify the sysctl.conf to allow the mapping with, e.g., <code>net.ipv4.ip_unprivileged_port_start=53</code>.  <br />
+Then reload sysctl. </p>
+</div>
+<p>Create the container with the associated Pod:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>podman run -it \
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    --name aaa \
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    --pod aaa.net.domain.local \
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    --restart=always \
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    docker.io/freeipa/freeipa-server:almalinux-9-4.12.2
+</span></code></pre></div>
+<p>This will kick-off the interactive process to setup the domain. Once done, the prompt should return the container shell which will allow us to add our kubernetes host:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kinit admin
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>ipa host-add ip-172-31-46-200.net.domain.local --force
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>----------------------------------------------
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>Added host &quot;ip-172-31-46-200.net.domain.local&quot;
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>----------------------------------------------
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>  Host name: ip-172-31-46-200.net.domain.local
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>  Principal name: host/ip-172-31-46-200.net.domain.local@NET.DOMAIN.LOCAL
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>  Principal alias: host/ip-172-31-46-200.net.domain.local@NET.DOMAIN.LOCAL
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>  Password: False
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>  Keytab: False
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>  Managed by: ip-172-31-46-200.net.domain.local
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>ipa-getkeytab -s aaa.net.domain.local -p host/ip-172-31-46-200.net.domain.local -k /data/client.keytab
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>Keytab successfully retrieved and stored in: /data/client.keytab
+</span></code></pre></div>
+<p>At this stage, exit the shell to return to the host shell and copy the keytab and ca.crt to the kubernetes node:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>podman volume inspect aaa.net.domain.local
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>[
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>     {
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>          &quot;Name&quot;: &quot;aaa.net.domain.local&quot;,
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>          &quot;Driver&quot;: &quot;local&quot;,
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>          &quot;Mountpoint&quot;: &quot;/home/ec2-user/.local/share/containers/storage/volumes/aaa.net.domain.local/_data&quot;,
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>          &quot;CreatedAt&quot;: &quot;2025-09-09T13:04:34.649436415Z&quot;,
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>          &quot;Labels&quot;: {},
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>          &quot;Scope&quot;: &quot;local&quot;,
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>          &quot;Options&quot;: {},
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>          &quot;MountCount&quot;: 0,
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>          &quot;NeedsCopyUp&quot;: true,
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>          &quot;LockNumber&quot;: 0
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>     }
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>]
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>scp /home/ec2-user/.local/share/containers/storage/volumes/aaa.net.domain.local/_data/client.keytab ip-172-31-46-200:~/
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>scp /home/ec2-user/.local/share/containers/storage/volumes/aaa.net.domain.local/_data/etc/ipa/ca.crt ip-172-31-46-200:~/
+</span></code></pre></div></p>
+<p>Last, update the <code>/etc/resolv.conf</code> to <code>127.0.0.1</code>. </p>
+<p>Here are screenshots of the GUI with all the details, including the user, groups, hosts added later on. </p>
+<p><img alt="" src="../../../images/Screenshot%20from%202025-09-10%2017-01-48.png" />
+<img alt="" src="../../../images/Screenshot%20from%202025-09-10%2017-01-55.png" />
+<img alt="" src="../../../images/Screenshot%20from%202025-09-10%2017-02-01.png" /></p>
+<h4 id="kubernetes-node">Kubernetes node</h4>
+<p>Instance is a Suse 15.6 with latest updates installed including <code>podman podman-docker nfs-client krb5-client sssd-tools krb5-client ca-certificates-mozilla adcli sssd-ad libipa_hbac0 sssd-ipa</code>. </p>
+<p>Setup the host to join the FreeIPA domain realm. </p>
+<p>Setup the retrieved files to the right directory:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>cp ~/client.keytab /etc/krb5.keytab
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>chmod 600 /etc/krb5.keytab 
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>mkdir /etc/ipa
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>cp ~/ca.crt /etc/ipa/ca.crt
+</span></code></pre></div></p>
+<p>Configure <code>/etc/krb5.conf</code></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a># To opt out of the system crypto-policies configuration of krb5, remove the
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a># symlink at /etc/krb5.conf.d/crypto-policies which will not be recreated.
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>includedir  /etc/krb5.conf.d
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>[libdefaults]
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    dns_canonicalize_hostname = false
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    rdns = false
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    verify_ap_req_nofail = true
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    default_ccache_name = KEYRING:persistent:%{uid}
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>    default_realm = NET.DOMAIN.LOCAL
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    dns_lookup_realm = false
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>    dns_lookup_kdc = true
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>    ticket_lifetime = 24h
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>    forwardable = true
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>[realms]
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>    NET.DOMAIN.LOCAL = {
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>      kdc = aaa.net.domain.local:88
+</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>      master_kdc = aaa.net.domain.local:88
+</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>      admin_server = aaa.net.domain.local:749
+</span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>      default_domain = net.domain.local
+</span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a>      kinit_anchors = FILE:/etc/ipa/ca.crt
+</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a>  }
+</span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a>
+</span><span id="__span-6-26"><a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a>[domain_realm]
+</span><span id="__span-6-27"><a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a>    .net.domain.local = NET.DOMAIN.LOCAL
+</span><span id="__span-6-28"><a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a>    net.domain.local = NET.DOMAIN.LOCAL
+</span><span id="__span-6-29"><a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a>
+</span><span id="__span-6-30"><a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a>[logging]
+</span><span id="__span-6-31"><a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a>    kdc = FILE:/var/log/krb5/krb5kdc.log
+</span><span id="__span-6-32"><a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a>    admin_server = FILE:/var/log/krb5/kadmind.log
+</span><span id="__span-6-33"><a id="__codelineno-6-33" name="__codelineno-6-33" href="#__codelineno-6-33"></a>    default = SYSLOG:NOTICE:DAEMON
+</span></code></pre></div>
+<p>Then protect the configuration file <code>chmod 600 /etc/krb5.keytab</code>. 
+At this stage, running <code>kinit admin</code> should ask for credentials from the realm. If not, troubleshoot the error.</p>
+<p>Configure <code>/etc/sssd/sssd.conf</code></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>[sssd]
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>config_file_version = 2
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>services = nss, pam
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>domains = NET.DOMAIN.LOCAL
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>[nss]
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>filter_groups = root
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>filter_users = root
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>[pam]
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>[domain/NET.DOMAIN.LOCAL]
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>id_provider = ipa
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>auth_provider = ipa
+</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>chpass_provider = ipa
+</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>access_provider = ipa
+</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>ipa_server = _srv_
+</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>ipa_domain = net.domain.local
+</span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>ldap_tls_cacert = /etc/ipa/ca.crt
+</span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>cache_credentials = True
+</span></code></pre></div>
+<p>Then protect the configuration file <code>chmod 600 /etc/sssd/sssd.conf</code>. 
+Run the <code>pam-config</code> to setup the creation of homedir for the realm users <code>pam-config -a --sss --mkhomedir</code>.
+Then start the <code>sssd</code> with <code>systemctl enable --now sssd</code> that should return a similar status:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>● sssd.service - System Security Services Daemon
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>     Loaded: loaded (/usr/lib/systemd/system/sssd.service; enabled; preset: disabled)
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>     Active: active (running) since Wed 2025-09-10 08:15:52 UTC; 34min ago
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>   Main PID: 6069 (sssd)
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>      Tasks: 5
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>        CPU: 304ms
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>     CGroup: /system.slice/sssd.service
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>             ├─6069 /usr/sbin/sssd -i --logger=files
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>             ├─6070 /usr/lib/sssd/sssd_be --domain NET.DOMAIN.LOCAL --uid 0 --gid 0 --logger=files
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>             ├─6071 /usr/lib/sssd/sssd_nss --uid 0 --gid 0 --logger=files
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>             ├─6072 /usr/lib/sssd/sssd_pam --uid 0 --gid 0 --logger=files
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>             └─6073 /usr/lib/sssd/sssd_pac --uid 0 --gid 0 --logger=files
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>Sep 10 08:15:52 ip-172-31-46-200 sssd_pac[6073]: Starting up
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>Sep 10 08:15:52 ip-172-31-46-200 systemd[1]: Started System Security Services Daemon.
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>Sep 10 08:30:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 1
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>Sep 10 08:30:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 1
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>Sep 10 08:30:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 1
+</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>Sep 10 08:30:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 2
+</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>Sep 10 08:45:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 1
+</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>Sep 10 08:45:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 1
+</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>Sep 10 08:45:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 1
+</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>Sep 10 08:45:52 ip-172-31-46-200 sssd_be[6070]: GSSAPI client step 2
+</span></code></pre></div>
+<p>If the status is different, troubleshoot the error. 
+Make sure that <code>/etc/nsswitch.conf</code> has <code>sss</code> added as follows:</p>
+<p><div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>passwd:         compat sss
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>group:          compat sss
+</span></code></pre></div>
+Then issue the following command to valide the full setup:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>id admin
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>uid=1907600000(admin) gid=1907600000(admins) groups=1907600000(admins)
+</span></code></pre></div>
+<p>This will confirm a working connection between the host and the KDC to retrieve tickets and verify identities. Now, we can install a test Kubernetes environment using <code>kind</code>,<code>kubectl</code>, and <code>helm</code>. </p>
+<p>Deploy a test environment:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>kind create cluster
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>using podman due to KIND_EXPERIMENTAL_PROVIDER
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>enabling experimental podman provider
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>Creating cluster &quot;kind&quot; ...
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a> ✓ Ensuring node image (kindest/node:v1.34.0) 🖼
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a> ✓ Preparing nodes 📦
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a> ✓ Writing configuration 📜
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a> ✓ Starting control-plane 🕹️
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a> ✓ Installing CNI 🔌
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a> ✓ Installing StorageClass 💾
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>Set kubectl context to &quot;kind-kind&quot;
+</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>You can now use your cluster with:
+</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>
+</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>kubectl cluster-info --context kind-kind
+</span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>
+</span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>Thanks for using kind! 😊
+</span></code></pre></div>
+<p>Verify the readyness of the cluster
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>ec2-user@ip-172-31-46-200:~&gt; kubectl get nodes -w
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>NAME                 STATUS     ROLES           AGE   VERSION
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>kind-control-plane   NotReady   control-plane   20s   v1.34.0
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>kind-control-plane   Ready    control-plane   47s   v1.34.0
+</span></code></pre></div></p>
+<p>Deploy NetApp Trident</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>helm repo add netapp-trident https://netapp.github.io/trident-helm-chart
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>helm install trident netapp-trident/trident-operator --version 100.2506.0 --create-namespace --namespace trident
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>NAME: trident
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>LAST DEPLOYED: Wed Sep 10 08:57:25 2025
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>NAMESPACE: trident
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>STATUS: deployed
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>REVISION: 1
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>TEST SUITE: None
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>NOTES:
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>Thank you for installing trident-operator, which will deploy and manage NetApp&#39;s Trident CSI
+</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>storage provisioner for Kubernetes.
+</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>
+</span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>Your release is named &#39;trident&#39; and is installed into the &#39;trident&#39; namespace.
+</span><span id="__span-13-15"><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>Please note that there must be only one instance of Trident (and trident-operator) in a Kubernetes cluster.
+</span><span id="__span-13-16"><a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a>
+</span><span id="__span-13-17"><a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a>To configure Trident to manage storage resources, you will now need to configure at least one storage
+</span><span id="__span-13-18"><a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a>backend and add a matching storageClass.
+</span><span id="__span-13-19"><a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a>
+</span><span id="__span-13-20"><a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a>Examples of backend and storageClass definitions are available at official NetApp Trident documentation.
+</span><span id="__span-13-21"><a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a>
+</span><span id="__span-13-22"><a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a>Further, You may find all Trident releases and source code online at https://github.com/NetApp/trident.
+</span><span id="__span-13-23"><a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a>
+</span><span id="__span-13-24"><a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a>To learn more about the release, try:
+</span><span id="__span-13-25"><a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a>
+</span><span id="__span-13-26"><a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a>  $ helm status trident
+</span><span id="__span-13-27"><a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a>  $ helm get all trident
+</span></code></pre></div>
+<p>Verify the deployment
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>kubectl -n trident get pods -w
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>NAME                                  READY   STATUS              RESTARTS   AGE
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>trident-controller-689cfc669f-flg7j   0/6     ContainerCreating   0          2s
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>trident-node-linux-8cdx4              0/2     ContainerCreating   0          1s
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>trident-operator-b999469bc-4r7rd      1/1     Running             0          39s
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>trident-node-linux-8cdx4              1/2     Running             0          5s
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>trident-node-linux-8cdx4              1/2     Running             0          10s
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>trident-controller-689cfc669f-flg7j   6/6     Running             0          14s
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>trident-node-linux-8cdx4              2/2     Running             0          31s
+</span></code></pre></div></p>
+<p>Setting up Trident Backend Configuration to interact with the SVM. First create a secret: </p>
+<p><div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>kubectl create secret generic ontap-nas --namespace trident --from-literal=username=vsadmin --from-literal=password=SVMTrident234         
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>secret/ontap-nas created
+</span></code></pre></div>
+Verify creation</p>
+<p><div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl get secret -n trident
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>NAME                            TYPE                 DATA   AGE
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>ontap-nas                       Opaque               2      13s
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>sh.helm.release.v1.trident.v1   helm.sh/release.v1   1      29m
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>trident-csi                     Opaque               6      29m
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>trident-encryption-keys         Opaque               1      29m
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>kubectl get secret -n trident ontap-nas -o yaml
+</span></code></pre></div>
+The password data field can be double check with <code>base64 -d</code> to verify that the password didn't get truncated.</p>
+<p>Create a TridentBackendConfig:</p>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">trident.netapp.io/v1</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TridentBackendConfig</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ontap-nas</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">trident</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="nt">spec</span><span class="p">:</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">  </span><span class="nt">backendName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fsx-ontap</span>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="w">  </span><span class="nt">storageDriverName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ontap-nas</span>
+</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="w">  </span><span class="nt">managementLIF</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">172.31.47.242</span>
+</span><span id="__span-17-11"><a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="w">  </span><span class="nt">svm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">svmnfsv4</span>
+</span><span id="__span-17-12"><a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a><span class="w">  </span><span class="nt">nasType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nfs</span>
+</span><span id="__span-17-13"><a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a><span class="w">  </span><span class="nt">nfsMountOptions</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nfsvers=4.1, sec=krb5</span>
+</span><span id="__span-17-14"><a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="w">  </span><span class="nt">credentials</span><span class="p">:</span>
+</span><span id="__span-17-15"><a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ontap-nas</span>
+</span></code></pre></div>
+<p><div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>kubectl apply -f tbc.yaml
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>tridentbackendconfig.trident.netapp.io/ontap-nas created
+</span></code></pre></div>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">trident.netapp.io/v1</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TridentBackendConfig</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span><span class="nt">annotations</span><span class="p">:</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">    </span><span class="nt">kubectl.kubernetes.io/last-applied-configuration</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">      </span><span class="no">{&quot;apiVersion&quot;:&quot;trident.netapp.io/v1&quot;,&quot;kind&quot;:&quot;TridentBackendConfig&quot;,&quot;metadata&quot;:{&quot;annotations&quot;:{},&quot;name&quot;:&quot;ontap-nas&quot;,&quot;namespace&quot;:&quot;trident&quot;},&quot;spec&quot;:{&quot;backendName&quot;:&quot;fsx-ontap&quot;,&quot;credentials&quot;:{&quot;name&quot;:&quot;ontap-nas&quot;},&quot;managementLIF&quot;:&quot;172.31.47.242&quot;,&quot;nasType&quot;:&quot;nfs&quot;,&quot;nfsMountOptions&quot;:&quot;nfsvers=4.1, sec=krb5&quot;,&quot;storageDriverName&quot;:&quot;ontap-nas&quot;,&quot;svm&quot;:&quot;svmnfsv4&quot;,&quot;version&quot;:1}}</span>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">  </span><span class="nt">creationTimestamp</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-09-10T09:49:23Z&quot;</span>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">  </span><span class="nt">finalizers</span><span class="p">:</span>
+</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">trident.netapp.io</span>
+</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">  </span><span class="nt">generation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-19-11"><a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ontap-nas</span>
+</span><span id="__span-19-12"><a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">trident</span>
+</span><span id="__span-19-13"><a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="w">  </span><span class="nt">resourceVersion</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;6534&quot;</span>
+</span><span id="__span-19-14"><a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="w">  </span><span class="nt">uid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c079e1e4-f515-4e6e-8cc2-18417ac16731</span>
+</span><span id="__span-19-15"><a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="nt">spec</span><span class="p">:</span>
+</span><span id="__span-19-16"><a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a><span class="w">  </span><span class="nt">backendName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fsx-ontap</span>
+</span><span id="__span-19-17"><a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a><span class="w">  </span><span class="nt">credentials</span><span class="p">:</span>
+</span><span id="__span-19-18"><a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ontap-nas</span>
+</span><span id="__span-19-19"><a id="__codelineno-19-19" name="__codelineno-19-19" href="#__codelineno-19-19"></a><span class="w">  </span><span class="nt">managementLIF</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">172.31.47.242</span>
+</span><span id="__span-19-20"><a id="__codelineno-19-20" name="__codelineno-19-20" href="#__codelineno-19-20"></a><span class="w">  </span><span class="nt">nasType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nfs</span>
+</span><span id="__span-19-21"><a id="__codelineno-19-21" name="__codelineno-19-21" href="#__codelineno-19-21"></a><span class="w">  </span><span class="nt">nfsMountOptions</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nfsvers=4.1, sec=krb5</span>
+</span><span id="__span-19-22"><a id="__codelineno-19-22" name="__codelineno-19-22" href="#__codelineno-19-22"></a><span class="w">  </span><span class="nt">storageDriverName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ontap-nas</span>
+</span><span id="__span-19-23"><a id="__codelineno-19-23" name="__codelineno-19-23" href="#__codelineno-19-23"></a><span class="w">  </span><span class="nt">svm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">svmnfsv4</span>
+</span><span id="__span-19-24"><a id="__codelineno-19-24" name="__codelineno-19-24" href="#__codelineno-19-24"></a><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-19-25"><a id="__codelineno-19-25" name="__codelineno-19-25" href="#__codelineno-19-25"></a><span class="nt">status</span><span class="p">:</span>
+</span><span id="__span-19-26"><a id="__codelineno-19-26" name="__codelineno-19-26" href="#__codelineno-19-26"></a><span class="w">  </span><span class="nt">backendInfo</span><span class="p">:</span>
+</span><span id="__span-19-27"><a id="__codelineno-19-27" name="__codelineno-19-27" href="#__codelineno-19-27"></a><span class="w">    </span><span class="nt">backendName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fsx-ontap</span>
+</span><span id="__span-19-28"><a id="__codelineno-19-28" name="__codelineno-19-28" href="#__codelineno-19-28"></a><span class="w">    </span><span class="nt">backendUUID</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">99b00c6b-edd7-4c9d-8a9e-d55fe09ba48f</span>
+</span><span id="__span-19-29"><a id="__codelineno-19-29" name="__codelineno-19-29" href="#__codelineno-19-29"></a><span class="w">  </span><span class="nt">deletionPolicy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">delete</span>
+</span><span id="__span-19-30"><a id="__codelineno-19-30" name="__codelineno-19-30" href="#__codelineno-19-30"></a><span class="w">  </span><span class="nt">lastOperationStatus</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Success</span>
+</span><span id="__span-19-31"><a id="__codelineno-19-31" name="__codelineno-19-31" href="#__codelineno-19-31"></a><span class="w">  </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Backend &#39;fsx-ontap&#39; created</span>
+</span><span id="__span-19-32"><a id="__codelineno-19-32" name="__codelineno-19-32" href="#__codelineno-19-32"></a><span class="w">  </span><span class="nt">phase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Bound</span>
+</span></code></pre></div></p>
+<p>Create a StorageClass:</p>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">storage.k8s.io/v1</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">StorageClass</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ontap-nfsv4</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="nt">provisioner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">csi.trident.netapp.io</span>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="nt">mountOptions</span><span class="p">:</span>
+</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nfsvers=4.1</span>
+</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sec=krb5</span>
+</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nolock</span>
+</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="nt">parameters</span><span class="p">:</span>
+</span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="w">  </span><span class="nt">backendType</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ontap-nas&quot;</span>
+</span><span id="__span-20-12"><a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="nt">allowVolumeExpansion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-20-13"><a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a><span class="nt">volumeBindingMode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Immediate</span>
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>kubectl apply -f sc.yaml
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>storageclass.storage.k8s.io/ontap-nfsv4 created
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>kubectl get sc/ontap-nfsv4
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>NAME          PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>ontap-nfsv4   csi.trident.netapp.io   Delete          Immediate           true                   10s
+</span></code></pre></div>
+<p>Create a test PVC:</p>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PersistentVolumeClaim</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data-krb</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="nt">spec</span><span class="p">:</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="w">  </span><span class="nt">accessModes</span><span class="p">:</span>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ReadWriteMany</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">  </span><span class="nt">storageClassName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ontap-nfsv4</span>
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">  </span><span class="nt">resources</span><span class="p">:</span>
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="w">    </span><span class="nt">requests</span><span class="p">:</span>
+</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="w">      </span><span class="nt">storage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1Gi</span>
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>kubectl apply -f pvc.yaml
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>persistentvolumeclaim/data-krb created
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>kubectl get pvc -w
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>NAME       STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>data-krb   Bound    pvc-a6ce2f55-0579-47b8-b04e-805e4b4278b9   1Gi        RWX            ontap-nfsv4    &lt;unset&gt;                 7s
+</span></code></pre></div>
+<h4 id="deploying-pod">Deploying Pod</h4>
+<p>Create a test Pod:</p>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Pod</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kerberos-user-pod-hardened</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="nt">spec</span><span class="p">:</span>
+</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="w">  </span><span class="nt">securityContext</span><span class="p">:</span>
+</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="w">    </span><span class="nt">runAsUser</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1907600003</span>
+</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="w">    </span><span class="nt">runAsGroup</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5005</span>
+</span><span id="__span-24-9"><a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="w">    </span><span class="nt">fsGroup</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5005</span>
+</span><span id="__span-24-10"><a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="w">    </span><span class="nt">supplementalGroups</span><span class="p">:</span><span class="w"> </span>
+</span><span id="__span-24-11"><a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5005</span>
+</span><span id="__span-24-12"><a id="__codelineno-24-12" name="__codelineno-24-12" href="#__codelineno-24-12"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6006</span>
+</span><span id="__span-24-13"><a id="__codelineno-24-13" name="__codelineno-24-13" href="#__codelineno-24-13"></a><span class="w">    </span><span class="nt">fsGroupChangePolicy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;OnRootMismatch&quot;</span>
+</span><span id="__span-24-14"><a id="__codelineno-24-14" name="__codelineno-24-14" href="#__codelineno-24-14"></a><span class="w">    </span><span class="nt">runAsNonRoot</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"> </span><span class="c1"># </span>
+</span><span id="__span-24-15"><a id="__codelineno-24-15" name="__codelineno-24-15" href="#__codelineno-24-15"></a><span class="w">  </span><span class="nt">containers</span><span class="p">:</span>
+</span><span id="__span-24-16"><a id="__codelineno-24-16" name="__codelineno-24-16" href="#__codelineno-24-16"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test-container</span>
+</span><span id="__span-24-17"><a id="__codelineno-24-17" name="__codelineno-24-17" href="#__codelineno-24-17"></a><span class="w">      </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">busybox:latest</span>
+</span><span id="__span-24-18"><a id="__codelineno-24-18" name="__codelineno-24-18" href="#__codelineno-24-18"></a><span class="w">      </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;/bin/sh&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;-c&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;sleep</span><span class="nv"> </span><span class="s">3600&quot;</span><span class="p p-Indicator">]</span>
+</span><span id="__span-24-19"><a id="__codelineno-24-19" name="__codelineno-24-19" href="#__codelineno-24-19"></a><span class="w">      </span><span class="nt">securityContext</span><span class="p">:</span>
+</span><span id="__span-24-20"><a id="__codelineno-24-20" name="__codelineno-24-20" href="#__codelineno-24-20"></a><span class="w">        </span><span class="nt">allowPrivilegeEscalation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</span><span id="__span-24-21"><a id="__codelineno-24-21" name="__codelineno-24-21" href="#__codelineno-24-21"></a><span class="w">        </span><span class="nt">capabilities</span><span class="p">:</span>
+</span><span id="__span-24-22"><a id="__codelineno-24-22" name="__codelineno-24-22" href="#__codelineno-24-22"></a><span class="w">          </span><span class="nt">drop</span><span class="p">:</span>
+</span><span id="__span-24-23"><a id="__codelineno-24-23" name="__codelineno-24-23" href="#__codelineno-24-23"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ALL</span>
+</span><span id="__span-24-24"><a id="__codelineno-24-24" name="__codelineno-24-24" href="#__codelineno-24-24"></a><span class="w">        </span><span class="nt">privileged</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</span><span id="__span-24-25"><a id="__codelineno-24-25" name="__codelineno-24-25" href="#__codelineno-24-25"></a><span class="w">        </span><span class="nt">readOnlyRootFilesystem</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</span><span id="__span-24-26"><a id="__codelineno-24-26" name="__codelineno-24-26" href="#__codelineno-24-26"></a>
+</span><span id="__span-24-27"><a id="__codelineno-24-27" name="__codelineno-24-27" href="#__codelineno-24-27"></a><span class="w">      </span><span class="nt">volumeMounts</span><span class="p">:</span>
+</span><span id="__span-24-28"><a id="__codelineno-24-28" name="__codelineno-24-28" href="#__codelineno-24-28"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nfs-data</span>
+</span><span id="__span-24-29"><a id="__codelineno-24-29" name="__codelineno-24-29" href="#__codelineno-24-29"></a><span class="w">          </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/data/home&quot;</span><span class="w"> </span>
+</span><span id="__span-24-30"><a id="__codelineno-24-30" name="__codelineno-24-30" href="#__codelineno-24-30"></a><span class="w">  </span><span class="nt">volumes</span><span class="p">:</span>
+</span><span id="__span-24-31"><a id="__codelineno-24-31" name="__codelineno-24-31" href="#__codelineno-24-31"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nfs-data</span>
+</span><span id="__span-24-32"><a id="__codelineno-24-32" name="__codelineno-24-32" href="#__codelineno-24-32"></a><span class="w">      </span><span class="nt">persistentVolumeClaim</span><span class="p">:</span>
+</span><span id="__span-24-33"><a id="__codelineno-24-33" name="__codelineno-24-33" href="#__codelineno-24-33"></a><span class="w">        </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data-krb</span>
+</span></code></pre></div>
+<h4 id="troubleshooting">Troubleshooting</h4>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>ipa host-add svmnfsv4.net.domain.local --force
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>--------------------------------------
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>Added host &quot;svmnfsv4.net.domain.local&quot;
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>--------------------------------------
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>  Host name: svmnfsv4.net.domain.local
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>  Principal name: host/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>  Principal alias: host/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL
+</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>  Password: False
+</span><span id="__span-25-9"><a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a>  Keytab: False
+</span><span id="__span-25-10"><a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a>  Managed by: svmnfsv4.net.domain.local
+</span><span id="__span-25-11"><a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a>
+</span><span id="__span-25-12"><a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a>ipa dnsrecord-add net.domain.local svmnfsv4 --a-rec=172.31.47.242
+</span><span id="__span-25-13"><a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a>  Record name: svmnfsv4
+</span><span id="__span-25-14"><a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a>  A record: 172.31.47.242
+</span><span id="__span-25-15"><a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a>
+</span><span id="__span-25-16"><a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a>ipa service-add nfs/svmnfsv4.net.domain.local
+</span><span id="__span-25-17"><a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a>--------------------------------------------------------------
+</span><span id="__span-25-18"><a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a>Added service &quot;nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL&quot;
+</span><span id="__span-25-19"><a id="__codelineno-25-19" name="__codelineno-25-19" href="#__codelineno-25-19"></a>--------------------------------------------------------------
+</span><span id="__span-25-20"><a id="__codelineno-25-20" name="__codelineno-25-20" href="#__codelineno-25-20"></a>  Principal name: nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL
+</span><span id="__span-25-21"><a id="__codelineno-25-21" name="__codelineno-25-21" href="#__codelineno-25-21"></a>  Principal alias: nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL
+</span><span id="__span-25-22"><a id="__codelineno-25-22" name="__codelineno-25-22" href="#__codelineno-25-22"></a>  Managed by: svmnfsv4.net.domain.local
+</span><span id="__span-25-23"><a id="__codelineno-25-23" name="__codelineno-25-23" href="#__codelineno-25-23"></a>
+</span><span id="__span-25-24"><a id="__codelineno-25-24" name="__codelineno-25-24" href="#__codelineno-25-24"></a>ipa-getkeytab -p nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL -k /tmp/client-ntap.keytab -e aes256-cts-hmac-sha1-96,aes128-cts-hmac-sha1-96
+</span><span id="__span-25-25"><a id="__codelineno-25-25" name="__codelineno-25-25" href="#__codelineno-25-25"></a>Keytab successfully retrieved and stored in: /tmp/client-ntap.keytab
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>services name-service dns create -domains net.domain.local -name-servers 172.31.32.73
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>services name-service dns show
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>                                                    Name
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>Vserver         Domains                             Servers
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a>--------------- ----------------------------------- ----------------
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a>svmnfsv4        net.domain.local                    172.31.32.73
+</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a>
+</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a>services name-service dns check -name-server 172.31.32.73
+</span><span id="__span-26-10"><a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a>
+</span><span id="__span-26-11"><a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a>       Name Server: 172.31.32.73
+</span><span id="__span-26-12"><a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a>Name Server Status: up
+</span><span id="__span-26-13"><a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a>    Status Details: Response time (msec): 1
+</span><span id="__span-26-14"><a id="__codelineno-26-14" name="__codelineno-26-14" href="#__codelineno-26-14"></a>
+</span><span id="__span-26-15"><a id="__codelineno-26-15" name="__codelineno-26-15" href="#__codelineno-26-15"></a>services name-service ns-switch modify -database hosts dns, files
+</span><span id="__span-26-16"><a id="__codelineno-26-16" name="__codelineno-26-16" href="#__codelineno-26-16"></a>
+</span><span id="__span-26-17"><a id="__codelineno-26-17" name="__codelineno-26-17" href="#__codelineno-26-17"></a>services name-service ns-switch show -database hosts
+</span><span id="__span-26-18"><a id="__codelineno-26-18" name="__codelineno-26-18" href="#__codelineno-26-18"></a>
+</span><span id="__span-26-19"><a id="__codelineno-26-19" name="__codelineno-26-19" href="#__codelineno-26-19"></a>Name Service Switch Database: hosts
+</span><span id="__span-26-20"><a id="__codelineno-26-20" name="__codelineno-26-20" href="#__codelineno-26-20"></a>   Name Service Source Order: dns, files
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>podman volume create keytab-storage
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>keytab-storage
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>podman volume inspect keytab-storage
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>[
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>     {
+</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a>          &quot;Name&quot;: &quot;keytab-storage&quot;,
+</span><span id="__span-27-8"><a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>          &quot;Driver&quot;: &quot;local&quot;,
+</span><span id="__span-27-9"><a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a>          &quot;Mountpoint&quot;: &quot;/home/ec2-user/.local/share/containers/storage/volumes/keytab-storage/_data&quot;,
+</span><span id="__span-27-10"><a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a>          &quot;CreatedAt&quot;: &quot;2025-09-10T16:28:26.27678136Z&quot;,
+</span><span id="__span-27-11"><a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a>          &quot;Labels&quot;: {},
+</span><span id="__span-27-12"><a id="__codelineno-27-12" name="__codelineno-27-12" href="#__codelineno-27-12"></a>          &quot;Scope&quot;: &quot;local&quot;,
+</span><span id="__span-27-13"><a id="__codelineno-27-13" name="__codelineno-27-13" href="#__codelineno-27-13"></a>          &quot;Options&quot;: {},
+</span><span id="__span-27-14"><a id="__codelineno-27-14" name="__codelineno-27-14" href="#__codelineno-27-14"></a>          &quot;MountCount&quot;: 0,
+</span><span id="__span-27-15"><a id="__codelineno-27-15" name="__codelineno-27-15" href="#__codelineno-27-15"></a>          &quot;NeedsCopyUp&quot;: true,
+</span><span id="__span-27-16"><a id="__codelineno-27-16" name="__codelineno-27-16" href="#__codelineno-27-16"></a>          &quot;NeedsChown&quot;: true,
+</span><span id="__span-27-17"><a id="__codelineno-27-17" name="__codelineno-27-17" href="#__codelineno-27-17"></a>          &quot;LockNumber&quot;: 2
+</span><span id="__span-27-18"><a id="__codelineno-27-18" name="__codelineno-27-18" href="#__codelineno-27-18"></a>     }
+</span><span id="__span-27-19"><a id="__codelineno-27-19" name="__codelineno-27-19" href="#__codelineno-27-19"></a>]
+</span><span id="__span-27-20"><a id="__codelineno-27-20" name="__codelineno-27-20" href="#__codelineno-27-20"></a>
+</span><span id="__span-27-21"><a id="__codelineno-27-21" name="__codelineno-27-21" href="#__codelineno-27-21"></a>ls -al /home/ec2-user/.local/share/containers/storage/volumes/keytab-storage/_data
+</span><span id="__span-27-22"><a id="__codelineno-27-22" name="__codelineno-27-22" href="#__codelineno-27-22"></a>total 4
+</span><span id="__span-27-23"><a id="__codelineno-27-23" name="__codelineno-27-23" href="#__codelineno-27-23"></a>drwxr-xr-x 2 ec2-user users  27 Sep 10 16:29 .
+</span><span id="__span-27-24"><a id="__codelineno-27-24" name="__codelineno-27-24" href="#__codelineno-27-24"></a>drwx------ 3 ec2-user users  19 Sep 10 16:28 ..
+</span><span id="__span-27-25"><a id="__codelineno-27-25" name="__codelineno-27-25" href="#__codelineno-27-25"></a>-rw------- 1 ec2-user users 196 Sep 10 16:29 client.keytab
+</span><span id="__span-27-26"><a id="__codelineno-27-26" name="__codelineno-27-26" href="#__codelineno-27-26"></a>
+</span><span id="__span-27-27"><a id="__codelineno-27-27" name="__codelineno-27-27" href="#__codelineno-27-27"></a>chmod 644 /home/ec2-user/.local/share/containers/storage/volumes/keytab-storage/_data/client.keytab
+</span><span id="__span-27-28"><a id="__codelineno-27-28" name="__codelineno-27-28" href="#__codelineno-27-28"></a>
+</span><span id="__span-27-29"><a id="__codelineno-27-29" name="__codelineno-27-29" href="#__codelineno-27-29"></a>podman run -d --name nginx-keytab-server -p 8080:80 -v keytab-storage:/usr/share/nginx/html:ro,Z docker.io/library/nginx:latest
+</span><span id="__span-27-30"><a id="__codelineno-27-30" name="__codelineno-27-30" href="#__codelineno-27-30"></a>Trying to pull docker.io/library/nginx:latest...
+</span><span id="__span-27-31"><a id="__codelineno-27-31" name="__codelineno-27-31" href="#__codelineno-27-31"></a>Getting image source signatures
+</span><span id="__span-27-32"><a id="__codelineno-27-32" name="__codelineno-27-32" href="#__codelineno-27-32"></a>Copying blob a785b80f5a67 done   |
+</span><span id="__span-27-33"><a id="__codelineno-27-33" name="__codelineno-27-33" href="#__codelineno-27-33"></a>Copying blob d107e437f729 done   |
+</span><span id="__span-27-34"><a id="__codelineno-27-34" name="__codelineno-27-34" href="#__codelineno-27-34"></a>Copying blob f1c4d397f477 done   |
+</span><span id="__span-27-35"><a id="__codelineno-27-35" name="__codelineno-27-35" href="#__codelineno-27-35"></a>Copying blob cb497a329a81 done   |
+</span><span id="__span-27-36"><a id="__codelineno-27-36" name="__codelineno-27-36" href="#__codelineno-27-36"></a>Copying blob f72106e86507 done   |
+</span><span id="__span-27-37"><a id="__codelineno-27-37" name="__codelineno-27-37" href="#__codelineno-27-37"></a>Copying blob 899c83fc198b done   |
+</span><span id="__span-27-38"><a id="__codelineno-27-38" name="__codelineno-27-38" href="#__codelineno-27-38"></a>Copying blob 6c50e4e0c439 done   |
+</span><span id="__span-27-39"><a id="__codelineno-27-39" name="__codelineno-27-39" href="#__codelineno-27-39"></a>Copying config 41f689c209 done   |
+</span><span id="__span-27-40"><a id="__codelineno-27-40" name="__codelineno-27-40" href="#__codelineno-27-40"></a>Writing manifest to image destination
+</span><span id="__span-27-41"><a id="__codelineno-27-41" name="__codelineno-27-41" href="#__codelineno-27-41"></a>WARN[0005] Failed to mount subscriptions, skipping entry in /etc/containers/mounts.conf: open /etc/zypp/credentials.d/SCCcredentials: permission denied
+</span><span id="__span-27-42"><a id="__codelineno-27-42" name="__codelineno-27-42" href="#__codelineno-27-42"></a>36ca20a52f2082ff3ef4993fb9681d6dd3ea8c1e490f14670b6f2de4f5136aec
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>nfs kerberos interface enable -lif nfs_smb_management_1 -spn nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL -keytab-uri http://172.31.46.200:8080/client.keytab
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>Warning: Keys for encryption types &quot;des-cbc-crc,des3-cbc-sha1,aes128-cts-hmac-sha1-96,aes256-cts-hmac-sha1-96&quot; are required for Vserver &quot;svmnfsv4&quot;
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>         but found keys only for encryption types &quot;aes128-cts-hmac-sha1-96,aes256-cts-hmac-sha1-96&quot;. Keys for encryption types
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>         &quot;des-cbc-crc,des3-cbc-sha1&quot; for service principal name &quot;nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL&quot; are missing. Available keys will be
+</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>         imported. Do you want to continue? {y|n}: y
+</span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>
+</span><span id="__span-28-8"><a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a>nfs kerberos interface show
+</span><span id="__span-28-9"><a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a>               Logical
+</span><span id="__span-28-10"><a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a>Vserver        Interface     Address         Kerberos SPN
+</span><span id="__span-28-11"><a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a>-------------- ------------- --------------- -------- -----------------------
+</span><span id="__span-28-12"><a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a>svmnfsv4       nfs_smb_management_1
+</span><span id="__span-28-13"><a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a>                             172.31.47.242   enabled  nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>kerberos interface show -vserver svmnfsv4 -lif nfs_smb_management_1
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>  (vserver nfs kerberos interface show)
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>                   Vserver: svmnfsv4
+</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>         Logical Interface: nfs_smb_management_1
+</span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>                IP Address: 172.31.47.242
+</span><span id="__span-29-7"><a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a>          Kerberos Enabled: enabled
+</span><span id="__span-29-8"><a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a>    Service Principal Name: nfs/svmnfsv4.net.domain.local@NET.DOMAIN.LOCAL
+</span><span id="__span-29-9"><a id="__codelineno-29-9" name="__codelineno-29-9" href="#__codelineno-29-9"></a>Permitted Encryption Types: aes-128, aes-256
+</span><span id="__span-29-10"><a id="__codelineno-29-10" name="__codelineno-29-10" href="#__codelineno-29-10"></a>      Machine Account Name: -
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a> export-policy rule show -vserver svmnfsv4 -policyname kerberos
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>             Policy          Rule    Access   Client                RO
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>Vserver      Name            Index   Protocol Match                 Rule
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>------------ --------------- ------  -------- --------------------- ---------
+</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>svmnfsv4     kerberos        1       nfs4     172.31.32.0/20,       krb5
+</span><span id="__span-30-6"><a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>                                              10.89.0.0/24
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>nc -zv 172.31.47.242 2049
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>ip-172-31-47-242.eu-west-3.compute.internal [172.31.47.242] 2049 (nfs) open
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>sudo  mount -t nfs -vvvv 172.31.47.242:/vol1 /mnt/test/
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>mount.nfs: timeout set for Thu Sep 11 07:46:23 2025
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>mount.nfs: trying text-based options &#39;vers=4.2,addr=172.31.47.242,clientaddr=172.31.46.200&#39;
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>mount |grep 172
+</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a>172.31.47.242:/vol1 on /mnt/test type nfs4 (rw,relatime,vers=4.2,rsize=65536,wsize=65536,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,clientaddr=172.31.46.200,local_lock=none,addr=172.31.47.242)
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>sudo mount -t nfs4 -vvvv -o sec=krb5 172.31.47.242:/trident_pvc_9e64b913_7d64_48e1_b640_6aea5e0b0951 /mnt/test/
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>mount.nfs4: timeout set for Thu Sep 11 14:09:28 2025
+</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>mount.nfs4: trying text-based options &#39;sec=krb5,vers=4.2,addr=172.31.47.242,clientaddr=172.31.46.200&#39;
+</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>mount |grep 172
+</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a>172.31.47.242:/trident_pvc_9e64b913_7d64_48e1_b640_6aea5e0b0951 on /mnt/test type nfs4 (rw,relatime,vers=4.2,rsize=65536,wsize=65536,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=krb5,clientaddr=172.31.46.200,local_lock=none,addr=172.31.47.242)
+</span></code></pre></div>
+<p>rebinding via kubelet fails to accept permission even when forcing a admin-level token.</p>
+<h3 id="obvervations">Obvervations</h3>
+<p>While the system-level mount succeeds at the host level through the CSI driver identicating a healthy connection between the hosts and ONTAP, the container observed a silent failure from <code>kubelet</code> when attempting to recursively run the <code>chown</code> and <code>chmod</code> command to grant access to the specificed group ID(s).  </p>
+<p>The root cause is linked to the entire kubernetes stack up to the Pod presented as non-root including <code>kubelet</code> leading to <code>NFS4ERR_ACCESS</code>. As such the ONTAP will map the request to a non-privileged user leading to the silent failure. While he test container process starts with <code>uid=1907600003</code>and is a member of groups <code>5005</code> and <code>6006</code>, when trying to write to the volume, the NFS checks the file's permissions with no matching permissions.</p>
+<p>While a <code>no_root_squash</code> or setting  <code>-superuser krb5</code> at the policy level would, in theory, address the behavior, the next error is linked to a authorization mismatched at the GSS due to the wrong security primitives being presented.  While presenting the appropriate authentication at the node level, the container is presenting itself with the wrong one, not a <code>NFS4ERR_BAD_CRED</code> or <code>NFS4ERR_EXPIRED</code> but returning <code>NFSV4ERR_WRONG_SEC</code> from ONTAP, the wrong type of ID presented based on the overall Kerberos authentication and authorization chain. </p>
+<p>The root cause is linked to a mismatch at the client level, ONTAP has granted one access at the node level to mount and access the filesystem, <code>kubelet</code> is also granted if set with the superuser, but the security context is not applied at the pod process level, calling for the process, the container, to present valid credentials. This can be done through the usage of a side car or running the SSSD within the container.</p>
+<h2 id="potential-mitigations">Potential mitigations</h2>
+<h3 id="running-as-a-virtual-machine">Running as a virtual machine</h3>
+<p>Today's Kubernetes project called Kubevirt is widely used as an alternative to the most common hypervisors on the market, providing the benefit of traditional virtual machines along with containers for unified cloud-native deployment and management strategies. <br />
+This option would reduce the complexity of retrofiting a vintage application to containers when considering the deep coupled integration from an operationg system, libraries, filesystem, and user management. </p>
+<h3 id="pod-with-integrated-sssd">Pod with integrated SSSD</h3>
+<p>This approach is basically attempting to mimic the behavior of a full standing virtual machine in a container by handling the Kerberos handshake at the Pod level. From an overall workflow, the process would: </p>
+<ol>
+<li>Storage Provisioning: this initial phase is a standard, automated process for provisioning storage in Kubernetes using a Trident CSI. This will provide a managed volume via Trident opening for snapshot, cloning, and local and remote backup with Trident Protect. </li>
+<li>Pod mount and user Access: this phase mounts the storage from within its own Pod environment, bypassing the standard kubelet mount process, with internal Kerberos ticket handling within the Pod leveraging built-in container image Kerberos utilities (kinit) to contact the KDC and acquire a service ticket for the NFS export. This can also include the user management access into the running pod. Their login is authenticated against the same central IdM/KDC, giving them access to the interactive shell and the securely mounted filesystem.</li>
+</ol>
+<pre class="mermaid"><code>sequenceDiagram
+    participant User as User/Operator
+    participant KubeAPI as Kube-API Server
+    participant TridentCSI as Trident CSI Driver
+    participant ONTAP as NetApp ONTAP
+    participant AppPod as Application Pod (with krb5/nfs utils)
+    participant KDC as IdM/KDC (FreeIPA/AD)
+
+    %% --- Phase 1: Storage Provisioning ---
+    Note over User, ONTAP: Phase 1: Storage Provisioning (Admin Task)
+    User-&gt;&gt;KubeAPI: 1. Apply PVC manifest
+    KubeAPI-&gt;&gt;TridentCSI: 2. Request new volume for PVC
+    TridentCSI-&gt;&gt;ONTAP: 3. Create volume &amp; export
+    ONTAP--&gt;&gt;TridentCSI: 4. PV details (e.g., export path)
+    TridentCSI-&gt;&gt;KubeAPI: 5. Create PV object, bind to PVC
+
+    %% --- Phase 2: Pod Deployment and In-Container Mount ---
+    Note over User, KDC: Phase 2: Application Pod Mount &amp; User Access
+    User-&gt;&gt;KubeAPI: 6. Deploy Pod manifest (references PVC)
+    KubeAPI-&gt;&gt;AppPod: 7. Schedule &amp; start Pod container
+
+    AppPod-&gt;&gt;AppPod: 8. Startup script in container runs
+    AppPod-&gt;&gt;KDC: 9. Container's kinit gets ticket for NFS SPN
+    KDC--&gt;&gt;AppPod: 10. Service ticket issued to container
+    AppPod-&gt;&gt;ONTAP: 11. Container runs: mount -t nfs4 -o sec=krb5 ...
+    ONTAP--&gt;&gt;AppPod: 12. NFS export mounted inside the Pod
+
+    %% --- Optional User Access Flow ---
+    participant EndUser as End User
+    EndUser-&gt;&gt;AppPod: 13. SSH to Pod (authenticated via KDC)</code></pre>
+<p>Reference: <img alt="Kubernetes Kerberos" src="https://github.com/whyistheinternetbroken/k8s-kerberos/tree/main" /></p>
+<h3 id="pod-with-sidecar">Pod with sidecar</h3>
+<p>The Pod with integrated SSSD requires either a build image with scripts or an initContainer handling the registration with FreeIPA to have dynamic registration, which might be complex and open another set of security challenges too.    </p>
+<p>The Pod with sidecar implementation addresses the following requirements: <br />
+- <strong>Separation of concerns:</strong> The sidecar handles all the complex Kerberos logic, allowing the application container to remain lightweight and focused on its core function. <br />
+- <strong>Security:</strong> Only the sidecar needs access to the sensitive keytab file. The main application only ever sees the less-sensitive ticket cache. <br />
+- <strong>Automated renewal:</strong> The sidecar ensures the Kerberos tickets are automatically renewed, preventing authentication failures for long-running applications without manual intervention. <br />
+- <strong>Simplified application development:</strong> Developers don't need to embed Kerberos dependencies or logic into their application images. The sidecar pattern is managed at the platform level.   </p>
+<p>Compare to previous diagram, the following workflow is handling the Kerberos authentication, caching, and rotation through a sidecar:</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant User as User/Operator
+    participant KubeAPI as Kube-API Server
+    participant AppPod as Application Pod (App + Kerberos Sidecar)
+    participant KDC as KDC
+
+    User-&gt;&gt;KubeAPI: 1. Apply ConfigMap (krb5.conf) and Secret (service keytab)
+    User-&gt;&gt;KubeAPI: 2. Deploy Pod (App + Sidecar, shared ccache)
+
+    Note over AppPod: emptyDir(/var/run/krb5cc/app.ccache) shared by both containers
+
+    AppPod-&gt;&gt;AppPod: 3. Sidecar starts
+    AppPod-&gt;&gt;KDC: 4. Sidecar kinit -kt service.keytab SERVICE_PRINCIPAL
+    KDC--&gt;&gt;AppPod: 5. TGT issued to shared ccache
+    AppPod-&gt;&gt;AppPod: 6. Sidecar loop renews/re-kinit periodically
+
+    AppPod-&gt;&gt;KDC: 7. App requests service tickets as needed (GSSAPI)
+    KDC--&gt;&gt;AppPod: 8. Service ticket via shared ccache
+    AppPod-&gt;&gt;ExternalSvc: 9. App calls Kerberos-protected service (HTTP, DB, etc.)</code></pre>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 10, 2025 07:55:05 UTC">October 10, 2025</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 10, 2025 07:55:05 UTC">October 10, 2025</span>
+  </span>
+
+    
+    
+      
+  
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Contributors">
+      
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/></svg>
+      
+    </span>
+    <nav>
+      
+        <a href="mailto:55788733+romdalf@users.noreply.github.com">Rom Adams</a>
+    </nav>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    
+      
+  <span class="md-icon" title="Contributors">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/></svg>
+  </span>
+  <span>GitHub</span>
+
+    
+    <nav>
+      
+        <a href="https://github.com/romdalf" class="md-author" title="@romdalf">
+          
+          <img src="https://avatars.githubusercontent.com/u/55788733?v=4&size=72" alt="romdalf">
+        </a>
+      
+        <a href="https://github.com/web-flow" class="md-author" title="@web-flow">
+          
+          <img src="https://avatars.githubusercontent.com/u/19864447?v=4&size=72" alt="web-flow">
+        </a>
+      
+      
+      
+    </nav>
+  </span>
+
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../foss/kleidi/" class="md-footer__link md-footer__link--prev" aria-label="Previous: kleidí">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                kleidí
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../neo/" class="md-footer__link md-footer__link--next" aria-label="Next: neo client">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                neo client
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Apache-2.0 License -  <a href="#__consent">Change cookie settings</a>
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs Insiders
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/romdalf/romadams.com" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.youtube.com/@beezydev" target="_blank" rel="noopener" title="www.youtube.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M549.7 124.1c-6.2-23.7-24.8-42.3-48.3-48.6C458.9 64 288.1 64 288.1 64S117.3 64 74.7 75.5c-23.5 6.3-42 24.9-48.3 48.6C15 167 15 256.4 15 256.4s0 89.4 11.4 132.3c6.3 23.6 24.8 41.5 48.3 47.8C117.3 448 288.1 448 288.1 448s170.8 0 213.4-11.5c23.5-6.3 42-24.2 48.3-47.8 11.4-42.9 11.4-132.3 11.4-132.3s0-89.4-11.4-132.3zM232.2 337.6V175.2l142.7 81.2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/romdalf" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M357.2 48h70.6L273.6 224.2 455 464H313L201.7 318.6 74.5 464H3.8l164.9-188.5L-5.2 48h145.6l100.5 132.9zm-24.8 373.8h39.1L119.1 88h-42z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/in/romdalf/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+      <div class="md-consent" data-md-component="consent" id="__consent" hidden>
+        <div class="md-consent__overlay"></div>
+        <aside class="md-consent__inner">
+          <form class="md-consent__form md-grid md-typeset" name="consent">
+            
+
+
+
+  
+
+<h4>Cookie consent</h4>
+<p>We use cookies to recognize your repeated visits and preferences, as well as to measure the effectiveness of our documentation and whether users find what they're searching for. With your consent, you're helping us to make our documentation better.</p>
+<input class="md-toggle" type="checkbox" id="__settings" checked>
+<div class="md-consent__settings">
+  <ul class="task-list">
+    
+    
+      
+    
+    
+      
+        
+  
+  
+    
+    
+  
+  <li class="task-list-item">
+    <label class="task-list-control">
+      <input type="checkbox" name="github" checked>
+      <span class="task-list-indicator"></span>
+      GitHub
+    </label>
+  </li>
+
+      
+    
+    
+  </ul>
+</div>
+<div class="md-consent__controls">
+  
+    
+      <button class="md-button md-button--primary">Accept</button>
+    
+    
+    
+  
+    
+    
+      <button type="reset" class="md-button md-button--primary">Reject</button>
+    
+    
+  
+</div>
+          </form>
+        </aside>
+      </div>
+      <script>var consent=__md_get("__consent");if(consent)for(var input of document.forms.consent.elements)input.name&&(input.checked=consent[input.name]||!1);else"file:"!==location.protocol&&setTimeout((function(){document.querySelector("[data-md-component=consent]").hidden=!1}),250);var form=document.forms.consent;for(var action of["submit","reset"])form.addEventListener(action,(function(e){if(e.preventDefault(),"reset"===e.type)for(var n of document.forms.consent.elements)n.name&&(n.checked=!1);__md_set("__consent",Object.fromEntries(Array.from(new FormData(form).keys()).map((function(e){return[e,!0]})))),location.hash="",location.reload()}))</script>
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.code.annotate", "navigation.top", "navigation.footer", "navigation.indexes", "navigation.tabs", "navigation.tabs.sticky", "content.code.copy", "content.code.select"], "search": "../../../assets/javascripts/workers/search.26099bd0.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.9d1edc04.min.js"></script>
+      
+    
+  </body>
+</html>

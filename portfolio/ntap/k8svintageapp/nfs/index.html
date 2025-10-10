@@ -1,0 +1,2483 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://romadams.com/portfolio/ntap/k8svintageapp/nfs/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21+insiders-4.53.17">
+    
+    
+      
+        <title>Securing NFSv4 with authentication and authorization for containerized applications - romadams.com</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.010a373c.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Red+Hat+Text:300,300i,400,400i,700,700i%7CRed+Hat+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Red Hat Text";--md-code-font:"Red Hat Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#securing-nfsv4-with-authentication-and-authorization-for-containerized-applications" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="romadams.com" class="md-header__button md-logo" aria-label="romadams.com" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M399 384.2c-22.1-38.4-63.6-64.2-111-64.2h-64c-47.4 0-88.9 25.8-111 64.2 35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8M0 256a256 256 0 1 1 512 0 256 256 0 1 1-512 0m256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            romadams.com
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Securing NFSv4 with authentication and authorization for containerized applications
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="red"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="red"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/romdalf/romadams.com" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    romdalf/romadams.com
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../.." class="md-tabs__link">
+          
+  
+  
+    
+  
+  about
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="romadams.com" class="md-nav__button md-logo" aria-label="romadams.com" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M399 384.2c-22.1-38.4-63.6-64.2-111-64.2h-64c-47.4 0-88.9 25.8-111 64.2 35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8M0 256a256 256 0 1 1 512 0 256 256 0 1 1-512 0m256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144"/></svg>
+
+    </a>
+    romadams.com
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/romdalf/romadams.com" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    romdalf/romadams.com
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../.." class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    about
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1" id="__nav_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    about
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    portfolio
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1_2" id="__nav_1_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    portfolio
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_2_2" id="__nav_1_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    foss
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    foss
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_2_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../foss/abacc/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    abacc-rag
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    abacc-rag
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_2_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../foss/dialup/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    dialup
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    dialup
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_2_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../foss/eufc/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    unified eu sovereign cloud hub
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    unified eu sovereign cloud hub
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_2_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../foss/kleidi/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    kleidi
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    kleidi
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_2_3" id="__nav_1_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    netapp
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    netapp
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_3_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Securing home directories for containerized vintage applications
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Securing home directories for containerized vintage applications
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_3_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../neo/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    neo client
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    neo client
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_3_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../trident/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    netapp consoles for openshift
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    netapp consoles for openshift
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_2_4" id="__nav_1_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    red hat
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    red hat
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_4_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../rdht/namespace/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    namespace
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    namespace
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_4_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../rdht/appresources/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    app resources
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    app resources
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_4_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../rdht/s2i/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    source2image
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    source2image
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2_4_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../rdht/helm/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    helm charts
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_1_2_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    helm charts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#abstract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Abstract
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Introduction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Introduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nfsv4-with-kerberos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NFSv4 with Kerberos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cloud-native-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cloud-native application
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#containerized-vintage-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Containerized vintage application
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="securing-nfsv4-with-authentication-and-authorization-for-containerized-applications">Securing NFSv4 with authentication and authorization for containerized applications</h1>
+<div class="admonition warning">
+<p class="admonition-title">Status: <strong>draft</strong></p>
+<p>This document is a research document in a <em>Request for Comments</em> (RFC) format, product of the NetApp Office of the CTO - Innovation &amp; Solutions Group.</p>
+<p><strong>Author(s)</strong>  <br />
+- Rom Adams, Principal Software Engineer, Office of the CTO - NetApp Inc. <br />
+<strong>Contributor(s)</strong>   <br />
+- Elliott Ecton, Technical Marketing Engineer, Shared Platform Product Management - NetApp Inc. <br />
+- Erik Stjerna, Professional Services Consultant, Consulting - NetApp Inc.  <br />
+- Johannes Wagner, Sr Solution Architect, Solution Engineering - NetApp Inc.    </p>
+<p><strong>Copyright Notes</strong>   <br />
+Copyright (c) 2025 NetApp Inc. and the persons identified as the document authors and contributors.  <br />
+All rights reserved <a href="https://www.netapp.com/company/legal/copyright/">https://www.netapp.com/company/legal/copyright/</a>.</p>
+</div>
+<hr />
+<h2 id="abstract">Abstract</h2>
+<p>This RFC outlines the technical and operational challenges of implementing NFSv4 with authentication and authorization to improve the security posture of containerized workloads in Kubernetes environments, specifically for legacy applications. <br />
+While cloud-native applications benefit from a decoupled architecture that simplifies authentication and authorization integration with NFSv4, legacy applications present unique constraints due to their reliance on interactive shell environments and persistent user contexts. The ephemeral and immutable nature of containers complicates authentication and authorization management which are essential for secure access to NFSv4 exports.</p>
+<hr />
+<h2 id="introduction">Introduction</h2>
+<p>In a Kubernetes environment, integrating NFSv4 with Kerberos on ONTAP using Trident, the NetApp Container Storage Interface (CSI), combines storage orchestration with secure, strong authentication and encryption. This approach requires coordinating the Kubernetes nodes, the CSI, and the Kerberos authentication to provision and mount volumes for pods dynamically.  </p>
+<h3 id="nfsv4-with-kerberos">NFSv4 with Kerberos</h3>
+<p>NFSv4 with Kerberos performs authentication, verifying a user's identity through a trusted third-party service like Active Directory or OpenLDAP. NFSv4 also supports Access Control Lists (ACLs), which <strong>could</strong> be enforced by the NFSv4 server to determine user permissions for file and directory operations after authentication has occurred.   </p>
+<p>Kerberos is a client-server <strong>authentication protocol</strong> that uses tickets to allow nodes communicating over an insecure network to prove their identity to one another in a secure manner. When a client requests access to an NFSv4 share, the Kerberos client obtains a ticket from the Kerberos server, which is then used to authenticate the user to the NFSv4 server. The protocol can also provide additional capabilities like data encruption and data integrity improving the NFSv4 security posture. </p>
+<p>ACLs provide granular control over file and directory access to define <strong>authorization</strong>, allowing administrators to define who can read, write, or execute files and directories. 
+The NFSv4 server could enforce ACLs. It checks the user's authenticated identity against the ACLs to grant or deny access to resources. When a new file or subdirectory is created within a directory with an ACL, it inherits the access control entries (ACEs) tagged for inheritance from the parent directory's ACL. </p>
+<p>When Kerberos is enabled, ONTAP NFSv4 enforces the authentication to verify the user identity. Once the authentication process is (successfully) done, the authorization process <strong>could</strong> enforce the ACLs too for authorization if enabled.</p>
+<p>References: <br />
+- NFS Kerberos in ONTAP, NetApp TR-4616: <a href="https://www.netapp.com/media/19384-tr-4616.pdf">https://www.netapp.com/media/19384-tr-4616.pdf</a>  <br />
+- ONTAP, NetApp: <a href="https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html">https://docs.netapp.com/us-en/ontap/nfs-admin/enable-disable-nfsv4-acls-task.html</a>    </p>
+<h3 id="cloud-native-application">Cloud-native application</h3>
+<p>A cloud-native application Pod, running without an interactive shell environment for users (no direct connection to a shell at the container level), will only require a valid Kerberos ticket to access the file system without encountering any 'permission denied' operations. This is a decoupled architecture where services and users are authorized or authenticated at the application layer while the filesystem is handled by the CSI at the node level: <br />
+- A Kerberos ticket is negotiated at the node level by the CSI, verified by the NFS service, then the NFS export is mounted to the Pod.    <br />
+- Authorization of services and users using a framework like Oauth2 granting third-parties with limited access to their data without revealing credentials.  <br />
+- Authentication of services and users using a framework like OpenID Connect (OIDC) built on top of OAuth2 validating identity for authentiction with user information to process capabilities like Single Sign-On.  </p>
+<h3 id="containerized-vintage-application">Containerized vintage application</h3>
+<p>Vintage applications are usually built with an interactive shell environment for one or multiple users, service accounts or regular users, to run, update, and access the application and interact with the application and filesystem. When integrating with Kerberos, all users interacting with the filesystem will require a valid Kerberos ticket to avoid any 'permission denied' operations. This model doesn't present a decoupled architecture and highly depend on the underlying operating systems to be set up for dynamic management of Kerberos tickets.
+This represents a challenge when the application is containerized as a container image can not simply be join a realm or pre-user provisioning for security reasons. The ephemeral state and immutable nature of containers will also challenge any post-start configuration that will happen at the container image. </p>
+<p>While the authentication at the Pod level would most likely follow the same logic as for a cloud-native application, users accessing an interactive shell with filesystem will have to authenticate even if authorization has been disabled.<br />
+Supporting a Kerberos will require to review the inner source of the application to address the dynamic management of Kerberos tickets to understand the different workflows address them via a modification of the deployment strategy up to a refactoring of the application to support the Kubernetes design constraints.  </p>
+<hr />
+<h1 id="solution-proposals">Solution Proposals</h1>
+<h2 id="environment">Environment</h2>
+<p>This section describes the working environment to reproduce the solution proposals.</p>
+<h3 id="components">Components</h3>
+<h3 id="main-objectives">Main objectives</h3>
+<ol>
+<li>Establish an iterative path to decouple the different challenges and solution path.  </li>
+<li>Establish a potential secure path to mount volumes using NFSv4 with Kerberos in Kubernetes using Trident.   </li>
+<li>Enable both application runtimes and multi-user SSH workflows with per-user authorization.   </li>
+</ol>
+<h3 id="_1"></h3>
+<h3 id="architectural-components">Architectural components</h3>
+<ul>
+<li>Kubernetes Control Plane: Manages all cluster resources, including Persistent Volumes (PVs) and Persistent Volume Claims (PVCs).</li>
+<li>Trident CSI with NAS Driver: Interface between Kubernetes storage and the NFS server.</li>
+<li>Key Distribution Center (KDC): Issues tickets for authentication, could be an Active Directory, FreeIPA, ...</li>
+<li>ONTAP NFSv4: expose the data path service, the export configuration, and validate authentication.</li>
+<li>Secrets Store CSI Driver: Optional component to mount secrets from external stores into Pods.</li>
+<li>Client credentials: Either node machine creds (host/<node>) or per-user delegated creds; do not use the server’s nfs/<server> key on the client.</li>
+<li>Application Pod: Contains the application container and the storage volume.</li>
+<li>Kerberos Configuration on nodes (krb5.conf, nfs-utils, idmap): Required for node-side Kerberos.   </li>
+</ul>
+<hr />
+<h2 id="kerberos-at-the-junction-path-with-sys-at-volume-level">Kerberos at the junction path with sys at volume level</h2>
+<p>With an ONTAP NFSv4 configured with Kerberos, all mounts will require a valid Kerberos ticket, and all entities, service and user, interacting at the filesystem level will also need a valid Kerberos ticket.  </p>
+<p>This also applies, by design from a security standpoint, to export policies that somehow attempt to bypass the krb5 auth being set up at the junction path as follows: <br />
+- The root junction path, <code>/</code>, is configured with <code>krb5</code> to force Kerberos authentication at the node level. <br />
+- All exports are configured with <code>sys</code> to allow a classic non-Kerberos authentication.     </p>
+<p>The outcomes of such a configuration are: <br />
+- The junction mount at the node level with a valid Kerberos authentication will succeed. <br />
+- Only root and an authenticated user with Kerberos will have access to the mount of the junction path <strong>AND</strong> all volumes from this junction path.   </p>
+<p>We can conclude that setting up the junction path with Kerberos will create a least privileged permission set for the whole tree, even if <code>sys</code>  is defined for underlying volumes. Presenting the data path through NFSv4 with Kerberos authentication enforced a valid ticket for all services and users that would interact with the filesystem, even when a different authentication construct is forced at the export level, the Kerberos authentication takes precedence and enforces a least privileged permission set.</p>
+<h3 id="important-constraints-and-clarifications">Important constraints and clarifications</h3>
+<ul>
+<li>NFSv4 Kerberos negotiation happens on the node: the CSI Node plugin mounts the NFS volume in the host namespace, and the node’s kernel NFS client plus rpc.gssd perform GSSAPI. Pods do not run rpc.gssd for these mounts.    </li>
+<li>Configure Kerberos (krb5.conf, nfs-utils, rpc.gssd/gssproxy, idmap) on the nodes. Injecting krb5.conf into a Pod does not affect node-side Kerberos.   </li>
+<li>For a non-ONTAP solution, do not distribute the NFS server’s keytab (nfs/<server>@REALM) to clients/Pods. Use either:    </li>
+<li>Node-scoped machine credentials (e.g., host/<node>@REALM) in /etc/krb5.keytab for system mounts; or    </li>
+<li>Per-user delegated credentials, making the user’s ccache visible to the node’s rpc.gssd (e.g., KEYRING caches, hostPath ccaches with cruid, or gssproxy).   </li>
+<li>The Secrets Store CSI Driver pulls from external secret stores (optionally syncing to a Kubernetes Secret). It does not read Kubernetes Secrets directly. This improves the security posture if no Kubernetes KMS plugin is used to encrypt the ETCD data payloads for Secrets and ConfigMaps.   </li>
+<li>The NFS server validates Kerberos service tickets locally with its keytab; it typically does not call back to the KDC on each request.   </li>
+<li>If the NFS provisioner mounts the export to create subdirectories, it also needs Kerberos credentials on its node.   </li>
+<li>For NetApp Trident (provisioner csi.trident.netapp.io), Kerberos is enabled on the ONTAP SVM/backend (Kerberos interface, SVM realm join, export-policy rules). StorageClass parameters do not enable Kerberos; mountOptions with sec=krb5, krb5i, or krb5p only signal the client to request Kerberos.   </li>
+<li>In AD environments, ensure consistent UID/GID-to-principal mapping across nodes and the NFS server (idmap/nfsidmap with SSSD on nodes; appropriate name services on the server) so the same user maps to the duplicate IDs.   </li>
+</ul>
+<h3 id="kubernetes-node-configuration">Kubernetes node configuration</h3>
+<p>Kerberos client defaults (KEYRING ccaches by UID so rpc.gssd can use delegated creds):
+<div class="language-INI highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[libdefaults]</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="na">default_realm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">EXAMPLE.COM</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="na">dns_lookup_kdc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="na">dns_lookup_realm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="na">rdns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">false</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="na">ticket_lifetime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">24h</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="na">renew_lifetime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">7d</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="na">forwardable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="na">default_ccache_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">KEYRING:persistent:%{uid}</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="k">[domain_realm]</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="na">.example.com</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">EXAMPLE.COM</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="na">example.com</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">EXAMPLE.COM</span>
+</span></code></pre></div></p>
+<p>Ubuntu/Debian:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">set</span><span class="w"> </span>-euxo<span class="w"> </span>pipefail
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>nfs-common<span class="w"> </span>krb5-user
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span>-q<span class="w"> </span><span class="s1">&#39;^NEED_GSSD&#39;</span><span class="w"> </span>/etc/default/nfs-common<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span>sudo<span class="w"> </span>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;s/^NEED_GSSD=.*/NEED_GSSD=yes/&#39;</span><span class="w"> </span>/etc/default/nfs-common
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="k">else</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;NEED_GSSD=yes&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>-a<span class="w"> </span>/etc/default/nfs-common
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="k">fi</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>sudo<span class="w"> </span>install<span class="w"> </span>-m<span class="w"> </span><span class="m">0644</span><span class="w"> </span>-o<span class="w"> </span>root<span class="w"> </span>-g<span class="w"> </span>root<span class="w"> </span>examples/node/krb5.conf<span class="w"> </span>/etc/krb5.conf
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>nfs-client.target
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>nfs-client.target
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Join the realm and ensure /etc/krb5.keytab contains host/&lt;node&gt;@REALM.&quot;</span>
+</span></code></pre></div></p>
+<p>RHEL/CentOS/Fedora:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">set</span><span class="w"> </span>-euxo<span class="w"> </span>pipefail
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>nfs-utils<span class="w"> </span>krb5-workstation
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>sudo<span class="w"> </span>install<span class="w"> </span>-m<span class="w"> </span><span class="m">0644</span><span class="w"> </span>-o<span class="w"> </span>root<span class="w"> </span>-g<span class="w"> </span>root<span class="w"> </span>examples/node/krb5.conf<span class="w"> </span>/etc/krb5.conf
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>rpc-gssd
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Join the realm and ensure /etc/krb5.keytab contains host/&lt;node&gt;@REALM.&quot;</span>
+</span></code></pre></div>
+SUSE (SLES/openSUSE):
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">set</span><span class="w"> </span>-euxo<span class="w"> </span>pipefail
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># Install NFS client + Kerberos client</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>sudo<span class="w"> </span>zypper<span class="w"> </span>refresh
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>sudo<span class="w"> </span>zypper<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>nfs-client<span class="w"> </span>krb5-client
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1"># Install krb5.conf (uses KEYRING ccaches by UID if you keep the template above)</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>sudo<span class="w"> </span>install<span class="w"> </span>-m<span class="w"> </span><span class="m">0644</span><span class="w"> </span>-o<span class="w"> </span>root<span class="w"> </span>-g<span class="w"> </span>root<span class="w"> </span>examples/node/krb5.conf<span class="w"> </span>/etc/krb5.conf
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1"># Enable NFS client stack and Kerberos helpers</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>nfs-client.target
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>rpc-gssd.service
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>nfs-idmapd.service
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Join the realm and ensure /etc/krb5.keytab contains host/&lt;node&gt;@REALM.&quot;</span>
+</span></code></pre></div></p>
+<p>NFSv4 idmapping and AD integration:
+<div class="language-INI highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># /etc/idmapd.conf</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">[General]</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="na">Domain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">example.com</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="na">Local-Realms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">EXAMPLE.COM</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="k">[Mapping]</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="na">Nobody-User</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">nobody</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="na">Nobody-Group</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">nogroup</span>
+</span></code></pre></div></p>
+<ul>
+<li>Install and configure SSSD so node NSS resolves AD users/groups; ensure nsswitch.conf includes “sss” for passwd/group.   </li>
+<li>Ensure the SVM/backend resolves the same identities consistently (LDAP/AD).   </li>
+</ul>
+<h3 id="ontap-svm-configuration-checklist-nfsv4-kerberos">ONTAP SVM configuration checklist (NFSv4 + Kerberos)</h3>
+<p>Prerequisites: <br />
+- ONTAP 9.x, SVM (e.g., vs1), DNS/NTP, network reachability, consistent identity source.   </p>
+<p>Steps: <br />
+1. Time &amp; DNS <br />
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>cluster time-service ntp server create -server 10.0.0.10
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>vserver services name-service dns create -vserver vs1 -domains example.com -name-servers 10.0.0.10,10.0.0.11
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>vserver services name-service dns show -vserver vs1
+</span></code></pre></div></p>
+<ol>
+<li>
+<p>NFSv4.1 and v4-id-domain <br />
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>vserver nfs create -vserver vs1 -v3 enabled -v4.1 enabled -v4.0 disabled -v4-id-domain example.com
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>vserver nfs show -vserver vs1
+</span></code></pre></div></p>
+</li>
+<li>
+<p>UNIX name services (LDAP example with AD) <br />
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>vserver services name-service ldap client create -vserver vs1 -client-config ad-ldap -servers 10.0.0.10,10.0.0.11 -schema MS-AD-BIS -base-dn &quot;DC=example,DC=com&quot; -bind-dn &quot;CN=svc_ldap,OU=Service Accounts,DC=example,DC=com&quot; -bind-password
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>vserver services name-service ldap create -vserver vs1 -client-config ad-ldap
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>vserver services name-service ns-switch modify -vserver vs1 -database passwd -sources files,ldap
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>vserver services name-service ns-switch modify -vserver vs1 -database group -sources files,ldap
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>vserver services name-service ns-switch show -vserver vs1
+</span></code></pre></div></p>
+</li>
+<li>
+<p>Kerberos realm <br />
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>vserver services kerberos realm create -vserver vs1 -realm EXAMPLE.COM -kdc-vendor Microsoft -kdc-ip 10.0.0.10 -kdc-port 88 -admin-server-ip 10.0.0.10 -admin-server-port 749
+</span></code></pre></div>
+or
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>vserver services kerberos realm create -vserver vs1 -realm EXAMPLE.COM -kdc-vendor Microsoft
+</span></code></pre></div>
+then
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>vserver services kerberos realm show -vserver vs1
+</span></code></pre></div></p>
+</li>
+<li>
+<p>Kerberos on NFS LIF(s) <br />
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>vserver nfs kerberos interface enable -vserver vs1 -lif lif_nfs1 -spn nfs/nfs01.example.com@EXAMPLE.COM
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>vserver nfs kerberos interface show -vserver vs1
+</span></code></pre></div>
+Optional keytab upload: <br />
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>vserver services kerberos keytab add -vserver vs1 -spn nfs/nfs01.example.com@EXAMPLE.COM -keytab-from-uri ...
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>vserver services kerberos keytab show -vserver vs1
+</span></code></pre></div></p>
+</li>
+<li>
+<p>Export policy requiring Kerberos <br />
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>vserver export-policy create -vserver vs1 -policyname nfs_krb5p
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>vserver export-policy rule create -vserver vs1 -policyname nfs_krb5p -ruleindex 1 -clientmatch 10.0.0.0/16 -rorule krb5p -rwrule krb5p -superuser krb5p -anon 65534 -protocol nfs4
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>vserver export-policy rule show -vserver vs1 -policyname nfs_krb5p -instance
+</span></code></pre></div></p>
+</li>
+<li>
+<p>Volume and junction <br />
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>volume create -vserver vs1 -volume projects -aggregate aggr1 -size 500GB -security-style unix
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>volume mount -vserver vs1 -volume projects -junction-path /projects
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>volume modify -vserver vs1 -volume projects -policy nfs_krb5p
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>volume show -vserver vs1 -volume projects -fields junction-path,policy,security-style
+</span></code></pre></div></p>
+</li>
+<li>
+<p>Validate <br />
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>vserver nfs kerberos interface show -vserver vs1
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>vserver services kerberos show-spn -vserver vs1
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>vserver services name-service getxxbyyy getpwbyname -vserver vs1 -username alice
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>vserver services name-service getxxbyyy getgrbyname -vserver vs1 -groupname engineers
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>vserver export-policy check-access -vserver vs1 -volume projects -client-ip 10.0.5.25 -authentication-method krb5p -protocol nfs4 -access-type read-write
+</span></code></pre></div></p>
+</li>
+</ol>
+<h4 id="considerations">Considerations</h4>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<ul>
+<li>Time: <code>cluster time-service ntp server show</code>   </li>
+<li>Kerberos/AD: <code>event log show -severity NOTICE..EMERGENCY -message-name secd.*</code>   </li>
+<li>DNS: <code>vserver services name-service dns check -vserver vs1</code>   </li>
+<li>LDAP: <code>vserver services name-service ldap check -vserver vs1 -client-config ad-ldap</code>   </li>
+<li>Ensure SVM v4-id-domain matches client idmapd domain; clients mount with nfsvers=4.1 and sec=krb5[p|i].   </li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul>
+<li>CIFS is not required for NFS Kerberos.   </li>
+<li>Enable Kerberos on each NFS data LIF and use its FQDN for mounts.    </li>
+<li>Use “unix” security style for NFS-only; mixed/ntfs introduces ACL translation complexity.   </li>
+</ul>
+</div>
+<h3 id="backendconfig-storageclass-and-pvc">BackendConfig, StorageClass, and PVC</h3>
+<p>Choose either ONTAP auth based on your security policies</p>
+<h4 id="basic-auth-secret">Basic auth Secret</h4>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Secret</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ontap-auth</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">trident</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Opaque</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="nt">stringData</span><span class="p">:</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">  </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">  </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">REPLACE_WITH_PASSWORD</span>
+</span></code></pre></div>
+<h4 id="tls-auth-secret">TLS Auth Secret</h4>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Secret</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ontap-auth</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">trident</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Opaque</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="nt">stringData</span><span class="p">:</span>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">  </span><span class="nt">clientPrivateKey</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="w">    </span><span class="no">-----BEGIN PRIVATE KEY-----</span>
+</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="w">    </span><span class="no">...your key...</span>
+</span><span id="__span-17-11"><a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="w">    </span><span class="no">-----END PRIVATE KEY-----</span>
+</span><span id="__span-17-12"><a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a><span class="w">  </span><span class="nt">clientCertificate</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+</span><span id="__span-17-13"><a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a><span class="w">    </span><span class="no">-----BEGIN CERTIFICATE-----</span>
+</span><span id="__span-17-14"><a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="w">    </span><span class="no">...your cert...</span>
+</span><span id="__span-17-15"><a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="w">    </span><span class="no">-----END CERTIFICATE-----</span>
+</span><span id="__span-17-16"><a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a><span class="w">  </span><span class="nt">trustedCACertificate</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+</span><span id="__span-17-17"><a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a><span class="w">    </span><span class="no">-----BEGIN CERTIFICATE-----</span>
+</span><span id="__span-17-18"><a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a><span class="w">    </span><span class="no">...ca cert...</span>
+</span><span id="__span-17-19"><a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a><span class="w">    </span><span class="no">-----END CERTIFICATE-----</span>
+</span></code></pre></div>
+<h4 id="trident-backendconfig">Trident BackendConfig:</h4>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">trident.netapp.io/v1</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TridentBackendConfig</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ontap-nas-krb</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">trident</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="nt">spec</span><span class="p">:</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">  </span><span class="nt">storageDriverName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ontap-nas</span>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">  </span><span class="nt">managementLIF</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10.0.0.50</span><span class="w">                   </span><span class="c1"># Cluster or SVM mgmt LIF</span>
+</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">  </span><span class="nt">dataLIF</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nfs01.example.com</span><span class="w">                 </span><span class="c1"># FQDN of Kerberos-enabled NFS data LIF (matches SPN)</span>
+</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">  </span><span class="nt">svm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vs1</span>
+</span><span id="__span-18-12"><a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">  </span><span class="nt">credentials</span><span class="p">:</span>
+</span><span id="__span-18-13"><a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ontap-auth</span>
+</span><span id="__span-18-14"><a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">#useREST</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">                         </span><span class="c1"># To uncommment if TLS Auth Secret</span>
+</span><span id="__span-18-15"><a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="w">      </span><span class="c1">#clientCertificate: true                # To uncommment if TLS Auth Secret</span>
+</span><span id="__span-18-16"><a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="w">  </span><span class="nt">nfsMountOptions</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nfsvers=4.1,sec=krb5p</span><span class="w">     </span><span class="c1"># Mount options with matching krb5[p|i]</span>
+</span><span id="__span-18-17"><a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="w">  </span><span class="nt">defaults</span><span class="p">:</span>
+</span><span id="__span-18-18"><a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="w">    </span><span class="nt">exportPolicy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nfs_krb5p</span><span class="w">                  </span><span class="c1"># Export policy requiring and matching krb5[p|i]</span>
+</span><span id="__span-18-19"><a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a><span class="w">    </span><span class="nt">unixPermissions</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;0770&quot;</span>
+</span><span id="__span-18-20"><a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a><span class="w">    </span><span class="c1"># Optional: qtreeParentFlexvol: trident_qtree_parent</span>
+</span><span id="__span-18-21"><a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a><span class="w">  </span><span class="nt">labels</span><span class="p">:</span>
+</span><span id="__span-18-22"><a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nfs-krb</span>
+</span></code></pre></div>
+<h4 id="considerations_1">Considerations</h4>
+<div class="admonition note">
+<p class="admonition-title">Reason for unixPermissions 0770</p>
+<ul>
+<li>Principle of least privilege: rwx for owner and group; no access for others. Even after Kerberos auth, “other” users on the realm can’t read/exec the PV root.   </li>
+<li>Group-collaboration: lets a team (shared GID) fully use the volume while keeping everyone else out. Fits multi-user SSH where users share a POSIX group.   </li>
+<li>Safe defaults with ONTAP “unix” security-style: applies at volume/qtree root at create time; you can further tighten/relax later or add NFSv4 ACLs.   </li>
+<li>When to adjust   </li>
+<li>Single-user volume: use "0700".   </li>
+<li>Read-only for others: "0750".   </li>
+<li>World-readable: "0755".   </li>
+<li>Team-share with enforced group inheritance: prefer setgid on the directory (02770) so new files inherit the group.     </li>
+<li>Ensure the PV root is owned by the correct UID/GID (match your app’s runAsUser/fsGroup or an init job chown). "0770" with root:root won’t help your users; the group must match the consumers.   </li>
+</ul>
+</div>
+<h4 id="storageclass">StorageClass</h4>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">storage.k8s.io/v1</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">StorageClass</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">trident-ontap-nfs-krb5p</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="nt">provisioner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">csi.trident.netapp.io</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="nt">parameters</span><span class="p">:</span>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">  </span><span class="nt">trident.netapp.io/backendType</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ontap-nas&quot;</span>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="nt">mountOptions</span><span class="p">:</span>
+</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nfsvers=4.1</span>
+</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sec=krb5p</span>
+</span><span id="__span-19-11"><a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">proto=tcp</span>
+</span><span id="__span-19-12"><a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rsize=1048576</span>
+</span><span id="__span-19-13"><a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wsize=1048576</span>
+</span><span id="__span-19-14"><a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">timeo=600</span>
+</span><span id="__span-19-15"><a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">retrans=2</span>
+</span><span id="__span-19-16"><a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a><span class="nt">volumeBindingMode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">WaitForFirstConsumer</span>
+</span><span id="__span-19-17"><a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a><span class="nt">reclaimPolicy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Retain</span>
+</span><span id="__span-19-18"><a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a><span class="nt">allowVolumeExpansion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span></code></pre></div>
+<h4 id="pvc-example">PVC Example</h4>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PersistentVolumeClaim</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data-krb</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="nt">spec</span><span class="p">:</span>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">  </span><span class="nt">accessModes</span><span class="p">:</span>
+</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ReadWriteMany</span>
+</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="w">  </span><span class="nt">storageClassName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">trident-ontap-nfs-krb5p</span>
+</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="w">  </span><span class="nt">resources</span><span class="p">:</span>
+</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="w">    </span><span class="nt">requests</span><span class="p">:</span>
+</span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="w">      </span><span class="nt">storage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100Gi</span>
+</span></code></pre></div>
+<h2 id="basic-implementation-for-an-application-runtime">Basic implementation for an application runtime</h2>
+<p>This approach is a simplified implementation demonstrating NFSv4 with Kerberos for an application runtime in a Pod. </p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant User as User/Operator
+    participant KubeAPI as Kube-API Server
+    participant Provisioner as Trident Controller
+    participant Kubelet as Kubelet
+    participant NodePlugin as CSI NFS Node Plugin
+    participant NFSserver as ONTAP NFSv4
+    participant KDC as KDC
+    participant AppPod as Application Pod
+
+    User-&gt;&gt;KubeAPI: 1. Creates PVC referencing StorageClass
+    KubeAPI-&gt;&gt;Provisioner: 2. New PVC
+    Provisioner-&gt;&gt;NFSserver: 3. Create volume
+    Provisioner-&gt;&gt;KubeAPI: 4. Create PV, bind PVC
+    KubeAPI-&gt;&gt;Kubelet: 5. Schedule Pod
+    Kubelet-&gt;&gt;NodePlugin: 6. NodePublishVolume (mount on node)
+    Kubelet-&gt;&gt;KDC: 7. Node rpc.gssd uses node keytab or per-user cache
+    Kubelet-&gt;&gt;NFSserver: 8. Kerberos negotiation (node-side)
+    NFSserver-&gt;&gt;Kubelet: 9. Mount success
+    NodePlugin-&gt;&gt;AppPod: 10. Bind-mount into Pod
+    AppPod-&gt;&gt;NFSserver: 11. File I/O</code></pre>
+<h4 id="application-deployment">Application Deployment:</h4>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apps/v1</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deployment</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-krb</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="nt">spec</span><span class="p">:</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span>
+</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-krb</span>
+</span><span id="__span-21-10"><a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="w">  </span><span class="nt">template</span><span class="p">:</span>
+</span><span id="__span-21-11"><a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-21-12"><a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a><span class="w">      </span><span class="nt">labels</span><span class="p">:</span>
+</span><span id="__span-21-13"><a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-krb</span>
+</span><span id="__span-21-14"><a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a><span class="w">    </span><span class="nt">spec</span><span class="p">:</span>
+</span><span id="__span-21-15"><a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a><span class="w">      </span><span class="nt">containers</span><span class="p">:</span>
+</span><span id="__span-21-16"><a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
+</span><span id="__span-21-17"><a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a><span class="w">          </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu:22.04</span>
+</span><span id="__span-21-18"><a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a><span class="w">          </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;/bin/bash&quot;</span><span class="p p-Indicator">,</span><span class="s">&quot;-lc&quot;</span><span class="p p-Indicator">,</span><span class="s">&quot;while</span><span class="nv"> </span><span class="s">true;</span><span class="nv"> </span><span class="s">do</span><span class="nv"> </span><span class="s">sleep</span><span class="nv"> </span><span class="s">3600;</span><span class="nv"> </span><span class="s">done&quot;</span><span class="p p-Indicator">]</span>
+</span><span id="__span-21-19"><a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a><span class="w">          </span><span class="nt">volumeMounts</span><span class="p">:</span>
+</span><span id="__span-21-20"><a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span>
+</span><span id="__span-21-21"><a id="__codelineno-21-21" name="__codelineno-21-21" href="#__codelineno-21-21"></a><span class="w">              </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/mnt/data</span>
+</span><span id="__span-21-22"><a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a><span class="w">      </span><span class="nt">volumes</span><span class="p">:</span>
+</span><span id="__span-21-23"><a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span>
+</span><span id="__span-21-24"><a id="__codelineno-21-24" name="__codelineno-21-24" href="#__codelineno-21-24"></a><span class="w">          </span><span class="nt">persistentVolumeClaim</span><span class="p">:</span>
+</span><span id="__span-21-25"><a id="__codelineno-21-25" name="__codelineno-21-25" href="#__codelineno-21-25"></a><span class="w">            </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data-krb</span>
+</span></code></pre></div>
+<h4 id="considerations_2">Considerations</h4>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul>
+<li>No sidecar attached to the Pod to run <code>kinit/krenew</code> as the credentials are handled at the node's NFS mount level.   </li>
+<li>A sidecar is to be used only for application-level Kerberos.   </li>
+</ul>
+</div>
+<h2 id="basic-implementation-for-an-application-runtime-with-application-level-kerberos">Basic implementation for an application runtime with application-level Kerberos</h2>
+<p>This implementation addresses the following requirements: <br />
+- <strong>Separation of concerns:</strong> The sidecar handles all the complex Kerberos logic, allowing the application container to remain lightweight and focused on its core function. <br />
+- <strong>Security:</strong> Only the sidecar needs access to the sensitive keytab file. The main application only ever sees the less-sensitive ticket cache. <br />
+- <strong>Automated renewal:</strong> The sidecar ensures the Kerberos tickets are automatically renewed, preventing authentication failures for long-running applications without manual intervention. <br />
+- <strong>Simplified application development:</strong> Developers don't need to embed Kerberos dependencies or logic into their application images. The sidecar pattern is managed at the platform level.   </p>
+<p>On top of the previous diagram for the NFSv4 Kerberos, the following workflow is added to handle the application-level Kerberos authentication:</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant User as User/Operator
+    participant KubeAPI as Kube-API Server
+    participant AppPod as Application Pod (App + Kerberos Sidecar)
+    participant KDC as KDC
+
+    User-&gt;&gt;KubeAPI: 1. Apply ConfigMap (krb5.conf) and Secret (service keytab)
+    User-&gt;&gt;KubeAPI: 2. Deploy Pod (App + Sidecar, shared ccache)
+
+    Note over AppPod: emptyDir(/var/run/krb5cc/app.ccache) shared by both containers
+
+    AppPod-&gt;&gt;AppPod: 3. Sidecar starts
+    AppPod-&gt;&gt;KDC: 4. Sidecar kinit -kt service.keytab SERVICE_PRINCIPAL
+    KDC--&gt;&gt;AppPod: 5. TGT issued to shared ccache
+    AppPod-&gt;&gt;AppPod: 6. Sidecar loop renews/re-kinit periodically
+
+    AppPod-&gt;&gt;KDC: 7. App requests service tickets as needed (GSSAPI)
+    KDC--&gt;&gt;AppPod: 8. Service ticket via shared ccache
+    AppPod-&gt;&gt;ExternalSvc: 9. App calls Kerberos-protected service (HTTP, DB, etc.)</code></pre>
+<h4 id="kerberos-client-config-configmap">Kerberos client config ConfigMap</h4>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ConfigMap</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5-conf</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="nt">data</span><span class="p">:</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="w">  </span><span class="nt">krb5.conf</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="w">    </span><span class="no">[libdefaults]</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">      </span><span class="no">default_realm = EXAMPLE.COM</span>
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">      </span><span class="no">dns_lookup_kdc = true</span>
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="w">      </span><span class="no">dns_lookup_realm = true</span>
+</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="w">      </span><span class="no">rdns = false</span>
+</span><span id="__span-22-12"><a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a><span class="w">      </span><span class="no">ticket_lifetime = 24h</span>
+</span><span id="__span-22-13"><a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a><span class="w">      </span><span class="no">renew_lifetime = 7d</span>
+</span><span id="__span-22-14"><a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a><span class="w">      </span><span class="no">forwardable = true</span>
+</span><span id="__span-22-15"><a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a><span class="w">      </span><span class="no">default_ccache_name = FILE:/var/run/krb5cc/app.ccache</span>
+</span><span id="__span-22-16"><a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a><span class="w">    </span><span class="no">[domain_realm]</span>
+</span><span id="__span-22-17"><a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a><span class="w">      </span><span class="no">.example.com = EXAMPLE.COM</span>
+</span><span id="__span-22-18"><a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a><span class="w">      </span><span class="no">example.com = EXAMPLE.COM</span>
+</span></code></pre></div>
+<h4 id="service-keytab-secret">Service keytab Secret</h4>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Secret</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-service-keytab</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Opaque</span>
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="nt">data</span><span class="p">:</span>
+</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="w">  </span><span class="c1"># base64-encode your binary keytab file</span>
+</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="w">  </span><span class="nt">krb5.keytab</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BASE64_KEYTAB</span>
+</span></code></pre></div>
+<blockquote>
+<p>![INFO] <br />
+Replace <code>BASE64_KEYTAB</code> with your base64 encoded keytab content</p>
+</blockquote>
+<h4 id="dockerfile-for-the-sidecar-image">Dockerfile for the sidecar image</h4>
+<div class="language-Dockerfile highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">FROM</span><span class="w"> </span><span class="s">ubuntu:22.04</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="k">ENV</span><span class="w"> </span><span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>--no-install-recommends<span class="w"> </span>krb5-user<span class="w"> </span>ca-certificates<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>/var/lib/apt/lists/*
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="c"># Lightweight entrypoint to kinit and periodically renew/re-kinit</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="k">COPY</span><span class="w"> </span>entrypoint.sh<span class="w"> </span>/entrypoint.sh
+</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="k">RUN</span><span class="w"> </span>chmod<span class="w"> </span>+x<span class="w"> </span>/entrypoint.sh
+</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="k">ENTRYPOINT</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;/entrypoint.sh&quot;</span><span class="p">]</span>
+</span></code></pre></div>
+<p>Entrypoint script
+<div class="language-BASH highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="ch">#!/usr/bin/env bash</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="nb">set</span><span class="w"> </span>-euo<span class="w"> </span>pipefail
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>:<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">SERVICE_PRINCIPAL</span><span class="p">:?set SERVICE_PRINCIPAL env var</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>:<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">KRB5_KTNAME</span><span class="p">:=/etc/krb5.keytab</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>:<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">KRB5_CONFIG</span><span class="p">:=/etc/krb5.conf</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>:<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">KRB5CCNAME</span><span class="p">:=/var/run/krb5cc/app.ccache</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="nb">export</span><span class="w"> </span>KRB5_KTNAME<span class="w"> </span>KRB5_CONFIG<span class="w"> </span>KRB5CCNAME
+</span><span id="__span-25-9"><a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a>
+</span><span id="__span-25-10"><a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Initial kinit for </span><span class="si">${</span><span class="nv">SERVICE_PRINCIPAL</span><span class="si">}</span><span class="s2"> using </span><span class="si">${</span><span class="nv">KRB5_KTNAME</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="__span-25-11"><a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a>kinit<span class="w"> </span>-kt<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">KRB5_KTNAME</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">SERVICE_PRINCIPAL</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="__span-25-12"><a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a>
+</span><span id="__span-25-13"><a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="c1"># Renew loop: re-kinit if cache not valid, else try renew</span>
+</span><span id="__span-25-14"><a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a><span class="k">while</span><span class="w"> </span>true<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+</span><span id="__span-25-15"><a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a><span class="w">  </span>sleep<span class="w"> </span><span class="m">900</span>
+</span><span id="__span-25-16"><a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span>klist<span class="w"> </span>-s<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+</span><span id="__span-25-17"><a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a><span class="w">    </span><span class="c1"># Try to renew; ignore failure (may hit renew_lifetime)</span>
+</span><span id="__span-25-18"><a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a><span class="w">    </span>kinit<span class="w"> </span>-R<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+</span><span id="__span-25-19"><a id="__codelineno-25-19" name="__codelineno-25-19" href="#__codelineno-25-19"></a><span class="w">  </span><span class="k">else</span>
+</span><span id="__span-25-20"><a id="__codelineno-25-20" name="__codelineno-25-20" href="#__codelineno-25-20"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Ticket missing/expired, re-kinit&quot;</span>
+</span><span id="__span-25-21"><a id="__codelineno-25-21" name="__codelineno-25-21" href="#__codelineno-25-21"></a><span class="w">    </span>kinit<span class="w"> </span>-kt<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">KRB5_KTNAME</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">SERVICE_PRINCIPAL</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="__span-25-22"><a id="__codelineno-25-22" name="__codelineno-25-22" href="#__codelineno-25-22"></a><span class="w">  </span><span class="k">fi</span>
+</span><span id="__span-25-23"><a id="__codelineno-25-23" name="__codelineno-25-23" href="#__codelineno-25-23"></a><span class="k">done</span>
+</span></code></pre></div></p>
+<h4 id="application-deployment-with-kerberos-sidecar">Application Deployment with Kerberos sidecar</h4>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apps/v1</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deployment</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-with-krb-sidecar</span>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="nt">spec</span><span class="p">:</span>
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span>
+</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-with-krb-sidecar</span>
+</span><span id="__span-26-10"><a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="w">  </span><span class="nt">template</span><span class="p">:</span>
+</span><span id="__span-26-11"><a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-26-12"><a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="w">      </span><span class="nt">labels</span><span class="p">:</span>
+</span><span id="__span-26-13"><a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-with-krb-sidecar</span>
+</span><span id="__span-26-14"><a id="__codelineno-26-14" name="__codelineno-26-14" href="#__codelineno-26-14"></a><span class="w">    </span><span class="nt">spec</span><span class="p">:</span>
+</span><span id="__span-26-15"><a id="__codelineno-26-15" name="__codelineno-26-15" href="#__codelineno-26-15"></a><span class="w">      </span><span class="nt">securityContext</span><span class="p">:</span>
+</span><span id="__span-26-16"><a id="__codelineno-26-16" name="__codelineno-26-16" href="#__codelineno-26-16"></a><span class="w">        </span><span class="nt">runAsUser</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+</span><span id="__span-26-17"><a id="__codelineno-26-17" name="__codelineno-26-17" href="#__codelineno-26-17"></a><span class="w">        </span><span class="nt">runAsGroup</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+</span><span id="__span-26-18"><a id="__codelineno-26-18" name="__codelineno-26-18" href="#__codelineno-26-18"></a><span class="w">        </span><span class="nt">fsGroup</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+</span><span id="__span-26-19"><a id="__codelineno-26-19" name="__codelineno-26-19" href="#__codelineno-26-19"></a><span class="w">        </span><span class="nt">fsGroupChangePolicy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">OnRootMismatch</span>
+</span><span id="__span-26-20"><a id="__codelineno-26-20" name="__codelineno-26-20" href="#__codelineno-26-20"></a><span class="w">      </span><span class="nt">containers</span><span class="p">:</span>
+</span><span id="__span-26-21"><a id="__codelineno-26-21" name="__codelineno-26-21" href="#__codelineno-26-21"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
+</span><span id="__span-26-22"><a id="__codelineno-26-22" name="__codelineno-26-22" href="#__codelineno-26-22"></a><span class="w">          </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu:22.04</span>
+</span><span id="__span-26-23"><a id="__codelineno-26-23" name="__codelineno-26-23" href="#__codelineno-26-23"></a><span class="w">          </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;/bin/bash&quot;</span><span class="p p-Indicator">,</span><span class="s">&quot;-lc&quot;</span><span class="p p-Indicator">,</span><span class="s">&quot;apt-get</span><span class="nv"> </span><span class="s">update</span><span class="nv"> </span><span class="s">&amp;&amp;</span><span class="nv"> </span><span class="s">apt-get</span><span class="nv"> </span><span class="s">install</span><span class="nv"> </span><span class="s">-y</span><span class="nv"> </span><span class="s">curl</span><span class="nv"> </span><span class="s">&amp;&amp;</span><span class="nv"> </span><span class="s">while</span><span class="nv"> </span><span class="s">true;</span><span class="nv"> </span><span class="s">do</span><span class="nv"> </span><span class="s">sleep</span><span class="nv"> </span><span class="s">3600;</span><span class="nv"> </span><span class="s">done&quot;</span><span class="p p-Indicator">]</span>
+</span><span id="__span-26-24"><a id="__codelineno-26-24" name="__codelineno-26-24" href="#__codelineno-26-24"></a><span class="w">          </span><span class="nt">env</span><span class="p">:</span>
+</span><span id="__span-26-25"><a id="__codelineno-26-25" name="__codelineno-26-25" href="#__codelineno-26-25"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">KRB5_CONFIG</span>
+</span><span id="__span-26-26"><a id="__codelineno-26-26" name="__codelineno-26-26" href="#__codelineno-26-26"></a><span class="w">              </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/krb5.conf</span>
+</span><span id="__span-26-27"><a id="__codelineno-26-27" name="__codelineno-26-27" href="#__codelineno-26-27"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">KRB5CCNAME</span>
+</span><span id="__span-26-28"><a id="__codelineno-26-28" name="__codelineno-26-28" href="#__codelineno-26-28"></a><span class="w">              </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/run/krb5cc/app.ccache</span>
+</span><span id="__span-26-29"><a id="__codelineno-26-29" name="__codelineno-26-29" href="#__codelineno-26-29"></a><span class="w">          </span><span class="nt">volumeMounts</span><span class="p">:</span>
+</span><span id="__span-26-30"><a id="__codelineno-26-30" name="__codelineno-26-30" href="#__codelineno-26-30"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5</span>
+</span><span id="__span-26-31"><a id="__codelineno-26-31" name="__codelineno-26-31" href="#__codelineno-26-31"></a><span class="w">              </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/krb5.conf</span>
+</span><span id="__span-26-32"><a id="__codelineno-26-32" name="__codelineno-26-32" href="#__codelineno-26-32"></a><span class="w">              </span><span class="nt">subPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5.conf</span>
+</span><span id="__span-26-33"><a id="__codelineno-26-33" name="__codelineno-26-33" href="#__codelineno-26-33"></a><span class="w">              </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-26-34"><a id="__codelineno-26-34" name="__codelineno-26-34" href="#__codelineno-26-34"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5cc</span>
+</span><span id="__span-26-35"><a id="__codelineno-26-35" name="__codelineno-26-35" href="#__codelineno-26-35"></a><span class="w">              </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/run/krb5cc</span>
+</span><span id="__span-26-36"><a id="__codelineno-26-36" name="__codelineno-26-36" href="#__codelineno-26-36"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb-sidecar</span>
+</span><span id="__span-26-37"><a id="__codelineno-26-37" name="__codelineno-26-37" href="#__codelineno-26-37"></a><span class="w">          </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">your-registry/kerberos-sidecar:latest</span>
+</span><span id="__span-26-38"><a id="__codelineno-26-38" name="__codelineno-26-38" href="#__codelineno-26-38"></a><span class="w">          </span><span class="nt">imagePullPolicy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IfNotPresent</span>
+</span><span id="__span-26-39"><a id="__codelineno-26-39" name="__codelineno-26-39" href="#__codelineno-26-39"></a><span class="w">          </span><span class="nt">env</span><span class="p">:</span>
+</span><span id="__span-26-40"><a id="__codelineno-26-40" name="__codelineno-26-40" href="#__codelineno-26-40"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SERVICE_PRINCIPAL</span>
+</span><span id="__span-26-41"><a id="__codelineno-26-41" name="__codelineno-26-41" href="#__codelineno-26-41"></a><span class="w">              </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http/myapp.example.com@EXAMPLE.COM</span>
+</span><span id="__span-26-42"><a id="__codelineno-26-42" name="__codelineno-26-42" href="#__codelineno-26-42"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">KRB5_CONFIG</span>
+</span><span id="__span-26-43"><a id="__codelineno-26-43" name="__codelineno-26-43" href="#__codelineno-26-43"></a><span class="w">              </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/krb5.conf</span>
+</span><span id="__span-26-44"><a id="__codelineno-26-44" name="__codelineno-26-44" href="#__codelineno-26-44"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">KRB5CCNAME</span>
+</span><span id="__span-26-45"><a id="__codelineno-26-45" name="__codelineno-26-45" href="#__codelineno-26-45"></a><span class="w">              </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/run/krb5cc/app.ccache</span>
+</span><span id="__span-26-46"><a id="__codelineno-26-46" name="__codelineno-26-46" href="#__codelineno-26-46"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">KRB5_KTNAME</span>
+</span><span id="__span-26-47"><a id="__codelineno-26-47" name="__codelineno-26-47" href="#__codelineno-26-47"></a><span class="w">              </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/krb5.keytab</span>
+</span><span id="__span-26-48"><a id="__codelineno-26-48" name="__codelineno-26-48" href="#__codelineno-26-48"></a><span class="w">          </span><span class="nt">volumeMounts</span><span class="p">:</span>
+</span><span id="__span-26-49"><a id="__codelineno-26-49" name="__codelineno-26-49" href="#__codelineno-26-49"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5</span>
+</span><span id="__span-26-50"><a id="__codelineno-26-50" name="__codelineno-26-50" href="#__codelineno-26-50"></a><span class="w">              </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/krb5.conf</span>
+</span><span id="__span-26-51"><a id="__codelineno-26-51" name="__codelineno-26-51" href="#__codelineno-26-51"></a><span class="w">              </span><span class="nt">subPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5.conf</span>
+</span><span id="__span-26-52"><a id="__codelineno-26-52" name="__codelineno-26-52" href="#__codelineno-26-52"></a><span class="w">              </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-26-53"><a id="__codelineno-26-53" name="__codelineno-26-53" href="#__codelineno-26-53"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">keytab</span>
+</span><span id="__span-26-54"><a id="__codelineno-26-54" name="__codelineno-26-54" href="#__codelineno-26-54"></a><span class="w">              </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/krb5.keytab</span>
+</span><span id="__span-26-55"><a id="__codelineno-26-55" name="__codelineno-26-55" href="#__codelineno-26-55"></a><span class="w">              </span><span class="nt">subPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5.keytab</span>
+</span><span id="__span-26-56"><a id="__codelineno-26-56" name="__codelineno-26-56" href="#__codelineno-26-56"></a><span class="w">              </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-26-57"><a id="__codelineno-26-57" name="__codelineno-26-57" href="#__codelineno-26-57"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5cc</span>
+</span><span id="__span-26-58"><a id="__codelineno-26-58" name="__codelineno-26-58" href="#__codelineno-26-58"></a><span class="w">              </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/run/krb5cc</span>
+</span><span id="__span-26-59"><a id="__codelineno-26-59" name="__codelineno-26-59" href="#__codelineno-26-59"></a><span class="w">      </span><span class="nt">volumes</span><span class="p">:</span>
+</span><span id="__span-26-60"><a id="__codelineno-26-60" name="__codelineno-26-60" href="#__codelineno-26-60"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5</span>
+</span><span id="__span-26-61"><a id="__codelineno-26-61" name="__codelineno-26-61" href="#__codelineno-26-61"></a><span class="w">          </span><span class="nt">configMap</span><span class="p">:</span>
+</span><span id="__span-26-62"><a id="__codelineno-26-62" name="__codelineno-26-62" href="#__codelineno-26-62"></a><span class="w">            </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5-conf</span>
+</span><span id="__span-26-63"><a id="__codelineno-26-63" name="__codelineno-26-63" href="#__codelineno-26-63"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">keytab</span>
+</span><span id="__span-26-64"><a id="__codelineno-26-64" name="__codelineno-26-64" href="#__codelineno-26-64"></a><span class="w">          </span><span class="nt">secret</span><span class="p">:</span>
+</span><span id="__span-26-65"><a id="__codelineno-26-65" name="__codelineno-26-65" href="#__codelineno-26-65"></a><span class="w">            </span><span class="nt">secretName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-service-keytab</span>
+</span><span id="__span-26-66"><a id="__codelineno-26-66" name="__codelineno-26-66" href="#__codelineno-26-66"></a><span class="w">            </span><span class="nt">items</span><span class="p">:</span>
+</span><span id="__span-26-67"><a id="__codelineno-26-67" name="__codelineno-26-67" href="#__codelineno-26-67"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5.keytab</span>
+</span><span id="__span-26-68"><a id="__codelineno-26-68" name="__codelineno-26-68" href="#__codelineno-26-68"></a><span class="w">                </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5.keytab</span>
+</span><span id="__span-26-69"><a id="__codelineno-26-69" name="__codelineno-26-69" href="#__codelineno-26-69"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5cc</span>
+</span><span id="__span-26-70"><a id="__codelineno-26-70" name="__codelineno-26-70" href="#__codelineno-26-70"></a><span class="w">          </span><span class="nt">emptyDir</span><span class="p">:</span>
+</span><span id="__span-26-71"><a id="__codelineno-26-71" name="__codelineno-26-71" href="#__codelineno-26-71"></a><span class="w">            </span><span class="nt">medium</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Memory</span>
+</span></code></pre></div>
+<h2 id="basic-implementation-for-a-multi-user-environment">Basic implementation for a multi-user environment</h2>
+<p>When multiple users need SSH access to a pod and authenticate using GSSAPI (Kerberos), the architecture becomes more complex. Instead of a single sidecar managing a shared service keytab, the setup must handle individual user authentication and delegate credentials. The most secure and robust approach involves a secure SSH server inside the pod, configured for GSSAPI, with GSSAPIDelegateCredentials set to <code>yes</code> to forward user tickets for NFS access. </p>
+<p>Architectural components <br />
+- Kubernetes Control Plane, CSI Driver, KDC, NFSv4 Server: These function as before. <br />
+- SSH Server Container: A new container in the pod runs an SSH server (e.g., OpenSSH). It must be configured to use GSSAPI. <br />
+- Kerberos Sidecar: The sidecar's role is now limited to providing a service keytab for the SSH server to use for its own host principal. It manages and renews this ticket, but individual user tickets are handled differently.
+- Application Container: Runs the main application. <br />
+- Shared Volumes: Multiple shared emptyDir volumes are used: one for the SSH service keytab and krb5.conf, and another for user-specific ticket caches. <br />
+- Kerberos-Enabled Clients: Users' machines must have a Kerberos client (kinit) and an SSH client configured for GSSAPI. <br />
+- Credential Delegation: Crucial for multi-user NFS access. When users connect via SSH with GSSAPI, they delegate their Kerberos tickets, which are then used for NFSv4 authentication. <br />
+- sshd_config: The SSH server configuration file within the container must be set to allow GSSAPI authentication and credential delegation.   </p>
+<p>This implementation addresses the following requirements for production-readiness for a multi-user interactive environment: <br />
+-   <strong>Dedicated SSH Server:</strong> A container running an SSH server is required. Exposing it requires a Kubernetes Service. <br />
+-   <strong>Service Authentication:</strong> The Kerberos Sidecar handles authenticating the SSH server itself using a <code>host/</code> principal, so the pod can listen and establish a secure connection. <br />
+-   <strong>User Authentication:</strong> Individual users authenticate via SSH using their own credentials, a more secure approach than sharing a service keytab. <br />
+-   <strong>Credential Delegation:</strong> The <code>GSSAPIDelegateCredentials</code> SSH option is essential. It allows the SSH server to place a copy of the user's TGT into a ticket cache that can be used by services inside the pod (like NFS). <br />
+-   <strong>Per-Session Ticket Cache:</strong> The SSH server places the delegated user ticket into a cache that is scoped to the user's SSH session, providing proper isolation for multi-user access to NFS. <br />
+-   <strong>Implicit NFS Access:</strong> Once authenticated and inside the pod, the user's commands will automatically use the delegated Kerberos ticket for NFSv4 operations, with permissions tied to their own Kerberos principal.   </p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant User as User/Operator
+    participant KubeAPI as Kube-API Server
+    participant Kubelet as Kubelet (Node)
+    participant NodePlugin as CSI NFS Node Plugin
+    participant KDC as KDC/Active Directory
+    participant NFSserver as ONTAP NFSv4
+    participant SSHserver as SSH Server Container
+
+    User-&gt;&gt;KubeAPI: Create Pod with SSH Server
+    KubeAPI-&gt;&gt;Kubelet: Schedule Pod
+
+    Kubelet-&gt;&gt;NodePlugin: NodePublishVolume (sec=krb5p)
+    Kubelet-&gt;&gt;KDC: Node rpc.gssd uses node creds or delegated user creds
+    NodePlugin-&gt;&gt;SSHserver: Bind-mount into Pod
+
+    User-&gt;&gt;KDC: kinit on client
+    User-&gt;&gt;SSHserver: SSH with GSSAPIAuthentication + GSSAPIDelegateCredentials
+
+    SSHserver-&gt;&gt;User: Authenticated shell
+    Note over SSHserver,Kubelet: Delegated creds must be visible to node rpc.gssd (KEYRING/file+cruid/gssproxy)
+
+    User-&gt;&gt;NFSserver: I/O triggers node rpc.gssd using delegated creds
+    NFSserver-&gt;&gt;NFSserver: Validate via keytab (no KDC round-trip)
+    NFSserver-&gt;&gt;User: Per-user authorization</code></pre>
+<h4 id="docker-file-for-sshd-container">Docker file for sshd container</h4>
+<div class="language-DOCKERFILE highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">FROM</span><span class="w"> </span><span class="s">ubuntu:22.04</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="k">ENV</span><span class="w"> </span><span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">    </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>--no-install-recommends<span class="w"> </span>openssh-server<span class="w"> </span>krb5-user<span class="w"> </span>libpam-krb5<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">    </span>rm<span class="w"> </span>-rf<span class="w"> </span>/var/lib/apt/lists/*<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">    </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/var/run/sshd
+</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="c"># Optional: fixed UID user for testing</span>
+</span><span id="__span-27-8"><a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="k">RUN</span><span class="w"> </span>useradd<span class="w"> </span>-m<span class="w"> </span>-u<span class="w"> </span><span class="m">10001</span><span class="w"> </span>alice
+</span><span id="__span-27-9"><a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="k">EXPOSE</span><span class="w"> </span><span class="s">22</span>
+</span><span id="__span-27-10"><a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;/usr/sbin/sshd&quot;</span><span class="p">,</span><span class="s2">&quot;-D&quot;</span><span class="p">,</span><span class="s2">&quot;-e&quot;</span><span class="p">]</span>
+</span></code></pre></div>
+<h4 id="kerberos-client-config-and-ssh-configmaps">Kerberos client config and SSH ConfigMaps</h4>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ConfigMap</span>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5-conf</span>
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="nt">data</span><span class="p">:</span>
+</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="w">  </span><span class="nt">krb5.conf</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+</span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="w">    </span><span class="no">[libdefaults]</span>
+</span><span id="__span-28-8"><a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="w">      </span><span class="no">default_realm = EXAMPLE.COM</span>
+</span><span id="__span-28-9"><a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a><span class="w">      </span><span class="no">dns_lookup_kdc = true</span>
+</span><span id="__span-28-10"><a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a><span class="w">      </span><span class="no">dns_lookup_realm = true</span>
+</span><span id="__span-28-11"><a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a><span class="w">      </span><span class="no">rdns = false</span>
+</span><span id="__span-28-12"><a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a><span class="w">      </span><span class="no">default_ccache_name = KEYRING:persistent:%{uid}</span>
+</span><span id="__span-28-13"><a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a><span class="w">    </span><span class="no">[domain_realm]</span>
+</span><span id="__span-28-14"><a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a><span class="w">      </span><span class="no">.example.com = EXAMPLE.COM</span>
+</span><span id="__span-28-15"><a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a><span class="w">      </span><span class="no">example.com = EXAMPLE.COM</span>
+</span><span id="__span-28-16"><a id="__codelineno-28-16" name="__codelineno-28-16" href="#__codelineno-28-16"></a><span class="nn">---</span>
+</span><span id="__span-28-17"><a id="__codelineno-28-17" name="__codelineno-28-17" href="#__codelineno-28-17"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+</span><span id="__span-28-18"><a id="__codelineno-28-18" name="__codelineno-28-18" href="#__codelineno-28-18"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ConfigMap</span>
+</span><span id="__span-28-19"><a id="__codelineno-28-19" name="__codelineno-28-19" href="#__codelineno-28-19"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-28-20"><a id="__codelineno-28-20" name="__codelineno-28-20" href="#__codelineno-28-20"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sshd-config</span>
+</span><span id="__span-28-21"><a id="__codelineno-28-21" name="__codelineno-28-21" href="#__codelineno-28-21"></a><span class="nt">data</span><span class="p">:</span>
+</span><span id="__span-28-22"><a id="__codelineno-28-22" name="__codelineno-28-22" href="#__codelineno-28-22"></a><span class="w">  </span><span class="nt">sshd_config</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+</span><span id="__span-28-23"><a id="__codelineno-28-23" name="__codelineno-28-23" href="#__codelineno-28-23"></a><span class="w">    </span><span class="no">Port 22</span>
+</span><span id="__span-28-24"><a id="__codelineno-28-24" name="__codelineno-28-24" href="#__codelineno-28-24"></a><span class="w">    </span><span class="no">Protocol 2</span>
+</span><span id="__span-28-25"><a id="__codelineno-28-25" name="__codelineno-28-25" href="#__codelineno-28-25"></a><span class="w">    </span><span class="no">UsePAM yes</span>
+</span><span id="__span-28-26"><a id="__codelineno-28-26" name="__codelineno-28-26" href="#__codelineno-28-26"></a><span class="w">    </span><span class="no">GSSAPIAuthentication yes</span>
+</span><span id="__span-28-27"><a id="__codelineno-28-27" name="__codelineno-28-27" href="#__codelineno-28-27"></a><span class="w">    </span><span class="no">GSSAPICleanupCredentials yes</span>
+</span><span id="__span-28-28"><a id="__codelineno-28-28" name="__codelineno-28-28" href="#__codelineno-28-28"></a><span class="w">    </span><span class="no">GSSAPIStrictAcceptorCheck yes</span>
+</span><span id="__span-28-29"><a id="__codelineno-28-29" name="__codelineno-28-29" href="#__codelineno-28-29"></a><span class="w">    </span><span class="no">GSSAPIDelegateCredentials yes</span>
+</span><span id="__span-28-30"><a id="__codelineno-28-30" name="__codelineno-28-30" href="#__codelineno-28-30"></a><span class="w">    </span><span class="no">GSSAPIKeyExchange yes</span>
+</span><span id="__span-28-31"><a id="__codelineno-28-31" name="__codelineno-28-31" href="#__codelineno-28-31"></a><span class="w">    </span><span class="no">PermitRootLogin prohibit-password</span>
+</span><span id="__span-28-32"><a id="__codelineno-28-32" name="__codelineno-28-32" href="#__codelineno-28-32"></a><span class="w">    </span><span class="no">PasswordAuthentication no</span>
+</span><span id="__span-28-33"><a id="__codelineno-28-33" name="__codelineno-28-33" href="#__codelineno-28-33"></a><span class="w">    </span><span class="no">ChallengeResponseAuthentication no</span>
+</span><span id="__span-28-34"><a id="__codelineno-28-34" name="__codelineno-28-34" href="#__codelineno-28-34"></a><span class="w">    </span><span class="no">PubkeyAuthentication yes</span>
+</span><span id="__span-28-35"><a id="__codelineno-28-35" name="__codelineno-28-35" href="#__codelineno-28-35"></a><span class="w">    </span><span class="no">Subsystem sftp /usr/lib/openssh/sftp-server</span>
+</span></code></pre></div>
+<h4 id="application-deployment-with-ssh-container">Application deployment with SSH container</h4>
+<div class="language-YAML highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apps/v1</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deployment</span>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ssh-krb</span>
+</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="nt">spec</span><span class="p">:</span>
+</span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-29-7"><a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+</span><span id="__span-29-8"><a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span>
+</span><span id="__span-29-9"><a id="__codelineno-29-9" name="__codelineno-29-9" href="#__codelineno-29-9"></a><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ssh-krb</span>
+</span><span id="__span-29-10"><a id="__codelineno-29-10" name="__codelineno-29-10" href="#__codelineno-29-10"></a><span class="w">  </span><span class="nt">template</span><span class="p">:</span>
+</span><span id="__span-29-11"><a id="__codelineno-29-11" name="__codelineno-29-11" href="#__codelineno-29-11"></a><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-29-12"><a id="__codelineno-29-12" name="__codelineno-29-12" href="#__codelineno-29-12"></a><span class="w">      </span><span class="nt">labels</span><span class="p">:</span>
+</span><span id="__span-29-13"><a id="__codelineno-29-13" name="__codelineno-29-13" href="#__codelineno-29-13"></a><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ssh-krb</span>
+</span><span id="__span-29-14"><a id="__codelineno-29-14" name="__codelineno-29-14" href="#__codelineno-29-14"></a><span class="w">    </span><span class="nt">spec</span><span class="p">:</span>
+</span><span id="__span-29-15"><a id="__codelineno-29-15" name="__codelineno-29-15" href="#__codelineno-29-15"></a><span class="w">      </span><span class="nt">containers</span><span class="p">:</span>
+</span><span id="__span-29-16"><a id="__codelineno-29-16" name="__codelineno-29-16" href="#__codelineno-29-16"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sshd</span>
+</span><span id="__span-29-17"><a id="__codelineno-29-17" name="__codelineno-29-17" href="#__codelineno-29-17"></a><span class="w">          </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">your-registry/sshd-krb:latest</span>
+</span><span id="__span-29-18"><a id="__codelineno-29-18" name="__codelineno-29-18" href="#__codelineno-29-18"></a><span class="w">          </span><span class="nt">imagePullPolicy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IfNotPresent</span>
+</span><span id="__span-29-19"><a id="__codelineno-29-19" name="__codelineno-29-19" href="#__codelineno-29-19"></a><span class="w">          </span><span class="nt">ports</span><span class="p">:</span>
+</span><span id="__span-29-20"><a id="__codelineno-29-20" name="__codelineno-29-20" href="#__codelineno-29-20"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">22</span>
+</span><span id="__span-29-21"><a id="__codelineno-29-21" name="__codelineno-29-21" href="#__codelineno-29-21"></a><span class="w">          </span><span class="nt">volumeMounts</span><span class="p">:</span>
+</span><span id="__span-29-22"><a id="__codelineno-29-22" name="__codelineno-29-22" href="#__codelineno-29-22"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5</span>
+</span><span id="__span-29-23"><a id="__codelineno-29-23" name="__codelineno-29-23" href="#__codelineno-29-23"></a><span class="w">              </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/krb5.conf</span>
+</span><span id="__span-29-24"><a id="__codelineno-29-24" name="__codelineno-29-24" href="#__codelineno-29-24"></a><span class="w">              </span><span class="nt">subPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5.conf</span>
+</span><span id="__span-29-25"><a id="__codelineno-29-25" name="__codelineno-29-25" href="#__codelineno-29-25"></a><span class="w">              </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-29-26"><a id="__codelineno-29-26" name="__codelineno-29-26" href="#__codelineno-29-26"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">keytab</span>
+</span><span id="__span-29-27"><a id="__codelineno-29-27" name="__codelineno-29-27" href="#__codelineno-29-27"></a><span class="w">              </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/krb5.keytab</span>
+</span><span id="__span-29-28"><a id="__codelineno-29-28" name="__codelineno-29-28" href="#__codelineno-29-28"></a><span class="w">              </span><span class="nt">subPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5.keytab</span>
+</span><span id="__span-29-29"><a id="__codelineno-29-29" name="__codelineno-29-29" href="#__codelineno-29-29"></a><span class="w">              </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-29-30"><a id="__codelineno-29-30" name="__codelineno-29-30" href="#__codelineno-29-30"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span>
+</span><span id="__span-29-31"><a id="__codelineno-29-31" name="__codelineno-29-31" href="#__codelineno-29-31"></a><span class="w">              </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/mnt/data</span>
+</span><span id="__span-29-32"><a id="__codelineno-29-32" name="__codelineno-29-32" href="#__codelineno-29-32"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sshd-config</span>
+</span><span id="__span-29-33"><a id="__codelineno-29-33" name="__codelineno-29-33" href="#__codelineno-29-33"></a><span class="w">              </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/etc/ssh/sshd_config</span>
+</span><span id="__span-29-34"><a id="__codelineno-29-34" name="__codelineno-29-34" href="#__codelineno-29-34"></a><span class="w">              </span><span class="nt">subPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sshd_config</span>
+</span><span id="__span-29-35"><a id="__codelineno-29-35" name="__codelineno-29-35" href="#__codelineno-29-35"></a><span class="w">              </span><span class="nt">readOnly</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-29-36"><a id="__codelineno-29-36" name="__codelineno-29-36" href="#__codelineno-29-36"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
+</span><span id="__span-29-37"><a id="__codelineno-29-37" name="__codelineno-29-37" href="#__codelineno-29-37"></a><span class="w">          </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu:22.04</span>
+</span><span id="__span-29-38"><a id="__codelineno-29-38" name="__codelineno-29-38" href="#__codelineno-29-38"></a><span class="w">          </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;/bin/bash&quot;</span><span class="p p-Indicator">,</span><span class="s">&quot;-lc&quot;</span><span class="p p-Indicator">,</span><span class="s">&quot;while</span><span class="nv"> </span><span class="s">true;</span><span class="nv"> </span><span class="s">do</span><span class="nv"> </span><span class="s">sleep</span><span class="nv"> </span><span class="s">3600;</span><span class="nv"> </span><span class="s">done&quot;</span><span class="p p-Indicator">]</span>
+</span><span id="__span-29-39"><a id="__codelineno-29-39" name="__codelineno-29-39" href="#__codelineno-29-39"></a><span class="w">          </span><span class="nt">volumeMounts</span><span class="p">:</span>
+</span><span id="__span-29-40"><a id="__codelineno-29-40" name="__codelineno-29-40" href="#__codelineno-29-40"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span>
+</span><span id="__span-29-41"><a id="__codelineno-29-41" name="__codelineno-29-41" href="#__codelineno-29-41"></a><span class="w">              </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/mnt/data</span>
+</span><span id="__span-29-42"><a id="__codelineno-29-42" name="__codelineno-29-42" href="#__codelineno-29-42"></a><span class="w">      </span><span class="nt">volumes</span><span class="p">:</span>
+</span><span id="__span-29-43"><a id="__codelineno-29-43" name="__codelineno-29-43" href="#__codelineno-29-43"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5</span>
+</span><span id="__span-29-44"><a id="__codelineno-29-44" name="__codelineno-29-44" href="#__codelineno-29-44"></a><span class="w">          </span><span class="nt">configMap</span><span class="p">:</span>
+</span><span id="__span-29-45"><a id="__codelineno-29-45" name="__codelineno-29-45" href="#__codelineno-29-45"></a><span class="w">            </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5-conf</span>
+</span><span id="__span-29-46"><a id="__codelineno-29-46" name="__codelineno-29-46" href="#__codelineno-29-46"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sshd-config</span>
+</span><span id="__span-29-47"><a id="__codelineno-29-47" name="__codelineno-29-47" href="#__codelineno-29-47"></a><span class="w">          </span><span class="nt">configMap</span><span class="p">:</span>
+</span><span id="__span-29-48"><a id="__codelineno-29-48" name="__codelineno-29-48" href="#__codelineno-29-48"></a><span class="w">            </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sshd-config</span>
+</span><span id="__span-29-49"><a id="__codelineno-29-49" name="__codelineno-29-49" href="#__codelineno-29-49"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">keytab</span>
+</span><span id="__span-29-50"><a id="__codelineno-29-50" name="__codelineno-29-50" href="#__codelineno-29-50"></a><span class="w">          </span><span class="nt">secret</span><span class="p">:</span>
+</span><span id="__span-29-51"><a id="__codelineno-29-51" name="__codelineno-29-51" href="#__codelineno-29-51"></a><span class="w">            </span><span class="nt">secretName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ssh-host-keytab</span>
+</span><span id="__span-29-52"><a id="__codelineno-29-52" name="__codelineno-29-52" href="#__codelineno-29-52"></a><span class="w">            </span><span class="nt">items</span><span class="p">:</span>
+</span><span id="__span-29-53"><a id="__codelineno-29-53" name="__codelineno-29-53" href="#__codelineno-29-53"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5.keytab</span>
+</span><span id="__span-29-54"><a id="__codelineno-29-54" name="__codelineno-29-54" href="#__codelineno-29-54"></a><span class="w">                </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5.keytab</span>
+</span><span id="__span-29-55"><a id="__codelineno-29-55" name="__codelineno-29-55" href="#__codelineno-29-55"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span>
+</span><span id="__span-29-56"><a id="__codelineno-29-56" name="__codelineno-29-56" href="#__codelineno-29-56"></a><span class="w">          </span><span class="nt">persistentVolumeClaim</span><span class="p">:</span>
+</span><span id="__span-29-57"><a id="__codelineno-29-57" name="__codelineno-29-57" href="#__codelineno-29-57"></a><span class="w">            </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data-krb</span>
+</span><span id="__span-29-58"><a id="__codelineno-29-58" name="__codelineno-29-58" href="#__codelineno-29-58"></a><span class="nn">---</span>
+</span><span id="__span-29-59"><a id="__codelineno-29-59" name="__codelineno-29-59" href="#__codelineno-29-59"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+</span><span id="__span-29-60"><a id="__codelineno-29-60" name="__codelineno-29-60" href="#__codelineno-29-60"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Service</span>
+</span><span id="__span-29-61"><a id="__codelineno-29-61" name="__codelineno-29-61" href="#__codelineno-29-61"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-29-62"><a id="__codelineno-29-62" name="__codelineno-29-62" href="#__codelineno-29-62"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ssh-krb</span>
+</span><span id="__span-29-63"><a id="__codelineno-29-63" name="__codelineno-29-63" href="#__codelineno-29-63"></a><span class="nt">spec</span><span class="p">:</span>
+</span><span id="__span-29-64"><a id="__codelineno-29-64" name="__codelineno-29-64" href="#__codelineno-29-64"></a><span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+</span><span id="__span-29-65"><a id="__codelineno-29-65" name="__codelineno-29-65" href="#__codelineno-29-65"></a><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ssh-krb</span>
+</span><span id="__span-29-66"><a id="__codelineno-29-66" name="__codelineno-29-66" href="#__codelineno-29-66"></a><span class="w">  </span><span class="nt">ports</span><span class="p">:</span>
+</span><span id="__span-29-67"><a id="__codelineno-29-67" name="__codelineno-29-67" href="#__codelineno-29-67"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ssh</span>
+</span><span id="__span-29-68"><a id="__codelineno-29-68" name="__codelineno-29-68" href="#__codelineno-29-68"></a><span class="w">      </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">22</span>
+</span><span id="__span-29-69"><a id="__codelineno-29-69" name="__codelineno-29-69" href="#__codelineno-29-69"></a><span class="w">      </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">22</span>
+</span><span id="__span-29-70"><a id="__codelineno-29-70" name="__codelineno-29-70" href="#__codelineno-29-70"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ClusterIP</span>
+</span></code></pre></div>
+<h4 id="testing-ssh">Testing SSH</h4>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="c1"># On your client after kinit</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>kubectl<span class="w"> </span>port-forward<span class="w"> </span>deploy/ssh-krb<span class="w"> </span><span class="m">2222</span>:22<span class="w"> </span><span class="p">&amp;</span>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>ssh<span class="w"> </span>-p<span class="w"> </span><span class="m">2222</span><span class="w"> </span>-o<span class="w"> </span><span class="nv">GSSAPIAuthentication</span><span class="o">=</span>yes<span class="w"> </span>-o<span class="w"> </span><span class="nv">GSSAPIDelegateCredentials</span><span class="o">=</span>yes<span class="w"> </span>alice@127.0.0.1
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>klist
+</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="c1"># Test I/O under /mnt/data</span>
+</span></code></pre></div>
+<h4 id="considerations_3">Considerations</h4>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul>
+<li>RWO vs RWX: Two containers in the same Pod can share a single PVC with ReadWriteOnce (RWO). The volume is mounted once on the node, and both containers see the same mount. A ReadWriteOnce Pod is also fine for the sidecar-in-same-Pod pattern, but it will block any additional Pod from mounting the PVC. With the Trident NAS driver, choose RWX for flexibility and scalability.   </li>
+<li>Security: The sidecar brings a host/<fqdn> Kerberos keytab into the app Pod. A separate SSH Pod sharing the PVC avoids placing that credential in the app Pod and reduces blast radius.   </li>
+<li>Kerberos: sshd reads its host/<fqdn> key from /etc/krb5.keytab to accept GSS; it does not run kinit.   </li>
+<li>Delegation: Users must enable GSSAPIDelegateCredentials. Use KEYRING:persistent:%{uid} and align UIDs so delegated user tickets are visible to node rpc.gssd for per-user NFS.   </li>
+<li>NFS mount: The CSI Node plugin mounts on the node; Pod-side tickets do not alter the NFS mount unless the credential cache is visible to the node (KEYRING/file ccache + cruid, or gssproxy).    </li>
+<li>Hardening: Apply NetworkPolicies, runAsUser/runAsGroup/fsGroup, drop capabilities, restrict sshd users/groups.    </li>
+<li>Operations: Separate Pod lets you patch/rotate sshd and keytabs independently of the app and apply tighter PodSecurity/PSaC policies.    </li>
+</ul>
+</div>
+<h2 id="top-takeaways">Top Takeaways</h2>
+<ul>
+<li>Kerberos for NFSv4 is negotiated on the node by rpc.gssd; Pods don’t run Kerberos for these mounts.</li>
+<li>Do not distribute the NFS server’s keytab to Pods; use node machine creds or delegated user creds.</li>
+<li>Use KEYRING credential caches (or file ccaches + cruid) so rpc.gssd can use delegated SSH user tickets.</li>
+<li>StorageClass mountOptions (sec=krb5[p|i]) only signal the client; backend/SVM must be Kerberos-enabled.</li>
+<li>Align identity resolution (SSSD/idmapd on nodes and LDAP/AD on the SVM) for consistent UID/GID</li>
+</ul>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 10, 2025 07:55:05 UTC">October 10, 2025</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 10, 2025 07:55:05 UTC">October 10, 2025</span>
+  </span>
+
+    
+    
+      
+  
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Contributors">
+      
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/></svg>
+      
+    </span>
+    <nav>
+      
+        <a href="mailto:55788733+romdalf@users.noreply.github.com">Rom Adams</a>
+    </nav>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    
+      
+  <span class="md-icon" title="Contributors">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/></svg>
+  </span>
+  <span>GitHub</span>
+
+    
+    <nav>
+      
+        <a href="https://github.com/romdalf" class="md-author" title="@romdalf">
+          
+          <img src="https://avatars.githubusercontent.com/u/55788733?v=4&size=72" alt="romdalf">
+        </a>
+      
+        <a href="https://github.com/web-flow" class="md-author" title="@web-flow">
+          
+          <img src="https://avatars.githubusercontent.com/u/19864447?v=4&size=72" alt="web-flow">
+        </a>
+      
+      
+      
+    </nav>
+  </span>
+
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Apache-2.0 License -  <a href="#__consent">Change cookie settings</a>
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs Insiders
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/romdalf/romadams.com" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.youtube.com/@beezydev" target="_blank" rel="noopener" title="www.youtube.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M549.7 124.1c-6.2-23.7-24.8-42.3-48.3-48.6C458.9 64 288.1 64 288.1 64S117.3 64 74.7 75.5c-23.5 6.3-42 24.9-48.3 48.6C15 167 15 256.4 15 256.4s0 89.4 11.4 132.3c6.3 23.6 24.8 41.5 48.3 47.8C117.3 448 288.1 448 288.1 448s170.8 0 213.4-11.5c23.5-6.3 42-24.2 48.3-47.8 11.4-42.9 11.4-132.3 11.4-132.3s0-89.4-11.4-132.3zM232.2 337.6V175.2l142.7 81.2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/romdalf" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M357.2 48h70.6L273.6 224.2 455 464H313L201.7 318.6 74.5 464H3.8l164.9-188.5L-5.2 48h145.6l100.5 132.9zm-24.8 373.8h39.1L119.1 88h-42z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/in/romdalf/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+      <div class="md-consent" data-md-component="consent" id="__consent" hidden>
+        <div class="md-consent__overlay"></div>
+        <aside class="md-consent__inner">
+          <form class="md-consent__form md-grid md-typeset" name="consent">
+            
+
+
+
+  
+
+<h4>Cookie consent</h4>
+<p>We use cookies to recognize your repeated visits and preferences, as well as to measure the effectiveness of our documentation and whether users find what they're searching for. With your consent, you're helping us to make our documentation better.</p>
+<input class="md-toggle" type="checkbox" id="__settings" checked>
+<div class="md-consent__settings">
+  <ul class="task-list">
+    
+    
+      
+    
+    
+      
+        
+  
+  
+    
+    
+  
+  <li class="task-list-item">
+    <label class="task-list-control">
+      <input type="checkbox" name="github" checked>
+      <span class="task-list-indicator"></span>
+      GitHub
+    </label>
+  </li>
+
+      
+    
+    
+  </ul>
+</div>
+<div class="md-consent__controls">
+  
+    
+      <button class="md-button md-button--primary">Accept</button>
+    
+    
+    
+  
+    
+    
+      <button type="reset" class="md-button md-button--primary">Reject</button>
+    
+    
+  
+</div>
+          </form>
+        </aside>
+      </div>
+      <script>var consent=__md_get("__consent");if(consent)for(var input of document.forms.consent.elements)input.name&&(input.checked=consent[input.name]||!1);else"file:"!==location.protocol&&setTimeout((function(){document.querySelector("[data-md-component=consent]").hidden=!1}),250);var form=document.forms.consent;for(var action of["submit","reset"])form.addEventListener(action,(function(e){if(e.preventDefault(),"reset"===e.type)for(var n of document.forms.consent.elements)n.name&&(n.checked=!1);__md_set("__consent",Object.fromEntries(Array.from(new FormData(form).keys()).map((function(e){return[e,!0]})))),location.hash="",location.reload()}))</script>
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["content.code.annotate", "navigation.top", "navigation.footer", "navigation.indexes", "navigation.tabs", "navigation.tabs.sticky", "content.code.copy", "content.code.select"], "search": "../../../../assets/javascripts/workers/search.26099bd0.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.9d1edc04.min.js"></script>
+      
+    
+  </body>
+</html>
