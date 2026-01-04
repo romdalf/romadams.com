@@ -63,14 +63,10 @@ This section describes the working environment to reproduce the solution proposa
 
 ### Components
 
-
-
 ### Main objectives
 1. Establish an iterative path to decouple the different challenges and solution path.  
 2. Establish a potential secure path to mount volumes using NFSv4 with Kerberos in Kubernetes using Trident.   
 3. Enable both application runtimes and multi-user SSH workflows with per-user authorization.   
-
-###
 
 ### Architectural components   
 - Kubernetes Control Plane: Manages all cluster resources, including Persistent Volumes (PVs) and Persistent Volume Claims (PVCs).
