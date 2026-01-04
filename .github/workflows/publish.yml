@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -21,27 +22,21 @@ jobs:
         uses: actions/checkout@v4
         with: 
           fetch-depth: 0
-
-      - name: Setup NPM 
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-              
+      # - name: Setup NPM 
+      #   uses: pnpm/action-setup@v3
+      #   with:
+      #     version: 9
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm 
-      
       - name: Setup Pages
         uses: actions/configure-pages@v4
-
       - name: Install dependencies
         run: npm ci 
-
       - name: Build with VitePress
         run: npm run docs:build 
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -55,5 +50,5 @@ jobs:
   #   runs-on: ubuntu-latest
   #   steps:
       - name: Deploy to GitHub Pages
-        id: deployment
+        # id: deployment
         uses: actions/deploy-pages@v3
