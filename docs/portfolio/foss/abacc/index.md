@@ -19,7 +19,7 @@ The components are:
 - a web frontend for a classic off-application chatbot 
 - a Microsoft Word Add-in for in-application chat and insertion 
 
-For more details, you can go through [the documentation](DOCS/README.md)
+For more details, you can go through [the documentation](https://github.com/beezy-dev/abacc-rag/tree/main/DOCS)
 
 ## Documentation
 
@@ -30,7 +30,7 @@ The construct of additional attributes is to enrich the classic POSIX permission
 - the operation-based attributes, like adding an attribute to a file to set an append-only, immutable, secure, and undeletable attribute.
 - the extended attributes that a user would define through the 4 existing classes: user, security, system, and trusted.
 
-This use case is about the extended attributes, but the operation-based attributes examples are [available here](ops-attr.md).
+This use case is about the extended attributes, but the operation-based attributes examples are [available here](https://github.com/beezy-dev/abacc-rag/blob/main/DOCS/ops-attr.md).
 
 ### Extended attributes
 We will focus on the user namespace, meaning that extended attributes interact with applications; without extended application awareness, these extended attributes are essentially useless.
@@ -56,7 +56,7 @@ user.status="Final"
 ```
 
 > [!NOTE]
-> Exciting? Not really! While the [operation-based attributes](ops-attr.md) have a direct impact, the extended attributes don't. The impact will be handled at an application level, similar to the ABACC RAG.
+> Exciting? Not really! While the [operation-based attributes](https://github.com/beezy-dev/abacc-rag/blob/main/DOCS/ops-attr.md) have a direct impact, the extended attributes don't. The impact will be handled at an application level, similar to the ABACC RAG.
 
 ### ABACC RAG
 Organizations have been pouring millions of files into their storage systems over the years in an unstructured manner, resulting in a so-called data lake that resembles a data swamp more closely. As-is, this file real estate is a cost, a security burden, and a lifecycle nightmare with little return on investment.  
