@@ -22,10 +22,10 @@ jobs:
         with: 
           fetch-depth: 0
 
-      # - name: Setup NPM 
-      #   uses: pnpm/action-setup@v3
-      #   with:
-      #     version: 9
+      - name: Setup NPM 
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
               
       - name: Setup Node
         uses: actions/setup-node@v4
