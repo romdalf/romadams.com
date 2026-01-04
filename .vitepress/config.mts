@@ -1,6 +1,9 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
+  markdown: {
+    toc: { level: [2, 3, 4] }
+  },
   title: "Rom Adams",
   description: "Anomylist",
   themeConfig: {
