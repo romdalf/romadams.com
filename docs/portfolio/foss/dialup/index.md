@@ -1,4 +1,4 @@
-# dialup
+# Dialup
 
 dialup is a prototype to explore the usage of FUSE to mount a read-only virtual filesystem from the ABACC API backend serving content directly from ChromaDB.
 

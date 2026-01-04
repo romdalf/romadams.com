@@ -11,10 +11,8 @@ The origin is Greek, and the meaning is "key". (Source: [Wikipedia](https://en.w
 
 The project repository is available here: [kleidi](https://github.com/beezy-dev/kleidi)
 
-!!! warning "Deprecation Notice"
-
-    The Kubernetes provider plugin Trousseau is deprecated as it only supports KMSv1. In a production-grade environment,
-    it is highly advised to deploy a plugin supporting KMSv2, like Kleidi. 
+> [!warning] DEPRECATION
+> The Kubernetes provider plugin ***Trousseau*** is deprecated as it only supports KMSv1. In a production-grade environment, it is highly advised to deploy a plugin supporting KMSv2, like Kleidi. 
 
 ## implementation
 kleidi has bootstrapped a code base from the [Kunernetes mock KMS plugin](https://github.com/kubernetes/kms/tree/master/internal/plugins/_mock). This provides a PKCS#11 interface for a local software HSM like [SoftHSM](https://www.opendnssec.org/softhsm/).

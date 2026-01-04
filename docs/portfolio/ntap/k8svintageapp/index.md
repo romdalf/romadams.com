@@ -1,19 +1,20 @@
 # Securing home directories for containerized vintage applications 
 
-!!! warning "Status: **draft**"
-
-    This document is a research document in a *Request for Comments* (RFC) format, product of the NetApp Office of the CTO - Innovation & Solutions Group.
-         
-    **Author(s)**    
-    - Rom Adams, Principal Software Engineer, Office of the CTO - NetApp Inc.   
-    **Contributor(s)**     
-    - Elliott Ecton, Technical Marketing Engineer, Shared Platform Product Management - NetApp Inc.   
-    - Erik Stjerna, Professional Services Consultant, Consulting - NetApp Inc.    
-    - Johannes Wagner, Sr Solution Architect, Solution Engineering - NetApp Inc.    
-
-    **Copyright Notes**     
-    Copyright (c) 2025 NetApp Inc. and the persons identified as the document authors and contributors.    
-    All rights reserved [https://www.netapp.com/company/legal/copyright/](https://www.netapp.com/company/legal/copyright/).
+> [!WARNING] 
+> Status: **draft**
+>
+>    This document is a research document in a *Request for Comments* (RFC) format, product of the NetApp Office of the CTO - Innovation & Solutions Group.
+>         
+>    **Author(s)**    
+>    - Rom Adams, Principal Software Engineer, Office of the CTO - NetApp Inc.   
+>    **Contributor(s)**     
+>    - Elliott Ecton, Technical Marketing Engineer, Shared Platform Product Management - NetApp Inc.   
+>    - Erik Stjerna, Professional Services Consultant, Consulting - NetApp Inc.    
+>    - Johannes Wagner, Sr Solution Architect, Solution Engineering - NetApp Inc.    
+>
+>    **Copyright Notes**     
+>    Copyright (c) 2025 NetApp Inc. and the persons identified as the document authors and contributors.    
+>    All rights reserved [https://www.netapp.com/company/legal/copyright/](https://www.netapp.com/company/legal/copyright/).
 
 --- 
 

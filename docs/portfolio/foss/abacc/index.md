@@ -1,6 +1,6 @@
-# abacc rag
+# Attribute-Based Access Controlled Context for Retrieval-Augmented Generation
 
-ABACC RAG stands for Attribute-Based Access Controlled Context for Retrieval-Augmented Generation, exploring an organization-level AI sovereignty.
+Attribute-Based Access Controlled Context for Retrieval-Augmented Generation (or ABACC-RAG), exploring an organization-level AI sovereignty.
 
 Most retrieval examples typically consider the user feeding the LLM with a series of documents deemed relevant to their prompting activity.
 While this approach has direct value for a single user, it lacks value at the organizational level. However, the most complex challenge with organization-wide knowledge is **who can access what, from where, and when**. 

@@ -1,36 +1,59 @@
-name: ci
+name: Deploy Site to GitHub Pages
 on:
   push:
     branches:
       - main
+
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    if: github.event.repository.fork == false
     steps:
-      - uses: actions/checkout@v4
-      - name: Configure Git Credentials
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-      - uses: actions/setup-python@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with: 
+          fetch-depth: 0
+
+      # - name: Setup NPM 
+      #   uses: pnpm/action-setup@v3
+      #   with:
+      #     version: 9
+              
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          python-version: 3.x
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
-      - uses: actions/cache@v4
+          node-version: '20'
+          cache: npm 
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Install dependencies
+        run: npm ci 
+
+      - name: Build with VitePress
+        run: npm run docs:build 
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: .cache
-          restore-keys: |
-            mkdocs-material-
-      - run: pip install git+https://${GH_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git
-      - run: pip install mkdocs-diagrams 
-      - run: pip install mkdocs-git-committers-plugin-2
-      - run: pip install mkdocs-git-authors-plugin
-      - run: pip install mkdocs-git-revision-date-localized-plugin
-      - run: pip install pillow cairosvg
-      - run: mkdocs gh-deploy --force
-env:
-  GH_TOKEN: ${{ secrets.INSIDERS }}
+          path: docs/.vitepress/dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v3

@@ -1,4 +1,4 @@
-# namespace
+# OpenShift Project
 
 A ```project``` is a logical space created on an OpenShift cluster corresponding to a ```namespace``` to host one or more pods that will have direct interaction with each other. 
 As an example, a web front-end pod and a database pod could be deployed within a project called ```my-webapp```.

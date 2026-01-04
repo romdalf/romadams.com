@@ -1,4 +1,4 @@
-# neo client
+# Neo UI Framework
 
 This is the official cross-platform standalone and web UI for the Neo Data Governance solution.
 

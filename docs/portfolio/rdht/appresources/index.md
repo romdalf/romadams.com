@@ -1,4 +1,4 @@
-# reload, restart or redeploy
+# Reload, Restart or Redeploy
 
 ## context
 Containerized application deployed on Kubernetes, manually or via GitOps, is composed of multiple objects from namespace, deployment, configmaps, secrets, services, and more. Most are static while other will be updated during the application lifecycle.   
