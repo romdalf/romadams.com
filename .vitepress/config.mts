@@ -18,6 +18,12 @@ export default defineConfig({
     sidebar: [
       { text: 'Portfolio', link: '/docs/portfolio/index.md' },
       {
+        text: 'DevOps',
+        items: [
+          { text: 'Git 101', link: '/docs/portfolio/foss/git/index.md' },
+        ]
+      },
+      {
         text: 'Kubernetes',
         items: [
 
