@@ -115,6 +115,8 @@ nav:
     - portfolio:
       - portfolio/index.md
       - foss:
+        - git-101:
+          - portfolio/foss/git/index.md
         - abacc-rag:
           - portfolio/foss/abacc/index.md 
         - dialup: 
